@@ -1,0 +1,85 @@
+{
+    "summary": {
+        "model": "qwen2.5:7b",
+        "seconds": 22.7,
+        "tokens": 3734,
+        "valid_votes": "6\/6",
+        "reasons_referencing_players": "6\/6",
+        "wolf_self_outs": 0,
+        "seer_named_ben": false,
+        "wolves_voting_wolf": 0,
+        "eliminated": "P1"
+    },
+    "roles": {
+        "P1": "villager",
+        "P2": "werewolf",
+        "P3": "seer",
+        "P4": "villager",
+        "P5": "werewolf",
+        "P6": "villager"
+    },
+    "discussion": [
+        {
+            "id": "P1",
+            "text": "I'll keep an open mind and try to listen to everyone's opinions today."
+        },
+        {
+            "id": "P2",
+            "text": "I think it's important for us to get more information tonight before making any big decisions. Let's share our observations carefully."
+        },
+        {
+            "id": "P3",
+            "text": "I'll use my seer ability tonight to help us understand who the other werewolf is."
+        },
+        {
+            "id": "P4",
+            "text": "I'll keep an eye out for anything suspicious and be ready to share my observations. Let's all work together to uncover the werewolves tonight."
+        },
+        {
+            "id": "P5",
+            "text": "I think it's crucial we trust each other and consider everyone's perspective. Let's discuss our findings after the seer's investigation."
+        },
+        {
+            "id": "P6",
+            "text": "I'll stay alert and be ready to share any clues I notice tonight. Let's support Cleo's investigation and discuss openly afterward."
+        }
+    ],
+    "votes": [
+        {
+            "id": "P1",
+            "vote": "P6",
+            "reason": "Finn should focus on observation, but we need a clear lead from Cleo's seer ability first.",
+            "raw": "{\"vote\": \"P6\", \"reason\": \"Finn should focus on observation, but we need a clear lead from Cleo's seer ability first.\"}"
+        },
+        {
+            "id": "P2",
+            "vote": "P1",
+            "reason": "Ada seemed a bit too confident, which could be suspicious.",
+            "raw": "{\"vote\": \"P1\", \"reason\": \"Ada seemed a bit too confident, which could be suspicious.\"}"
+        },
+        {
+            "id": "P3",
+            "vote": "P2",
+            "reason": "Ben was identified as a werewolf by Cleo, the seer.",
+            "raw": "{\"vote\": \"P2\", \"reason\": \"Ben was identified as a werewolf by Cleo, the seer.\"}"
+        },
+        {
+            "id": "P4",
+            "vote": "P1",
+            "reason": "Ada should be more open-minded and share her observations.",
+            "raw": "{\"vote\": \"P1\", \"reason\": \"Ada should be more open-minded and share her observations.\"}"
+        },
+        {
+            "id": "P5",
+            "vote": "P4",
+            "reason": "Dan mentioned he'll be keeping an eye out for anything suspicious, which might make him a target.",
+            "raw": "{\"vote\": \"P4\", \"reason\": \"Dan mentioned he'll be keeping an eye out for anything suspicious, which might make him a target.\"}"
+        },
+        {
+            "id": "P6",
+            "vote": "P4",
+            "reason": "Dan suggested keeping an eye out for anything suspicious, but we need more concrete information first.",
+            "raw": "{\"vote\": \"P4\", \"reason\": \"Dan suggested keeping an eye out for anything suspicious, but we need more concrete information first.\"}"
+        }
+    ]
+}

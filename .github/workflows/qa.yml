@@ -1,0 +1,16 @@
+name: qa
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # make qa diffs against origin/main
+      - run: docker compose build php
+      - run: make install
+      - run: make qa

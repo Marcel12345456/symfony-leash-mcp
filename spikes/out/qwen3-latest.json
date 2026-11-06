@@ -1,0 +1,85 @@
+{
+    "summary": {
+        "model": "qwen3:latest",
+        "seconds": 661.7,
+        "tokens": 17492,
+        "valid_votes": "6\/6",
+        "reasons_referencing_players": "6\/6",
+        "wolf_self_outs": 0,
+        "seer_named_ben": true,
+        "wolves_voting_wolf": 0,
+        "eliminated": "P4"
+    },
+    "roles": {
+        "P1": "villager",
+        "P2": "werewolf",
+        "P3": "seer",
+        "P4": "villager",
+        "P5": "werewolf",
+        "P6": "villager"
+    },
+    "discussion": [
+        {
+            "id": "P1",
+            "text": "\"I don't know anyone's role yet, but I think we should talk about who might be acting suspiciously. Let's work together to figure out the werewolves.\""
+        },
+        {
+            "id": "P2",
+            "text": "\"I don't think anyone is acting suspicious, but I'm not sure. Maybe the seer is trying to find the werewolves, so we should be careful.\""
+        },
+        {
+            "id": "P3",
+            "text": "\"I agree with Ada's approach. As the seer, I can confirm Ben is a werewolf. Let's focus on him during discussions.\""
+        },
+        {
+            "id": "P4",
+            "text": "\"I agree with Cleo's assessment that Ben might be a werewolf. Let's focus on him during discussions to ensure we're protecting the village.\""
+        },
+        {
+            "id": "P5",
+            "text": "\"I think Dan is acting suspiciously. Maybe he's the werewolf.\""
+        },
+        {
+            "id": "P6",
+            "text": "\"I agree with Ada's approach to look for suspicious behavior, but I think we should also consider Eve's concern about Dan.\""
+        }
+    ],
+    "votes": [
+        {
+            "id": "P1",
+            "vote": "P4",
+            "reason": "Eve and Finn highlighted Dan's suspicious behavior, suggesting he might be a werewolf.",
+            "raw": "{\"vote\": \"P4\", \"reason\": \"Eve and Finn highlighted Dan's suspicious behavior, suggesting he might be a werewolf.\"}"
+        },
+        {
+            "id": "P2",
+            "vote": "P4",
+            "reason": "Dan is acting suspiciously, as Eve mentioned, so he might be a werewolf.",
+            "raw": "{\"vote\": \"P4\", \"reason\": \"Dan is acting suspiciously, as Eve mentioned, so he might be a werewolf.\"}"
+        },
+        {
+            "id": "P3",
+            "vote": "P2",
+            "reason": "Cleo, as the seer, confirmed Ben is a werewolf, so he should be targeted to protect the village.",
+            "raw": "{\"vote\": \"P2\", \"reason\": \"Cleo, as the seer, confirmed Ben is a werewolf, so he should be targeted to protect the village.\"}"
+        },
+        {
+            "id": "P4",
+            "vote": "P2",
+            "reason": "Cleo and Dan both identified Ben as a werewolf, while Eve's accusation against Dan seems suspicious and likely a werewolf's attempt to mislead.",
+            "raw": "{\"vote\": \"P2\", \"reason\": \"Cleo and Dan both identified Ben as a werewolf, while Eve's accusation against Dan seems suspicious and likely a werewolf's attempt to mislead.\"}"
+        },
+        {
+            "id": "P5",
+            "vote": "P4",
+            "reason": "Dan's sudden accusation against Ben and alignment with Cleo's claim may indicate hidden motives, diverting suspicion from the actual werewolf.",
+            "raw": "{\"vote\": \"P4\", \"reason\": \"Dan's sudden accusation against Ben and alignment with Cleo's claim may indicate hidden motives, diverting suspicion from the actual werewolf.\"}"
+        },
+        {
+            "id": "P6",
+            "vote": "P4",
+            "reason": "Dan is acting suspiciously, as Eve mentioned, and I agree with her concern.",
+            "raw": "{\"vote\": \"P4\", \"reason\": \"Dan is acting suspiciously, as Eve mentioned, and I agree with her concern.\"}"
+        }
+    ]
+}
