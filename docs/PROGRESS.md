@@ -5,14 +5,32 @@
 
 ## Current
 
-- Phase: 0 — Spike & scaffold **done** (all T1–T6 green, G0 decided: path A, Werewolf go). Phase 0 is [R]: branch `m/phase-0-spike-scaffold` pushed, **needs review + merge to main by a human** before M1 branches from main.
-- Branch: m/phase-0-spike-scaffold
-- Done-signal: `.claude/done.sh` exit 0 (automation tests + `make qa`: cs-fixer, phpstan max, phpunit incl. Proof 1 over real HTTP)
+- Phase: M1 — WorkflowMcp with roles, **in progress**. Done: deps, `lib/` autoload, architecture test, decisions 010–012. **No library or RefundDesk code yet.** [R] public API, [U] tests.
+- Left: library core → RefundDesk → tokens → HTTP test. Steps, class design, scope choices and the full done-signal: "M1 build plan" below.
+- Branch: m/phase-1-workflow-mcp (from main @ 2eb412b)
+- Done-signal: `.claude/done.sh` exit 0 with the tests in "M1 build plan" present and green.
 - Blocked: —
 
 ## Next prompt
 
-/phase M1
+/phase M1 — continue with step 1 (lib/WorkflowMcp core + synthetic-workflow unit tests), see "M1 build plan"
+
+## M1 build plan
+
+<!-- Detail for "Current"; not injected at session start (2000-char cap). Remove at M1 phase end. -->
+
+Remaining steps, in order:
+  1. `lib/WorkflowMcp` + unit tests on a synthetic non-domain workflow (`tests/Unit/Lib/WorkflowMcp`): `RoleResolverInterface` + `SecurityRoleResolver` (default; per-workflow override via metadata + typed locator); `#[AsPlaceTool(workflow, name, description, readOnly, input)]` + `PlaceToolInterface`; `ScopedCapabilityProvider` (enabled transitions ∩ `mcp_roles`, place `mcp_tools` role map, Transition instances for metadata, decisions/012); `SchemaFactory` (DTO + Validator → object JSON schema; output schema `{state, availableTools, message}`; unsupported → exception; elicitation schema waits for M2); `TransitionToolHandler` (denormalize + validate → actionable `CallToolResult::error` with Validator messages; re-check visibility + `can()`; `apply($subject, $t, ['input' => $dto])`; persist; returns structuredContent); `UnavailableCapabilityResponder` (request handler, `supports()` only for non-visible names, decisions/010) + events `CapabilityDenied`, `ToolCalled`; `ActorSelector` (roles with ≥1 visible non-read-only tool, token-less); `SubjectProviderInterface` (find/save) with a Doctrine impl using workflow metadata `mcp_subject` (class); endpoint controller `/mcp/{workflow}/{subjectId}` modelled on `src/Spike/SpikeMcpController.php` (`setCachePolicy(CachePolicy::default(0, CacheScope::Private))`, `ToolAnnotations(readOnlyHint:)`, named args on `addTool`, decisions/011).
+  2. `src/RefundDesk`: entities `Customer`, `Order`, `RefundCase` (`getStatus(): string`, `setStatus(string, array $context = [])`, `Decision` enum, `isRefundDecision()`/`isRejectDecision()`), `Refund`, `CaseEvent` (type enum); migration; `leash:demo:seed` (C1–C8, idempotent upsert by id); workflow YAML per PLAN §3.2; input DTOs `ProposeResolutionInput`, `RejectInput`; transition listeners copy input into the case; `RefundIssueVoter` (ROLE_RESOLVER and proposed amount ≤ order amount); place tools `refund_get_order`, `refund_get_customer_history`, `refund_get_proposal`, `refund_search_policy` (keyword stub over `data/policy/*.md`, real RAG in M3); CaseEvent listeners for `ToolCalled`, `CapabilityDenied`, workflow `completed`.
+  3. Security: stateless firewall `^/mcp/` with `access_token` + app `StaticTokenHandler` (tokens from env `LEASH_INVESTIGATOR_TOKEN`, `LEASH_RESOLVER_TOKEN`; fixed values in `.env.test`; `make install` generates them into `.env.local`); memory users `agent:investigator`/`agent:resolver`.
+  4. `tests/Integration/RefundMcpEndpointTest`: `Mcp\Client` over a PSR-18 adapter around `KernelBrowser` (in-process), schema via SchemaTool, seed; asserts the done-signal below. Optional `make inspector`.
+- Scope choices (not yet built): `refund_issue` takes no amount in M1 (amount input + approval come in M2); `refund_search_policy` is a keyword stub until M3.
+
+Done-signal: `.claude/done.sh` exit 0, with these tests present and green:
+  - `tests/Integration/RefundMcpEndpointTest` (mcp/sdk client, in-process HTTP, bearer tokens): investigator on C1 lists only `refund_start_investigation`; after calling it lists `refund_get_order`, `refund_get_customer_history`, `refund_search_policy`, `refund_propose_resolution`; resolver on C1 in `investigating` lists only `refund_search_policy` (read-only); invisible tool → actionable error naming visible tools + `capability_denied` CaseEvent, no state change; invalid `refund_propose_resolution` input → Validator messages as actionable error.
+  - Unit: `ScopedCapabilityProvider` (synthetic non-domain workflow + refund every place × role, guard/voter denial, custom `RoleResolverInterface`), `SchemaFactory`, `TransitionToolHandler`, `ActorSelector` (ignores read-only; refund role for every state).
+  - `tests/Architecture`: `lib/` never references `App\`, `RefundDesk`, `Werewolf`; `lib/HumanInput` never references `Leash\WorkflowMcp\`.
+  - Manual, not blocking: `make inspector TOKEN=…` shows the same lists (human check).
 
 ## Decisions
 
@@ -32,6 +50,12 @@
 - 2026-11-06: **G0 Werewolf = go** (human): `qwen3:8b` player model, replay for demo. Role in the video: 30–45 s closer showing state ∩ role tool visibility on the same libraries; never costs M time.
 - 2026-11-06: PHP `default_socket_timeout=300` in the toolchain image (`docker/php/leash.ini`): the Ollama platform ignores the configured HTTP client (BUGS.md). Ollama runs natively on the host (`OLLAMA_ENDPOINT=http://host.docker.internal:11434`).
 
+- 2026-11-06: M1: in `investigating` the resolver sees only read-only `refund_search_policy` (§3.2 YAML wins over the M1 acceptance wording "no tools"; human decision). ActorSelector still picks the investigator.
+
+- 2026-11-06: Invisible tool calls are answered by a per-request `CallToolRequest` handler whose `supports()` matches only non-visible names; SDK default would be JSON-RPC -32602 (`decisions/010`).
+- 2026-11-06: Tools return `CallToolResult` with structuredContent `{state, availableTools, message}`; refusals via `CallToolResult::error`/`ToolCallException`; explicit `CachePolicy::default(0, Private)` (`decisions/011`).
+- 2026-11-06: Workflow metadata via `getMetadataStore()` + Transition instances; roles from metadata + `RoleResolverInterface`, guards for state/voters; `ActorSelector` runs token-less (`decisions/012`).
+
 ## Test changes
 
 <!-- Every weakened, deleted, skipped or changed assertion: date, test, reason. -->
@@ -40,4 +64,5 @@
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
 
+- 2026-11-06 — M1 started. Done: deps, `lib/` autoload, architecture test, decisions 010–012 (invisible-tool handler, tool results/errors/cache, workflow metadata/guards), resolver-visibility decision. Blocked: none. Needs review: M1 public API once built ([R]). Spend: $0.
 - 2026-11-06 — Phase 0 done. Scaffold (Symfony 8.1, Docker toolchain, quiet `make qa`, CI green), library research (decisions 001, 003–007), Proof 1 MCP round-trip (008, in `make qa`), Proof 2 agent tool call on Ollama (009), Werewolf smoke on 3 local models (002). G0: path A, Werewolf go. BUGS.md: 3 confirmed (SDK handler generics, Ollama total tokens, Ollama client timeout) + 2 candidates. Blocked: none (HF credits unavailable → Ollama + replay). Needs review: whole phase-0 branch ([R]). Spend: $0. Note: vendor-guard hook blocks commands that combine `rm … vendor` with `grep` (false positive; split the command).

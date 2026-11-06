@@ -30,6 +30,7 @@
     >
         <include>
             <directory>src</directory>
+            <directory>lib</directory>
         </include>
 
         <deprecationTrigger>
