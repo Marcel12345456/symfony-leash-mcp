@@ -99,7 +99,7 @@ Submission tags: **MCP, Agents, RAG, Human-in-the-loop**.
 - *Transition tools:* `{mcp_prefix}_{transition_name}`. Transition names are chosen so that this yields the intended tool name (`issue` → `refund_issue`).
 - *Place tools:* tagged services, `#[AsPlaceTool(workflow: '...', name: '...', readOnly: true|false)]`, attached via place metadata `mcp_tools`. `readOnly` becomes the MCP `readOnlyHint` and decides whether the tool counts for `ActorSelector` (G3). Refund place tools are read-only; Werewolf actions (`ww_vote`, …) are not.
 - *Lookup:* place tools, place resources, approval policies and role resolvers are found through typed tagged locators (`#[AutowireLocator]`), keyed by name or class. Injecting the container is not allowed.
-- *Place resources:* tagged services, `#[AsPlaceResource(workflow: '...', uri: '...')]`, attached via place metadata `mcp_resources`, also role-filtered. **VERIFY** SDK resource + resource-template support for per-request registration. **Built in W2, not in M1** (Refund Desk has no resources); generic and tested with the synthetic workflow (G1).
+- *Place resources:* tagged services, `#[AsPlaceResource(workflow: '...', uri: '...')]`, attached via place metadata `mcp_resources`, also role-filtered. (verified: decisions/004 — `addResource`/`addResourceTemplate` per request.) **Built in W2, not in M1** (Refund Desk has no resources); generic and tested with the synthetic workflow (G1).
 
 **Metadata contract** (refund example, `config/packages/workflow.yaml`):
 
@@ -180,7 +180,7 @@ framework:
 
 - `ScopedCapabilityProvider` — subject + caller → visible tools and resources (name, description, input/output schema, handler).
 - `TransitionToolHandler` — validates input DTO (Serializer + Validator), re-checks visibility and `can()`, consults the approval policy, applies the transition, persists, returns structured result `{state, availableTools, message}`.
-- `SchemaFactory` — DTO + Validator constraints → JSON Schema (tool input) and → elicitation schema (string/number/integer/boolean/enum; formats date, date-time, email, uri). **VERIFY** what `mcp/sdk` already derives from PHP types / `#[Schema]` and reuse it.
+- `SchemaFactory` — DTO + Validator constraints → JSON Schema (tool input) and → elicitation schema (string/number/integer/boolean/enum; formats date, date-time, email, uri). (verified: decisions/005 — SDK infers input schema only; pass explicit `inputSchema`/`outputSchema`) Check what `mcp/sdk` already derives from PHP types / `#[Schema]` and reuse it.
 - `ApprovalPolicyInterface::requiresApproval(object $subject, Transition $t, object $input, UserInterface $caller): ?InputRequest` — null to proceed, otherwise the message and DTO for the elicitation form. `applyAnswer(object $input, object $answer): object` folds an accepted answer into the input (e.g. a lowered amount). `InputRequest` is a HumanInput class (dependency rule below).
 - `ElicitMissingInputPolicy` (generic, **built in W3, not in M2**) — if the caller is flagged as human-backed and required input is missing, answer with `input_required` asking for exactly the missing fields. Used by the Werewolf human seat.
 - `UnavailableCapabilityResponder` — unknown/invisible tool or resource → actionable error ("`refund_issue` is not available to your role in state `investigating`. Available: …") and `CapabilityDenied` event.
@@ -188,9 +188,9 @@ framework:
 
 **Library dependency direction.** `Leash\WorkflowMcp\` may depend on `Leash\HumanInput\`; `Leash\HumanInput\` never depends on `Leash\WorkflowMcp\`. HumanInput owns the MRTR primitives (`InputRequest`, `InputRequiredResult`, `RequestStateSigner`, idempotency store) and knows nothing about workflows. The architecture test enforces the direction.
 
-**Building the server per request.** **VERIFY** in Phase 0: preferred is a `Server` built per HTTP request via `Server::builder()->addTool(...)`/`addResource(...)` with closures, hosted in a Symfony controller through the Streamable HTTP transport; fallback is custom `tools/list`, `tools/call`, `resources/list`, `resources/read` handlers. Check whether the MCP Bundle routing can be reused.
+**Building the server per request.** (verified: decisions/004) In Phase 0: preferred is a `Server` built per HTTP request via `Server::builder()->addTool(...)`/`addResource(...)` with closures, hosted in a Symfony controller through the Streamable HTTP transport; fallback is custom `tools/list`, `tools/call`, `resources/list`, `resources/read` handlers. Check whether the MCP Bundle routing can be reused.
 
-**Caching.** Lists are state- and caller-dependent: set 2026-07-28 list cache hints (`ttlMs: 0`, non-shared scope) if supported (**VERIFY** names); emit `list_changed` notifications where the transport supports them. Clients re-list after every call regardless.
+**Caching.** Lists are state- and caller-dependent: set 2026-07-28 list cache hints (`ttlMs: 0`, non-shared scope) (verified: decisions/001 — `ttlMs`, `cacheScope: private`, `setCachePolicy`); emit `list_changed` notifications where the transport supports them. Clients re-list after every call regardless.
 
 **Authentication.** Bearer tokens via Symfony's `access_token` authenticator with a static token handler: `agent:investigator` (`ROLE_INVESTIGATOR`), `agent:resolver` (`ROLE_RESOLVER`), and per-seat tokens for Werewolf. Stretch: OAuth 2.1 protected-resource metadata per the MCP authorization spec.
 
@@ -203,7 +203,7 @@ framework:
 3. `requestState` is an opaque, HMAC-signed (`kernel.secret`) token `{subjectRef, capability, argsHash, callerId, nonce, expiresAt}`. Default expiry 24 h (Werewolf: phase deadline). `.env` ships an empty `APP_SECRET`; `make install` generates a random one into `.env.local` if missing, so no two installs share a signing key.
 4. On retry: verify signature, expiry, caller, and `argsHash`; fold the accepted answer into the input via the policy's `applyAnswer()` (the retry carries the original arguments unchanged, so `argsHash` still matches); apply using `nonce` as idempotency key (`ProcessedInputRequest` table). Duplicate retries return the stored result only. Decline/cancel → structured "not approved / no answer" result; no state change. The result names the visible tools so the caller knows how to continue (Refund Desk: `refund_revise`).
 
-**Expected wire shapes** (from the 2026-07-28 announcement; **VERIFY exact field names and placement against the spec pages before implementing** — start from `https://modelcontextprotocol.io/sitemap.xml`, fetch `.md` versions of the MRTR and elicitation pages):
+**Expected wire shapes** (from the 2026-07-28 announcement; (verified: decisions/001 — field names confirmed; retries also carry `_meta`) — start from `https://modelcontextprotocol.io/sitemap.xml`, fetch `.md` versions of the MRTR and elicitation pages):
 
 ```json
 // server → client (result of tools/call)
@@ -237,9 +237,9 @@ framework:
 
 ### 3.4 Agents (`src/Agent`)
 
-- **Platform:** Symfony AI Hugging Face bridge, model per agent from env (`LEASH_MODEL_INVESTIGATOR`, `LEASH_MODEL_RESOLVER`, default `LEASH_MODEL`). **VERIFY** tool calling support in the HF bridge; fallback: OpenAI-compatible platform at `https://router.huggingface.co/v1` with the HF token. Optional Ollama platform for local tournaments.
-- **Replay mode:** `LEASH_MODEL=replay` replays recorded responses for the demo (built on Symfony AI platform testing tools, **VERIFY**). Lets jurors run everything with no token.
-- **McpToolbox:** exposes the subject endpoint's tools to the Symfony AI Agent via the `mcp/sdk` client, authenticated with the agent's token. **VERIFY** whether Symfony AI already ships an MCP-client toolbox; otherwise implement an adapter (candidate upstream contribution). Re-lists after every call; routes `input_required` to the handler. **Unknown tool names are forwarded, not dropped:** if the model calls a tool that is not in its list, `McpToolbox` sends the `tools/call` anyway, so the server answers with `UnavailableCapabilityResponder` and records `capability_denied`. **VERIFY** whether the Symfony AI Agent rejects unknown tool names before they reach the toolbox; if it does, hook in there. Also exposes visible resources as a read tool or context injection (decide in Phase 1, record it).
+- **Platform:** Symfony AI Hugging Face bridge, model per agent from env (`LEASH_MODEL_INVESTIGATOR`, `LEASH_MODEL_RESOLVER`, default `LEASH_MODEL`). (verified: decisions/007 — supported per model capability) Tool calling support in the HF bridge; fallback: OpenAI-compatible platform at `https://router.huggingface.co/v1` with the HF token. Optional Ollama platform for local tournaments.
+- **Replay mode:** `LEASH_MODEL=replay` replays recorded responses for the demo (built on Symfony AI `RecordingProvider` + `Cassette`, verified: decisions/007). Lets jurors run everything with no token.
+- **McpToolbox:** exposes the subject endpoint's tools to the Symfony AI Agent via the `mcp/sdk` client, authenticated with the agent's token. (verified: decisions/006 — `symfony/ai-mcp-tool` `McpToolbox` exists; Runner snapshots tools per run) Whether Symfony AI already ships an MCP-client toolbox; otherwise implement an adapter (candidate upstream contribution). Re-lists after every call; routes `input_required` to the handler. **Unknown tool names are forwarded, not dropped:** if the model calls a tool that is not in its list, `McpToolbox` sends the `tools/call` anyway, so the server answers with `UnavailableCapabilityResponder` and records `capability_denied`. (verified: decisions/006 — rejected in `AbstractToolbox` before `ToolCallRequested`; decorator forwards them) Whether the Symfony AI Agent rejects unknown tool names before they reach the toolbox; if it does, hook in there. Also exposes visible resources as a read tool or context injection (decide in Phase 1, record it).
 - **Prompts:** `config/prompts/{investigator,resolver}.md`, `config/prompts/werewolf/*.md`. All state that tools change over time and that user/player text is untrusted data.
 - **Limits:** max tool calls per run (refund 12, Werewolf 3 per turn); per-run timeout; statement length caps in Werewolf.
 - **Entry points:** `leash:work [--case=ID|--all]`; Scheduler recurring task; `RunNextActor` Messenger message, which uses `ActorSelector` to pick the role and its agent (or the human channel).
@@ -267,7 +267,7 @@ Seed (`leash:demo:seed`, idempotent) with expected outcomes used by tests and ev
 | C7 | €420 high-value item | human approval; demo human declines → `refund_revise` → reject, closed |
 | C8 | Vague message, no order match | reject with customer message asking for details |
 
-RAG: policy markdown in `data/policy/*.md` indexed with Symfony AI Store into a store with no external service (SQLite or file-backed, **VERIFY**), HF embeddings, `leash:policy:index`, place tool `refund_search_policy`.
+RAG: policy markdown in `data/policy/*.md` indexed with Symfony AI Store into a store with no external service (pure-PHP `Sqlite\Store`, verified: decisions/007), HF embeddings, `leash:policy:index`, place tool `refund_search_policy`.
 - **No-token mode:** the index (vectors + chunks) is committed under `data/policy/index/`; `make install` loads it without calling HF. `leash:policy:index` re-embeds only when `HF_TOKEN` is set. Query embeddings also need HF, so without a token `refund_search_policy` falls back to keyword search over the committed chunks. Replay mode runs fully offline.
 
 ### 3.6 Demo 2 — Werewolf (`src/Werewolf`) — gated, parallel track
@@ -297,7 +297,7 @@ RAG: policy markdown in `data/policy/*.md` indexed with Symfony AI Store into a 
 
 ### 3.7 Dashboard (`/`)
 
-- Refund tab: case list, Mermaid workflow diagram per case (**VERIFY** Symfony Workflow's Mermaid dumper) with current place highlighted, live event timeline, actor shown per event. Red = capability denied, amber = input requested, green = transition.
+- Refund tab: case list, Mermaid workflow diagram per case (Symfony Workflow `MermaidDumper`, verified: decisions/007) with current place highlighted, live event timeline, actor shown per event. Red = capability denied, amber = input requested, green = transition.
 - Werewolf tab (if not cut): spectator view.
 - Polling JSON every second (vanilla JS, no build). Mermaid as a pinned, committed file (`public/vendor/mermaid.min.js`), not from a CDN, so the dashboard works offline. Twig only. Readable at 1080p, dark-mode aware.
 
@@ -311,7 +311,7 @@ RAG: policy markdown in `data/policy/*.md` indexed with Symfony AI Store into a 
 
 ## 4. Stack
 
-- PHP 8.4. Symfony: newest version supported by current `symfony/ai-*` and `mcp/sdk` (**VERIFY**; 7.4 LTS is the safe default).
+- PHP 8.4. Symfony: newest version supported by current `symfony/ai-*` and `mcp/sdk` (verified: decisions/003 → 8.1).
 - `symfony/ai-bundle`, Agent, Platform (HF bridge; optional Ollama), Store, `symfony/mcp-bundle` and/or `mcp/sdk`.
 - `symfony/workflow`, `security-bundle`, `notifier` (+ `telegram-notifier`, optional), `mailer`, `messenger` (Doctrine transport on SQLite), `scheduler`, `validator`, `serializer`, `form`, `twig-bundle`, `uid`.
 - Doctrine ORM + migrations, SQLite (`var/data.db`). Web server, worker and Scheduler write concurrently: enable WAL and set `busy_timeout` (e.g. 5000 ms) on every connection (Doctrine middleware), or "database is locked" errors appear under demo load.
