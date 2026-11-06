@@ -6,6 +6,7 @@ RUN apt-get update \
  && docker-php-ext-install intl zip pcntl \
  && rm -rf /var/lib/apt/lists/*
 
+COPY leash.ini /usr/local/etc/php/conf.d/leash.ini
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 ENV COMPOSER_HOME=/tmp/composer
