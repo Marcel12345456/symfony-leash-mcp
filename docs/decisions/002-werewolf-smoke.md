@@ -1,7 +1,7 @@
 # 002 — Werewolf smoke test
 
 - Date: 2026-11-06
-- Status: proposed — Werewolf half of gate G0 is a human decision
+- Status: accepted (G0 Werewolf = go, human decision 2026-11-06)
 - PLAN reference: Phase 0 task 6; gate G0 ("continue only if at least one affordable model produces coherent statements and votes that reference the conversation")
 
 ## Question
@@ -26,7 +26,7 @@ Reading the transcripts (the automatic "reason references a player" counter was 
 - **qwen2.5:14b** — still consensus small talk in the discussion; seer keeps quiet. Votes are grounded in statements ("Dan did not provide any specific observations"); both wolves vote the seer (coordinated). One reason misattributes a quote. Barely a game.
 - **qwen3:8b** — real Werewolf dynamics: seer claims ("As the seer, I can confirm Ben is a werewolf"), villager Dan backs her, wolf Eve deflects onto Dan, the village falls for it; Dan's vote calls out Eve's move as "a werewolf's attempt to mislead". Coherent statements and votes that reference the conversation. Cost: ~1 min per turn and ~5x the tokens.
 
-## Decision (proposed)
+## Decision
 
 **Recommendation: go for track W with `qwen3:8b` (thinking) as the player model**, under these conditions:
 - The demo and `make werewolf` use replay (recorded cassettes, decision 007); live play is too slow for video (~1 min per turn).
