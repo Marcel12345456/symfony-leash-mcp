@@ -1,7 +1,7 @@
 # 006 — Symfony AI toolbox contract and ai-mcp-tool
 
 - Date: 2026-11-06
-- Status: proposed (design consequence for the agent loop needs the human's OK)
+- Status: accepted (2026-11-06, human delegated the decision)
 - PLAN reference: §3.4 McpToolbox, both VERIFY items
 
 ## Question
@@ -18,7 +18,7 @@ symfony/ai-* 0.15.0, mcp/sdk 0.9.0.
 - **ai-mcp-tool ships an MCP-client toolbox:** `Symfony\AI\Agent\Bridge\Mcp\McpToolbox extends AbstractToolbox` + `ClientToolset` (wraps `Mcp\Client` + transport, lazy connect). Caches tools until `reset()` (`McpToolbox.php:33, 62-65, 110-113`), names prefixed `<server>_` (`:84`), unknown names rejected as above, remote `isError` → `ToolErrorException` (`:141-149`). No resources, prompts or elicitation (`ai-mcp-tool/README.md:6-9`). Auth via mcp-bundle client transport `headers` (`mcp-bundle/config/options.php:314`).
 - **Custom toolbox with ai-bundle:** no config key; decorate `ai.toolbox.<name>` or define the `Agent` service yourself (`Agent.php:50-63`).
 
-## Decision (proposed)
+## Decision
 
 - Reuse `McpToolbox` + `ClientToolset`; no MCP-client toolbox from scratch.
 - One generic decorator in `lib/WorkflowMcp` (workaround, clearly marked): `reset()` + re-list per step, and forward unknown tool names to `toolset->callTool()` so the server's `UnavailableCapabilityResponder` records `capability_denied`.

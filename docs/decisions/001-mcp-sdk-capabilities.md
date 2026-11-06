@@ -1,7 +1,7 @@
 # 001 — mcp/sdk capabilities: MRTR, elicitation, cache hints (protocol path)
 
 - Date: 2026-11-06
-- Status: proposed — protocol path is gate G0, a human decision
+- Status: accepted (G0, 2026-11-06: human delegated the decision; chosen for least effort)
 - PLAN reference: §3.3 "Expected wire shapes" VERIFY; §3.2 Caching VERIFY; Phase 0 output "Path A/B/C"
 
 ## Question
@@ -29,7 +29,7 @@ mcp/sdk v0.9.0, symfony/mcp-bundle v0.15.0.
 
 **Differences vs PLAN:** field names match. (1) retry example lacks `_meta` (SDK client adds it); (2) "non-shared scope" = `cacheScope:"private"`, `ttlMs:0`; (3) requestState not caller-bound by the SDK → bound fields go into our payload; (4) SDK TTL is global (default 600 s) → set 86400; (5) no single-use guarantee → our `ProcessedInputRequest`.
 
-## Decision (proposed for G0)
+## Decision
 
 **Path: A** — use the SDK's MRTR on Streamable HTTP.
 - Tools return `InputRequiredResult` (built from `ElicitRequest::forForm`) instead of blocking `ClientGateway::elicit()`, because the deferred flow must end the request.
