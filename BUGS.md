@@ -10,6 +10,13 @@
 - Expected: accepted; the template parameter should be covariant (`@template-covariant`) or the parameter typed `RequestHandlerInterface<*>`.
 - Workaround: inline `@phpstan-ignore argument.type` with comment in `src/Spike/SpikeMcpCommand.php`.
 
+## symfony/ai-ollama-platform 0.15.0 — no total token count
+
+- Repro: agent call on `ai.platform.ollama` (`qwen2.5:7b`); read `$result->getMetadata()->get('token_usage')`.
+- Actual: `TokenUsageAggregation` with prompt 425, completion 59, `getTotalTokens()` = null.
+- Expected: total = prompt + completion (Ollama returns `prompt_eval_count` and `eval_count`).
+- Workaround: compute prompt + completion ourselves (`src/Spike/SpikeLlmToolCommand.php`; later SpendGuard).
+
 ## Candidates (from code reading, not yet reproduced)
 
 - **symfony/ai-agent 0.15.0 — tool list frozen per run.** `Execution/Runner.php:76` exposes `toolbox->getTools()` once; the comment at `:304` says toolbox tools can change during a run, but `$options['tools']` is never refreshed. Repro idea: toolbox whose `getTools()` changes after the first `execute()`; the second model request still carries the old list. Workaround: one agent run per workflow step (`decisions/006`).
