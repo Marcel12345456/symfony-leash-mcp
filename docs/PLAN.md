@@ -325,7 +325,7 @@ RAG: policy markdown in `data/policy/*.md` indexed with Symfony AI Store into a 
 
 ```
 .
-├── .claude/done.sh             # runs `make qa`; Stop hook = Definition of Done
+├── .claude/                   # done.sh (Definition of Done), hooks, skills (/phase, /phase-end, /verify), tests
 ├── CLAUDE.md
 ├── README.md
 ├── BUGS.md
@@ -372,7 +372,7 @@ Each phase ends with: acceptance criteria demonstrated, `make qa` green, `docs/P
 
 ### Phase 0 — Spike & scaffold (Thu 11-05 → Fri 11-06) [R]
 
-1. Scaffold Symfony skeleton, Makefile, QA tooling, CI (GitHub Actions running `make qa`), `.claude/done.sh` (runs `make qa`; this is what unattended runs are checked against), MIT license, empty README/BUGS/PROGRESS. SQLite WAL + `busy_timeout` from the start.
+1. Scaffold Symfony skeleton, Makefile, QA tooling, CI (GitHub Actions running `make qa`), `.claude/done.sh` (runs `make qa`; this is what unattended runs are checked against), MIT license, empty README/BUGS. SQLite WAL + `busy_timeout` from the start. `make qa` prints only failures and a summary (`phpunit --no-progress`, `phpstan --no-progress --error-format=raw`, `php-cs-fixer --dry-run --diff` limited to changed files); `make qa-verbose` for full output. `.claude/checks/docs.sh` enforces `--no-progress`.
 2. Read `mcp/sdk` source for: per-request server building, controller-hosted HTTP transport, client API, resources, elicitation, any MRTR / `input_required` / 2026-07-28 support, schema generation, list cache hints.
 3. Read Symfony AI for: HF bridge (chat, tool calling, embeddings, token usage), Agent toolbox interface, existing MCP-client toolbox, platform testing tools, Ollama bridge, store options without external services, Mermaid dumper.
 4. Proof 1: controller-hosted MCP server with one dynamic tool and one dynamic resource, called from a PHP MCP client in a console command; then an `input_required` round-trip.

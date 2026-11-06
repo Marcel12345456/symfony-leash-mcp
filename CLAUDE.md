@@ -18,9 +18,17 @@ Leash is a Symfony AI & PHP MCP SDK hackathon project (deadline **Sun 2026-11-22
 - `symfony/ai` and `mcp/sdk` are pre-release. When something is broken: minimal repro, entry in `BUGS.md`, local workaround in one clearly marked class, move on. Bugs found are a deliverable.
 - Prefer the smallest thing that makes the demo real.
 
+## Session protocol (automated in `.claude/`)
+
+- Start with `/phase <key>`; never read `docs/PLAN.md` in full (`.claude/bin/plan-section.sh <key>`).
+- `vendor/` and every **VERIFY**: `/verify <question>` (subagents → `docs/decisions/`). Hook-enforced.
+- Record decisions immediately (PROGRESS "Decisions" or `docs/decisions/`).
+- Close with `/phase-end`, then `/clear`. Edit files in place, no copies.
+- Hooks `.claude/hooks/`, tests `.claude/tests/run.sh`, pause with `touch .claude/hooks.off`.
+
 ## Library rules (non-negotiable)
 
-- **G1:** `lib/WorkflowMcp` and `lib/HumanInput` contain no domain code. No mention of refunds or Werewolf. A library change needed by a demo must be generic, documented in the library README, and tested with a non-domain workflow.
+- **G1:** no domain code in `lib/` (no refunds, no Werewolf). Library changes are generic, documented, tested with a non-domain workflow.
 - **G2:** `lib/` never depends on `App\`.
 - **G3:** the workflow decides which actor works next (`ActorSelector`, counting only non-read-only tools), never an LLM.
 - `Leash\WorkflowMcp\` may depend on `Leash\HumanInput\`, never the reverse.
@@ -83,5 +91,5 @@ Keep the Makefile and README in sync with these commands.
 
 ## Testing
 
-- Unit-test `lib/` thoroughly, including a synthetic non-domain workflow; integration-test the MCP endpoint in-process; never call real LLMs in tests (scripted fake platforms).
+- Unit-test `lib/` (incl. a synthetic non-domain workflow); integration-test the MCP endpoint in-process; no real LLMs in tests.
 - The tests listed in `docs/PLAN.md` §7 must exist before the video is recorded.
