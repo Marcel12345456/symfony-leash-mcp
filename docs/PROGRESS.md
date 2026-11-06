@@ -5,20 +5,14 @@
 
 ## Current
 
-- Phase: 0 — Spike & scaffold (in progress)
+- Phase: 0 — Spike & scaffold **done** (all T1–T6 green, G0 decided: path A, Werewolf go). Phase 0 is [R]: branch `m/phase-0-spike-scaffold` pushed, **needs review + merge to main by a human** before M1 branches from main.
 - Branch: m/phase-0-spike-scaffold
-- Done-signal:
-  - T1 **green**: `.claude/done.sh` exit 0 (incl. `make qa`); `.github/workflows/qa.yml` runs `make qa`; green `gh run list` on branch
-  - T2–3 **green**: `docs/decisions/001-mcp-sdk-capabilities.md` contains a `Path: A|B|C` line
-  - T4: `bin/console spike:mcp` exit 0, prints tool result, resource content, `input_required` round-trip — **green** (`decisions/008`, test in `make qa`)
-  - T5 **green**: `bin/console spike:llm-tool` exit 0, prints one tool call + token usage (Ollama `qwen2.5:7b` instead of HF; `decisions/009`)
-  - T6 **green**: 3 transcripts in `spikes/out/`, recommendation in `docs/decisions/002-werewolf-smoke.md`, spend $0 (local Ollama)
-  - G0: human decision (evidence in Decisions)
+- Done-signal: `.claude/done.sh` exit 0 (automation tests + `make qa`: cs-fixer, phpstan max, phpunit incl. Proof 1 over real HTTP)
 - Blocked: —
 
 ## Next prompt
 
-/phase 0
+/phase M1
 
 ## Decisions
 
@@ -36,6 +30,7 @@
 - 2026-11-06: No HF credits. Models: Ollama (local, free) for dev/smoke, replay cassettes for demo/jurors/tests; paid/free-tier cloud key only if Ollama quality fails the Werewolf gate. Hackathon allows any Symfony AI provider (PLAN §2). Werewolf G0 still open until the smoke test runs.
 - 2026-11-06: **G0 evidence — Werewolf**: only `qwen3:8b` (thinking) plays coherently (seer claim, wolf deflection, votes grounded); qwen2.5 7b/14b too bland. Recommendation: go with qwen3 + replay for demo (`decisions/002`).
 - 2026-11-06: **G0 Werewolf = go** (human): `qwen3:8b` player model, replay for demo. Role in the video: 30–45 s closer showing state ∩ role tool visibility on the same libraries; never costs M time.
+- 2026-11-06: PHP `default_socket_timeout=300` in the toolchain image (`docker/php/leash.ini`): the Ollama platform ignores the configured HTTP client (BUGS.md). Ollama runs natively on the host (`OLLAMA_ENDPOINT=http://host.docker.internal:11434`).
 
 ## Test changes
 
@@ -44,3 +39,5 @@
 ## Log
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
+
+- 2026-11-06 — Phase 0 done. Scaffold (Symfony 8.1, Docker toolchain, quiet `make qa`, CI green), library research (decisions 001, 003–007), Proof 1 MCP round-trip (008, in `make qa`), Proof 2 agent tool call on Ollama (009), Werewolf smoke on 3 local models (002). G0: path A, Werewolf go. BUGS.md: 3 confirmed (SDK handler generics, Ollama total tokens, Ollama client timeout) + 2 candidates. Blocked: none (HF credits unavailable → Ollama + replay). Needs review: whole phase-0 branch ([R]). Spend: $0. Note: vendor-guard hook blocks commands that combine `rm … vendor` with `grep` (false positive; split the command).
