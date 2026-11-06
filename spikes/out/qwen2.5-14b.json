@@ -1,0 +1,85 @@
+{
+    "summary": {
+        "model": "qwen2.5:14b",
+        "seconds": 76.4,
+        "tokens": 3740,
+        "valid_votes": "6\/6",
+        "reasons_referencing_players": "6\/6",
+        "wolf_self_outs": 0,
+        "seer_named_ben": false,
+        "wolves_voting_wolf": 0,
+        "eliminated": "P4"
+    },
+    "roles": {
+        "P1": "villager",
+        "P2": "werewolf",
+        "P3": "seer",
+        "P4": "villager",
+        "P5": "werewolf",
+        "P6": "villager"
+    },
+    "discussion": [
+        {
+            "id": "P1",
+            "text": "I think it's important we all share our suspicions to figure out who the werewolves might be."
+        },
+        {
+            "id": "P2",
+            "text": "I agree, transparency is key. Let's also consider everyone's alibis and behaviors outside of accusations."
+        },
+        {
+            "id": "P3",
+            "text": "I trust that we can rely on clear evidence rather than just assumptions when considering who the werewolves might be."
+        },
+        {
+            "id": "P4",
+            "text": "I agree with everyone, let's focus on factual observations and not jump to conclusions based on gut feelings alone."
+        },
+        {
+            "id": "P5",
+            "text": "I second that. Let’s all share any specific instances where someone seemed suspicious or had a weak alibi, but let's keep our minds open and fair."
+        },
+        {
+            "id": "P6",
+            "text": "I agree with everyone; let's stick to concrete examples and not just rely on suspicions."
+        }
+    ],
+    "votes": [
+        {
+            "id": "P1",
+            "vote": "P4",
+            "reason": "Dan did not provide any specific observations or evidence during the discussion, raising suspicion about his involvement as a werewolf.",
+            "raw": "{\"vote\": \"P4\", \"reason\": \"Dan did not provide any specific observations or evidence during the discussion, raising suspicion about his involvement as a werewolf.\"}"
+        },
+        {
+            "id": "P2",
+            "vote": "P3",
+            "reason": "Cleo emphasized relying on clear evidence but did not provide any specific examples herself, raising a slight concern about her engagement in the investigation process.",
+            "raw": "{\"vote\": \"P3\", \"reason\": \"Cleo emphasized relying on clear evidence but did not provide any specific examples herself, raising a slight concern about her engagement in the investigation process.\"}"
+        },
+        {
+            "id": "P3",
+            "vote": "P2",
+            "reason": "Ben has shown unusual concern about assumptions and gut feelings, which may be an attempt to divert attention from himself.",
+            "raw": "{\"vote\": \"P2\", \"reason\": \"Ben has shown unusual concern about assumptions and gut feelings, which may be an attempt to divert attention from himself.\"}"
+        },
+        {
+            "id": "P4",
+            "vote": "P2",
+            "reason": "Ben has not provided any specific instances of suspicious behavior, suggesting a lack of active investigation.",
+            "raw": "{\"vote\": \"P2\", \"reason\": \"Ben has not provided any specific instances of suspicious behavior, suggesting a lack of active investigation.\"}"
+        },
+        {
+            "id": "P5",
+            "vote": "P3",
+            "reason": "Cleo emphasized relying on clear evidence but did not provide any herself, which seems suspicious.",
+            "raw": "{\"vote\": \"P3\", \"reason\": \"Cleo emphasized relying on clear evidence but did not provide any herself, which seems suspicious.\"}"
+        },
+        {
+            "id": "P6",
+            "vote": "P4",
+            "reason": "Dan has not provided any specific observations or behaviors that raise suspicion, unlike others who have shared their thoughts and concerns.",
+            "raw": "{\"vote\": \"P4\", \"reason\": \"Dan has not provided any specific observations or behaviors that raise suspicion, unlike others who have shared their thoughts and concerns.\"}"
+        }
+    ]
+}

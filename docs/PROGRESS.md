@@ -12,7 +12,7 @@
   - T2–3 **green**: `docs/decisions/001-mcp-sdk-capabilities.md` contains a `Path: A|B|C` line
   - T4: `bin/console spike:mcp` exit 0, prints tool result, resource content, `input_required` round-trip — **green** (`decisions/008`, test in `make qa`)
   - T5 **green**: `bin/console spike:llm-tool` exit 0, prints one tool call + token usage (Ollama `qwen2.5:7b` instead of HF; `decisions/009`)
-  - T6: 3 transcripts in `spikes/out/`, recommendation in `docs/decisions/002-werewolf-smoke.md`, spend ≤ $1
+  - T6 **green**: 3 transcripts in `spikes/out/`, recommendation in `docs/decisions/002-werewolf-smoke.md`, spend $0 (local Ollama)
   - G0: human decision (evidence in Decisions)
 - Blocked: —
 
@@ -34,6 +34,7 @@
 - 2026-11-06: **G0 protocol path = A** (SDK MRTR). Human delegated the call ("you decide to reduce resources"); A is least code.
 - 2026-11-06: CI (GitHub Actions `make qa`) green on `m/phase-0-spike-scaffold` (confirmed by human).
 - 2026-11-06: No HF credits. Models: Ollama (local, free) for dev/smoke, replay cassettes for demo/jurors/tests; paid/free-tier cloud key only if Ollama quality fails the Werewolf gate. Hackathon allows any Symfony AI provider (PLAN §2). Werewolf G0 still open until the smoke test runs.
+- 2026-11-06: **G0 evidence — Werewolf**: only `qwen3:8b` (thinking) plays coherently (seer claim, wolf deflection, votes grounded); qwen2.5 7b/14b too bland. Recommendation: go with qwen3 + replay for demo (`decisions/002`). **Awaiting human decision.**
 
 ## Test changes
 
