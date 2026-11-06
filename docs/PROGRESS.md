@@ -5,14 +5,18 @@
 
 ## Current
 
-- Phase: 0 — Spike & scaffold **done** (all T1–T6 green, G0 decided: path A, Werewolf go). Phase 0 is [R]: branch `m/phase-0-spike-scaffold` pushed, **needs review + merge to main by a human** before M1 branches from main.
-- Branch: m/phase-0-spike-scaffold
-- Done-signal: `.claude/done.sh` exit 0 (automation tests + `make qa`: cs-fixer, phpstan max, phpunit incl. Proof 1 over real HTTP)
+- Phase: M1 — WorkflowMcp with roles (in progress). [R] public API (stays on branch, needs review), [U] tests.
+- Branch: m/phase-1-workflow-mcp (from main @ 2eb412b, phase 0 merged via PR #1)
+- Done-signal: `.claude/done.sh` exit 0, with these tests present and green:
+  - `tests/Integration/RefundMcpEndpointTest` (mcp/sdk client, in-process HTTP, bearer tokens): investigator on C1 lists only `refund_start_investigation`; after calling it lists `refund_get_order`, `refund_get_customer_history`, `refund_search_policy`, `refund_propose_resolution`; resolver on C1 in `investigating` lists only `refund_search_policy` (read-only); invisible tool → actionable error naming visible tools + `capability_denied` CaseEvent, no state change; invalid `refund_propose_resolution` input → Validator messages as actionable error.
+  - Unit: `ScopedCapabilityProvider` (synthetic non-domain workflow + refund every place × role, guard/voter denial, custom `RoleResolverInterface`), `SchemaFactory`, `TransitionToolHandler`, `ActorSelector` (ignores read-only; refund role for every state).
+  - `tests/Architecture`: `lib/` never references `App\`, `RefundDesk`, `Werewolf`; `lib/HumanInput` never references `Leash\WorkflowMcp\`.
+  - Manual, not blocking: `make inspector TOKEN=…` shows the same lists (human check).
 - Blocked: —
 
 ## Next prompt
 
-/phase M1
+/phase M1 (continue on m/phase-1-workflow-mcp)
 
 ## Decisions
 
@@ -31,6 +35,8 @@
 - 2026-11-06: **G0 evidence — Werewolf**: only `qwen3:8b` (thinking) plays coherently (seer claim, wolf deflection, votes grounded); qwen2.5 7b/14b too bland. Recommendation: go with qwen3 + replay for demo (`decisions/002`).
 - 2026-11-06: **G0 Werewolf = go** (human): `qwen3:8b` player model, replay for demo. Role in the video: 30–45 s closer showing state ∩ role tool visibility on the same libraries; never costs M time.
 - 2026-11-06: PHP `default_socket_timeout=300` in the toolchain image (`docker/php/leash.ini`): the Ollama platform ignores the configured HTTP client (BUGS.md). Ollama runs natively on the host (`OLLAMA_ENDPOINT=http://host.docker.internal:11434`).
+
+- 2026-11-06: M1: in `investigating` the resolver sees only read-only `refund_search_policy` (§3.2 YAML wins over the M1 acceptance wording "no tools"; human decision). ActorSelector still picks the investigator.
 
 ## Test changes
 
