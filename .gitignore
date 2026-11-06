@@ -1,0 +1,15 @@
+/vendor/
+/var/
+/.env.local
+/.env.*.local
+/node_modules/
+.phpunit.cache/
+.php-cs-fixer.cache
+
+# Claude Code session state (done-gate, hooks)
+/.claude/.dirty-*
+/.claude/.strikes-*
+/.claude/.ctx-*
+/.claude/done.off
+/.claude/hooks.off
+/.claude/settings.local.json
