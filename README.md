@@ -25,6 +25,7 @@ Inside the container, or with a local PHP 8.4, pass `NATIVE=1` to skip Docker.
 ## Stack
 
 Symfony 8.1, PHP 8.4, Doctrine ORM on SQLite (WAL, `busy_timeout` 5000 ms).
+Pinned pre-release libraries: `symfony/ai-*` 0.15.0, `symfony/mcp-bundle` 0.15.0, `mcp/sdk` 0.9.0.
 
 ## License
 
