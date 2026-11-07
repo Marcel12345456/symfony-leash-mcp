@@ -200,7 +200,7 @@ framework:
 
 1. If a policy requires input and the request has no valid input responses, return `input_required`. **No side effects before this point.**
 2. `inputRequests` contains named `elicitation/create` form requests built from the policy's DTO.
-3. `requestState` is an opaque, HMAC-signed (`kernel.secret`) token `{subjectRef, capability, argsHash, callerId, nonce, expiresAt}`. Default expiry 24 h (Werewolf: phase deadline). `.env` ships an empty `APP_SECRET`; `make install` generates a random one into `.env.local` if missing, so no two installs share a signing key.
+3. `requestState` is an opaque, HMAC-signed (`kernel.secret`, via the SDK codec; verified: decisions/019) token `{subjectRef, capability, argsHash, callerId, nonce, expiresAt}`. Default expiry 24 h (Werewolf: phase deadline). `.env` ships an empty `APP_SECRET`; `make install` generates a random one into `.env.local` if missing, so no two installs share a signing key.
 4. On retry: verify signature, expiry, caller, and `argsHash`; fold the accepted answer into the input via the policy's `applyAnswer()` (the retry carries the original arguments unchanged, so `argsHash` still matches); apply using `nonce` as idempotency key (`ProcessedInputRequest` table). Duplicate retries return the stored result only. Decline/cancel → structured "not approved / no answer" result; no state change. The result names the visible tools so the caller knows how to continue (Refund Desk: `refund_revise`).
 
 **Expected wire shapes** (from the 2026-07-28 announcement; (verified: decisions/001 — field names confirmed; retries also carry `_meta`) — start from `https://modelcontextprotocol.io/sitemap.xml`, fetch `.md` versions of the MRTR and elicitation pages):
