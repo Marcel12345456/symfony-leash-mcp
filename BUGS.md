@@ -41,4 +41,4 @@
 - Repro: `$client->callTool('x', [...])` against a tool that returns `InputRequiredResult`, with a client that wants to park the request for a human answering hours later.
 - Actual: `Client\Protocol::request()` always auto-resolves rounds through elicitation handlers (max 10, `Client/Protocol.php:555-620`); `requestState` is never exposed, and `callTool()` has no parameter for `inputResponses`/`requestState`. Throwing from the callback yields a message-only `RuntimeException`.
 - Expected: an option to return the raw `InputRequiredResult`, and a way to send a retry with `inputResponses` + `requestState` (MRTR is designed for exactly this deferral).
-- Workaround: raw JSON-RPC client in `lib/HumanInput` (decisions/017).
+- Workaround: raw JSON-RPC client `Leash\HumanInput\Client\RawMcpClient` (decisions/017, 021).

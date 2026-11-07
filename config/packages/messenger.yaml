@@ -1,0 +1,16 @@
+framework:
+    messenger:
+        transports:
+            # Doctrine queue: `make demo` runs the worker. RunNextActor has no handler until M3 (agents).
+            async: '%env(MESSENGER_TRANSPORT_DSN)%'
+            sync: 'sync://'
+
+        routing:
+            Leash\HumanInput\Pending\ResumePendingInput: async
+            App\Agent\Message\RunNextActor: async
+
+when@test:
+    framework:
+        messenger:
+            transports:
+                async: 'in-memory://'

@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+{% block title %}Request #{{ item.id }}{% endblock %}
+{% block body %}
+<h1>Request #{{ item.id }}</h1>
+<p>{{ item.tool }} on {{ item.subjectRef }}, asked by {{ item.callerId }}.</p>
+{% if asks is empty %}
+    <p>Status: {{ item.status.value }}. Thank you, the agent continues from here.</p>
+{% else %}
+    <form method="post">
+        {% for ask in asks %}
+            <p><strong>{{ ask.message }}</strong></p>
+            {{ form_widget(ask.form) }}
+        {% endfor %}
+        <button type="submit" name="_decision" value="accept">Send answer</button>
+        <button type="submit" name="_decision" value="decline" formnovalidate>Decline</button>
+    </form>
+{% endif %}
+{% endblock %}

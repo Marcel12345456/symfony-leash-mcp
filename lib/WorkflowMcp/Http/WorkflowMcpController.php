@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Leash\WorkflowMcp\Http;
 
+use Leash\HumanInput\RequestState\RequestBinder;
+use Leash\HumanInput\RequestState\RequestStateKey;
 use Leash\WorkflowMcp\Server\WorkflowServerFactory;
 use Leash\WorkflowMcp\Subject\SubjectProviderInterface;
 use Mcp\Server\Session\FileSessionStore;
@@ -35,6 +37,9 @@ final readonly class WorkflowMcpController
         private WorkflowServerFactory $servers,
         #[Autowire('%kernel.cache_dir%/mcp-sessions')]
         private string $sessionDir,
+        #[Autowire('%kernel.secret%')]
+        #[\SensitiveParameter]
+        private string $secret,
     ) {}
 
     #[Route('/mcp/{workflow}/{subjectId}', name: 'leash_workflow_mcp', methods: ['GET', 'POST', 'DELETE', 'OPTIONS'])]
@@ -55,7 +60,9 @@ final readonly class WorkflowMcpController
         }
 
         // Legacy (initialize-based) clients need a persistent session; the stateless wire ignores it (decisions/014).
-        $builder = $this->servers->create($definition, $subject, $caller)->setSession(new FileSessionStore($this->sessionDir));
+        $builder = $this->servers->create($definition, $subject, $caller, $subjectId)
+            ->setSession(new FileSessionStore($this->sessionDir))
+            ->setRequestState(RequestStateKey::fromSecret($this->secret), RequestBinder::DEFAULT_TTL);
 
         $factory = new Psr17Factory();
         $psrRequest = (new PsrHttpFactory($factory, $factory, $factory, $factory))->createRequest($request);

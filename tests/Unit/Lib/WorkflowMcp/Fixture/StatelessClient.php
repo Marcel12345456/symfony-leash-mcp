@@ -22,7 +22,8 @@ final class StatelessClient
     {
         $params['_meta'] = [
             'io.modelcontextprotocol/protocolVersion' => '2026-07-28',
-            'io.modelcontextprotocol/clientCapabilities' => new \stdClass(),
+            // MRTR needs declared form elicitation, else the SDK answers -32021 instead of input_required.
+            'io.modelcontextprotocol/clientCapabilities' => ['elicitation' => ['form' => new \stdClass()]],
         ];
         $json = json_encode(['jsonrpc' => '2.0', 'id' => ++$this->id, 'method' => $method, 'params' => $params], \JSON_THROW_ON_ERROR);
 

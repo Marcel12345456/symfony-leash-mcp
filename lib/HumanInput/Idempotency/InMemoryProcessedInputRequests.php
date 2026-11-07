@@ -10,6 +10,11 @@ final class InMemoryProcessedInputRequests implements ProcessedInputRequests
     /** @var array<string, array<string, mixed>> */
     private array $results = [];
 
+    public function find(string $nonce): ?array
+    {
+        return $this->results[$nonce] ?? null;
+    }
+
     public function once(string $nonce, callable $apply): ProcessedResult
     {
         if (\array_key_exists($nonce, $this->results)) {

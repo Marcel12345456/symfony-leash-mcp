@@ -24,6 +24,7 @@ final class TransitionToolHandlerTest extends TestCase
         $result = $harness->transitionTools->handle(DocumentWorkflow::create(), $document, self::editor(), 'doc_approve', ['note' => 'x']);
 
         // The guard hides the tool, so the handler's visibility re-check denies it.
+        self::assertInstanceOf(CallToolResult::class, $result);
         self::assertTrue($result->isError);
         self::assertStringContainsString('Available now: doc_reject, doc_read_comments, doc_add_comment.', self::text($result));
         self::assertSame('review', $document->getStatus());
@@ -34,6 +35,7 @@ final class TransitionToolHandlerTest extends TestCase
     {
         $result = (new Harness())->transitionTools->handle(DocumentWorkflow::create(), new Document('review'), self::editor(), 'doc_add_comment', []);
 
+        self::assertInstanceOf(CallToolResult::class, $result);
         self::assertTrue($result->isError);
     }
 
@@ -44,6 +46,7 @@ final class TransitionToolHandlerTest extends TestCase
 
         $result = $harness->transitionTools->handle(DocumentWorkflow::create(), $document, self::editor(), 'doc_reject', []);
 
+        self::assertInstanceOf(CallToolResult::class, $result);
         self::assertFalse($result->isError);
         self::assertSame('draft', $document->getStatus());
         self::assertSame(['state' => 'draft', 'availableTools' => [], 'message' => 'Applied "doc_reject".'], $result->structuredContent);

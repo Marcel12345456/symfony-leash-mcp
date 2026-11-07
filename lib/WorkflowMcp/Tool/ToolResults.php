@@ -48,6 +48,23 @@ final class ToolResults
         );
     }
 
+    /**
+     * Rebuilds a transition result from its structuredContent (replayed to duplicate retries).
+     *
+     * @param array<string, mixed> $stored
+     */
+    public static function fromStored(array $stored): CallToolResult
+    {
+        $state = $stored['state'] ?? null;
+        $message = $stored['message'] ?? null;
+        $available = $stored['availableTools'] ?? null;
+        if (!\is_string($state) || !\is_string($message) || !\is_array($available) || !array_is_list($available)) {
+            return self::error('The stored result of this request is unreadable; call the tool again without inputResponses.');
+        }
+
+        return self::transitionResult($message, explode(', ', $state), array_values(array_filter($available, \is_string(...))));
+    }
+
     public static function error(string $message): CallToolResult
     {
         return CallToolResult::error([new TextContent($message)]);

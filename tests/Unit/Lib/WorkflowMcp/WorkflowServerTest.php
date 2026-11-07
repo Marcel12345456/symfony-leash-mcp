@@ -103,6 +103,6 @@ final class WorkflowServerTest extends TestCase
 
     private function client(Document $document, string $role): StatelessClient
     {
-        return new StatelessClient($this->harness->servers->create(DocumentWorkflow::create(), $document, new InMemoryUser('bob', null, [$role])));
+        return $this->harness->client(DocumentWorkflow::create(), $document, new InMemoryUser('bob', null, [$role]));
     }
 }
