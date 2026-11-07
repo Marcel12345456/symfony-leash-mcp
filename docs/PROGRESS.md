@@ -5,7 +5,7 @@
 
 ## Current
 
-- Phase: M2 — HumanInput / MRTR, **in progress** [R]: request-state primitives done (`RequestBinder` issue/verify, `RequestStateKey`, `ArgumentsHash`, `ProcessedInputRequests` + in-memory store; unit tests green). Left: Doctrine `ProcessedInputRequest` store + migration, wiring into the synthetic workflow (`TransitionToolHandler` → `input_required`, retry via `handleInline()`), then client/inbox/RefundDesk items below. (whole branch needs human review before merge). M1 merged to main (PR #4).
+- Phase: M2 — HumanInput / MRTR, **in progress** [R] (branch needs human review before merge). Done: request-state primitives (`RequestBinder`, `ProcessedInputRequests` in-memory; decisions/019). Next: Doctrine nonce store + migration, `input_required`/retry on the synthetic workflow.
 - Branch: m/phase-2-human-input (from main @ d43dd13).
 - VERIFY done: decisions/016 (list_changed not pursued), 017 (raw client MRTR), 018 (Inspector MRTR, proposed).
 - Done-signal (agreed with human): `.claude/done.sh` exit 0 incl.
