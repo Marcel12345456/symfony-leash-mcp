@@ -62,6 +62,8 @@
 
 - 2026-11-07: M3: `qwen3:8b` calls tools through the Symfony AI Ollama bridge (3/3) and Ollama direct (4/4); thinking ~8–12 s per tool step vs 1.1 s with `think: false`; `/no_think` soft switch has no effect through the bridge. Default stays thinking + replay; bridge `think` option is a VERIFY for M4 (`decisions/002` addendum).
 
+- 2026-11-07: M3 rule choices where §3.5 is silent (all tested, easy to flip): wolves cannot target a wolf; no self-vote, no self-inspection; one action per seat per phase; no wolf choice by the deadline → nobody dies; dawn reveals the death, not the role; game over reveals all roles; votes are public; discussion order = living seats ascending, every day; dead seats keep their private knowledge; win checked after every death (dawn and vote). `Game::arranged()` fixes roles for the recorded demo game; `advance()` is also the deadline path (missing actions abstain).
+
 ## Test changes
 
 <!-- Every weakened, deleted, skipped or changed assertion: date, test, reason. -->
