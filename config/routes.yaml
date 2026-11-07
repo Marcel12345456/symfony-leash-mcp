@@ -9,3 +9,7 @@
 
 controllers:
     resource: routing.controllers
+
+leash_workflow_mcp:
+    resource: ../lib/WorkflowMcp/Http/
+    type: attribute
