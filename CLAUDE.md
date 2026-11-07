@@ -2,7 +2,7 @@
 
 Leash is a Symfony AI & PHP MCP SDK hackathon project (deadline **Sun 2026-11-22 18:00 CET**, internal target **Sat 2026-11-21 20:00 CET**).
 
-**Pitch:** agents you can deploy. The workflow state and the agent's role decide which MCP tools exist; when a human is needed, the request leaves the chat (MRTR elicitation → Notifier) and resumes when the human answers. Main demo: Refund Desk. Gated second demo: Werewolf, built on the same libraries with no Werewolf code in them.
+**Pitch:** MCP servers where the workflow decides what each agent can see and do, and a human can step into a running agent's turn (MRTR → Notifier → retry). Lead with: information hiding (scoped tools *and resources*), workflow as orchestrator, human answer resumes the agent. Main demo: Werewolf. Second: Doc Review, same libraries, no game code. Refund Desk retired (`docs/decisions/022`).
 
 - Full plan, tracks, and gates: `docs/PLAN.md`
 - Progress, deviations, test-change log: `docs/PROGRESS.md`
@@ -11,8 +11,8 @@ Leash is a Symfony AI & PHP MCP SDK hackathon project (deadline **Sun 2026-11-22
 
 ## How to work in this repo
 
-- Follow `docs/PLAN.md` §6. Two tracks: **M** (main, guaranteed) and **W** (Werewolf, gated). Never start W work before gate G0 says go, and never let W block M.
-- Gates G0, G1, G2 are **human decisions**. At a gate, stop, write the evidence into `docs/PROGRESS.md`, and wait.
+- Follow `docs/PLAN.md` §6. One main track **M** (M1–M8); M3 (Werewolf rules) runs in parallel with M2.
+- Gates G0 and G1 are **human decisions**. At a gate, stop, write the evidence into `docs/PROGRESS.md`, and wait.
 - End every phase with: acceptance criteria demonstrated, `make qa` green, `docs/PROGRESS.md` updated, branch pushed, short summary.
 - Anything marked **VERIFY** in the plan is an unknown. Resolve it by reading the code in `vendor/` (symfony/ai-*, mcp/sdk) or official docs, never by guessing. Record the answer in `docs/decisions/`.
 - `symfony/ai` and `mcp/sdk` are pre-release. When something is broken: minimal repro, entry in `BUGS.md`, local workaround in one clearly marked class, move on. Bugs found are a deliverable.
@@ -28,7 +28,7 @@ Leash is a Symfony AI & PHP MCP SDK hackathon project (deadline **Sun 2026-11-22
 
 ## Library rules (non-negotiable)
 
-- **G1:** no domain code in `lib/` (no refunds, no Werewolf). Library changes are generic, documented, tested with a non-domain workflow.
+- **G1:** no domain code in `lib/` (no Werewolf, no Doc Review, no refunds). Library changes are generic, documented, tested with a non-domain workflow.
 - **G2:** `lib/` never depends on `App\`.
 - **G3:** the workflow decides which actor works next (`ActorSelector`, counting only non-read-only tools), never an LLM.
 - `Leash\WorkflowMcp\` may depend on `Leash\HumanInput\`, never the reverse.
@@ -50,18 +50,17 @@ The machine may run for long periods without a human. In that mode:
 ## Commands
 
 ```
-make install      # composer install, SQLite db (WAL), migrate, seed demo, load committed policy index; generate APP_SECRET + approver password into .env.local
-make demo         # php -S + messenger worker + scheduler (+ Telegram poller if TELEGRAM_DSN set); prints dashboard URL
-make work         # run the refund agents once over all open cases
+make install      # composer install, SQLite db (WAL), migrate, seed demo; generate APP_SECRET + approver password into .env.local
+make demo         # php -S + messenger worker (+ Telegram poller if TELEGRAM_DSN set), replay by default; prints dashboard URL
+make werewolf     # play one Werewolf game (replay by default; LEASH_MODEL=ollama for live)
+make work         # run the Doc Review agents once over all open documents
 make test         # phpunit
 make qa           # php-cs-fixer --dry-run + phpstan + phpunit (green before every commit)
 make inspector    # MCP Inspector against the local endpoint (pass TOKEN=...)
-make eval         # refund model comparison (paid; asks before spending)
-make werewolf     # play one Werewolf game (replay by default)
-make tournament   # Werewolf tournament (paid or Ollama; requires SPEND_CAP=<usd>)
+make tournament   # Werewolf exhibition on Ollama (stretch; time-budgeted)
 ```
 
-Keep the Makefile and README in sync with these commands.
+Targets arrive with their phase (PLAN v3). Keep the Makefile and README in sync with these commands.
 
 ## Code conventions
 
@@ -76,7 +75,7 @@ Keep the Makefile and README in sync with these commands.
 
 ## MCP design rules
 
-- Tool names `{prefix}_{action}` in snake_case (`refund_propose_resolution`, `ww_vote`).
+- Tool names `{prefix}_{action}` in snake_case (`doc_request_changes`, `ww_vote`).
 - Short descriptions: what the tool does and when to use it.
 - Input schemas from typed DTOs + Validator constraints; `structuredContent` with output schema where the SDK supports it.
 - Errors are actionable: what went wrong, what the caller can do instead (list currently visible tools).
@@ -84,10 +83,10 @@ Keep the Makefile and README in sync with these commands.
 
 ## Safety rules
 
-- No real money moves: `refund_issue` writes a `Refund` record through a fake payment provider.
+- No real money moves (until removal in M6, `refund_issue` only writes a `Refund` record through a fake payment provider).
 - Secrets only in `.env.local`; `.env` has placeholders.
-- MRTR `requestState` is HMAC-signed with `kernel.secret`, bound to the caller, and expires.
-- Seed case C3 contains a deliberate prompt injection. Do not "fix" it; it is the demo.
+- MRTR `requestState` is signed (SDK codec, `kernel.secret`), bound to the caller, and expires.
+- The recorded Werewolf demo game contains a deliberate prompt-injection statement and a villager's forbidden `ww_choose_victim` call (PLAN §3.5). Do not "fix" them; they are the demo. (Refund seed C3 stays as it is until the Refund Desk is removed.)
 
 ## Testing
 

@@ -4,7 +4,7 @@ out=$(sh $PS M1)
 expect_out    "plan-section M1: starts at M1"   '^\*\*M1 — '  "$(printf '%s' "$out" | head -1)"
 expect_no_out "plan-section M1: stops before M2" '\*\*M2 — '  "$out"
 out=$(sh $PS 3.2)
-expect_out    "plan-section 3.2: has YAML"      'refund_case:' "$out"
+expect_out    "plan-section 3.2: has YAML"      'doc_review:' "$out"
 expect_no_out "plan-section 3.2: stops before 3.3" '^### 3\.3' "$out"
 out=$(sh $PS 8)
 expect_out    "plan-section 8: keeps fenced ## lines" '^## N\.' "$out"

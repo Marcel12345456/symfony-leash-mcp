@@ -5,20 +5,21 @@
 
 ## Current
 
-- Phase: M2 — HumanInput / MRTR, **in progress** [R] (needs human review before merge). Done: request-state primitives, nonce store, server-side `input_required`/retry (`ApprovalFlowTest`); client side built (`RawMcpClient`, `HumanInputToolCaller`, `PendingInput`, `ResumePendingInput`, `RunNextActor`). Left: inbox + email, `RefundApprovalFlowTest` (refund policy, HTTP round trip), Inspector check.
+- **Plan v3 (2026-11-07):** Werewolf main, Doc Review second, Refund Desk retired in M6 (`decisions/022`, Tool Guard overlap). M3 (rules engine, pure PHP, [U]) may run in parallel with M2.
+- Phase: M2 — HumanInput / MRTR, **in progress** [R]. Done: request-state binding, nonce store, server `input_required`/retry (`ApprovalFlowTest`), client side (`RawMcpClient`, `HumanInputToolCaller`, `PendingInput`, `ResumePendingInput`, `RunNextActor`). Left: inbox + email, Inspector check.
 - Branch: m/phase-2-human-input (from main @ d43dd13).
-- Done-signal (agreed): `.claude/done.sh` exit 0 incl.
-  - [x] HumanInput unit (sign/verify, rejections, nonce idempotency); synthetic workflow MRTR.
-  - [x] Client: `input_required` → `PendingInput` + notification; answer → retry with original caller's token → `RunNextActor` dispatched. Tests: `DeferredInputFlowTest`, `RawMcpClientEndpointTest`, `RunNextActorOnResolvedTest`.
+- Done-signal (v3): `.claude/done.sh` exit 0 incl.
+  - [x] HumanInput unit; synthetic workflow MRTR; client deferral/resume tests.
   - [ ] Inbox: login redirect; signed URL works, expired not; submit dispatches resume; email has signed link.
-  - [ ] `RefundApprovalFlowTest` (C2 approve, lowered amount, duplicate, decline, revise, C7 reject).
+  - [ ] Enum elicitation renders as a choice; its answer resumes the synthetic workflow.
   - [ ] Manual Inspector 2.14.0 MRTR check, recorded here.
-- Packages still to add: form, twig-bundle, mailer. (doctrine-messenger added.)
+  - (dropped: `RefundApprovalFlowTest` → `DocReviewFlowTest` in M6)
+- Packages still to add: form, twig-bundle, mailer.
 - Blocked: none.
 
 ## Next prompt
 
-/phase M2 — continue: inbox (form, twig-bundle, mailer; login, signed expiring item URLs, dynamic form from elicitation schema → PendingInputAnswers, email notifier with signed link)
+/phase M2 — continue (plan v3): inbox (form, twig-bundle, mailer; login, signed expiring item URLs, dynamic form from elicitation schema incl. enum → choice, email notifier with signed link). In parallel or after: /phase M3 (qwen3:8b tool-call check first, then rules engine).
 
 ## Decisions
 
@@ -61,15 +62,20 @@
 
 - 2026-11-07: Client side built in `lib/HumanInput`: `Client\RawMcpClient` (one `call()`, resume = same call + answers + state), `Client\HumanInputToolCaller` (handler loop, max 10 rounds; deferred → "paused, do not retry" result with `_meta.pendingInput`), `Pending\PendingInput` entity (string id, 12 hex; no token), `PendingInputAnswers` (answer → `ResumePendingInput`), `ResumePendingInputHandler` (retry with `CallerTokens`; JSON-RPC error → `Failed`; re-ask → back to `Pending` + notify; duplicate message no-op; emits `PendingInputResolved`). Default notifier logs (inbox/email come next). The handler interface's context argument is a `ToolCall` (endpoint, subjectRef, callerId, tool, arguments), not SDK `InputContext`.
 - 2026-11-07: `symfony/doctrine-messenger` added; `async` transport (`MESSENGER_TRANSPORT_DSN`, `in-memory://` in test) carries `ResumePendingInput` and `RunNextActor`, so `RunNextActor` without a handler (until M3) does not throw. Migration adds `pending_input` + `messenger_messages`.
+- 2026-11-07: **Plan v3 — pivot** (human): Tool Guard (`acencyril/tool-guard-bundle`) already ships the refund-guard story (refund tagline, voters, Notifier approval, no agent resume). Werewolf becomes the headline, framed by mechanism (information hiding via scoped tools + resources, workflow as orchestrator, MRTR resume); Doc Review replaces the Refund Desk as the generality proof; RAG dropped; G1 (Fri 11-13) is the fallback switch; phases renumbered M3–M8, W track dissolved (`decisions/022`).
 - 2026-11-07: A resume answer under an unknown key is "No answer" (gate result), not a server re-ask; `askAgain` only runs if a server answers a retry with `input_required` again.
 
 ## Test changes
 
 <!-- Every weakened, deleted, skipped or changed assertion: date, test, reason. -->
 
+- 2026-11-07: `.claude/tests/bin.t.sh` "plan-section 3.2: has YAML" now expects `doc_review:` instead of `refund_case:`, because PLAN v3 §3.2 uses the Doc Review workflow as the metadata example (decisions/022). Same check, new content.
+
 ## Log
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
+
+- 2026-11-07 — Plan v3 written (docs only, no code). PLAN §1–§12 rewritten around Werewolf main + Doc Review; decision 022; CLAUDE.md pitch, tracks, commands, safety rules; `/phase` skill keys M1–M8; one `.claude` test assertion updated (see Test changes). Blocked: none. Needs review: plan v3 ([R]). Spend: $0.
 
 - 2026-11-07 — M2 continued (client side built). `lib/HumanInput/Client` (`RawMcpClient`, `HumanInputToolCaller`, `InputRequestHandlerInterface`, `CallerTokens`) and `Pending` (`PendingInput` entity, deferring handler, logging notifier, `PendingInputAnswers`, `ResumePendingInputHandler`, `PendingInputResolved`); App `RunNextActor` + listener; `StaticTokenHandler` implements `CallerTokens`. symfony/doctrine-messenger added, async transport; migration `pending_input` + `messenger_messages`. Tests: `DeferredInputFlowTest`, `RawMcpClientEndpointTest`, `RunNextActorOnResolvedTest`, `DoctrinePendingInputsTest`. Test changes: none (one new test corrected before its first commit). Blocked: none. Needs review: M2 branch ([R]), incl. async routing and `ToolCall` as handler context. Spend: $0.
 - 2026-11-07 — M2 continued (client side, research only). symfony/messenger installed (sync transport). VERIFY: decisions 020 (SDK `InputRequiredResult` has no `fromArray` → own VO; raw asks stored; `ElicitResult` answers) and 021 (`RequestEnvelope` + `HeaderFactory`; required MCP headers; `Accept: application/json`). Design: `PendingInputResolved` event in lib → App listener dispatches `RunNextActor` (`src/Agent/Message`); `CallerTokens` interface via `StaticTokenHandler`, no tokens in DB; toolset decorator and paused-subject skip deferred to M3. No code yet. Blocked: none. Needs review: M2 branch ([R]) incl. these design choices. Spend: $0.
