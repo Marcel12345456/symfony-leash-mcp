@@ -55,6 +55,8 @@
 - 2026-11-07: Inspector 2.14 supports MRTR per release notes (proposed until the manual check); Inspector pinned to 2.14.0 (`decisions/018`).
 - 2026-11-07: M2 creates and dispatches `RunNextActor` (message class only); the handler comes with the agents in M3 (human).
 - 2026-11-07: requestState: SDK codec is the only signature; HumanInput issues/checks the bound payload read via `getInputContext()?->requestState()` (verified array); no second HMAC; key via one `RequestStateKey` helper (`decisions/019`).
+- 2026-11-07: Approval wiring: transition metadata `mcp_approval: <name>` → `ApprovalPolicyInterface` (tagged, `#[AsTaggedItem]` name) via `HumanInputGate` in `TransitionToolHandler`; state bound to `<workflow>:<subjectId>` + tool name + caller; decline/cancel return a non-error result with unchanged state and visible tools. `WorkflowServerFactory::create()` takes the subject id; the controller sets the request-state key.
+- 2026-11-07: Duplicate retries usually target a tool that is no longer visible, so `UnavailableCapabilityResponder` replays stored results first. It reads the verified `InputContext` from the session key `InputContext::class` (observed SDK 0.9.0 behaviour, not a documented API). Clients must declare `elicitation.form` or the SDK answers -32021 instead of `input_required` (matters for the raw client).
 
 ## Test changes
 

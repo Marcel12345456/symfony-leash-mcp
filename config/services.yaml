@@ -44,5 +44,7 @@ services:
             - '../lib/HumanInput/RequestState/BoundRequest.php'
             - '../lib/HumanInput/RequestState/RejectionReason.php'
             - '../lib/HumanInput/RequestState/RequestStateRejected.php'
+            - '../lib/HumanInput/Server/Decision.php'
+            - '../lib/HumanInput/Server/Verdict.php'
 
     Leash\HumanInput\Idempotency\ProcessedInputRequests: '@Leash\HumanInput\Doctrine\DoctrineProcessedInputRequests'

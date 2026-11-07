@@ -60,6 +60,12 @@ final readonly class WorkflowMetadata
         return $class;
     }
 
+    /** Name of the approval policy (HumanInput) that guards this transition, if any. */
+    public static function transitionApproval(WorkflowInterface $workflow, Transition $transition): ?string
+    {
+        return self::optionalString($workflow, $workflow->getMetadataStore()->getTransitionMetadata($transition)['mcp_approval'] ?? null, 'mcp_approval of ' . $transition->getName());
+    }
+
     /** @return array<string, list<string>> tool name => roles */
     public static function placeTools(WorkflowInterface $workflow, string $place): array
     {

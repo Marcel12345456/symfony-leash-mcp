@@ -8,6 +8,8 @@ namespace App\Tests\Unit\Lib\WorkflowMcp\Fixture;
 final class Document
 {
     public bool $locked = false;
+    /** The `input` of the last applied transition context. */
+    public ?object $lastInput = null;
 
     public function __construct(
         private string $status = 'draft',
@@ -23,5 +25,7 @@ final class Document
     public function setStatus(string $status, array $context = []): void
     {
         $this->status = $status;
+        $input = $context['input'] ?? null;
+        $this->lastInput = \is_object($input) ? $input : null;
     }
 }
