@@ -5,17 +5,15 @@
 
 ## Current
 
-- Phase: M2 — HumanInput / MRTR, **in progress** [R] (branch needs human review before merge). Done: request-state primitives, Doctrine nonce store, `input_required`/retry on the synthetic workflow (`ApprovalFlowTest`). Client side designed (decisions 020, 021; Messenger installed), not yet built. Next: raw client, `InputRequestHandlerInterface`, `PendingInput` + notifier, `ResumePendingInput`, `PendingInputResolved` → `RunNextActor`.
+- Phase: M2 — HumanInput / MRTR, **in progress** [R] (needs human review before merge). Done: request-state primitives, nonce store, server-side `input_required`/retry (`ApprovalFlowTest`); client side designed (decisions 020, 021; Messenger installed), not built.
 - Branch: m/phase-2-human-input (from main @ d43dd13).
-- VERIFY done: decisions/016 (list_changed not pursued), 017 (raw client MRTR), 018 (Inspector MRTR, proposed), 020 (result parsing), 021 (raw client wire).
-- Done-signal (agreed with human): `.claude/done.sh` exit 0 incl.
-  - HumanInput unit: request state sign/verify; tampered, expired, wrong caller, mismatched args rejected; nonce idempotency.
-  - Synthetic workflow: first call `input_required` with no side effects; valid retry applies once; duplicate retry idempotent; decline/cancel → no change.
-  - Client: `input_required` → `PendingInput` + notification; answer → retry with the original caller's token → `RunNextActor` dispatched (message class only; handler in M3). Tests: `DeferredInputFlowTest` (synthetic workflow), `RawMcpClientEndpointTest` (C2 over HTTP), `RunNextActorOnResolvedTest`.
-  - Inbox: no login → redirect; signed URL works without login; expired does not; form submit dispatches resume; email contains the signed link.
-  - `RefundApprovalFlowTest`: C2 `input_required` → inbox submit → retry → one `Refund`, case `refunded`; lowered amount; duplicate retry; decline stays `proposed`; `refund_revise` → `investigating`; C7 reject → `closed`.
-  - Manual: Inspector 2.14.0 MRTR check, result recorded here.
-- New packages for M2: symfony/messenger, form, twig-bundle, mailer.
+- Done-signal (agreed): `.claude/done.sh` exit 0 incl.
+  - [x] HumanInput unit (sign/verify, rejections, nonce idempotency); synthetic workflow MRTR.
+  - [ ] Client: `input_required` → `PendingInput` + notification; answer → retry with original caller's token → `RunNextActor` dispatched. Tests: `DeferredInputFlowTest`, `RawMcpClientEndpointTest`, `RunNextActorOnResolvedTest`.
+  - [ ] Inbox: login redirect; signed URL works, expired not; submit dispatches resume; email has signed link.
+  - [ ] `RefundApprovalFlowTest` (C2 approve, lowered amount, duplicate, decline, revise, C7 reject).
+  - [ ] Manual Inspector 2.14.0 MRTR check, recorded here.
+- Packages still to add: form, twig-bundle, mailer.
 - Blocked: none.
 
 ## Next prompt
