@@ -399,6 +399,7 @@ Acceptance:
 
 **M2 — HumanInput / MRTR (Tue 11-10 → Thu 11-12)** [R]
 Approval policy (incl. `applyAnswer()`); `input_required` with signed `requestState`; retry verification + idempotency; client `InputRequiredResult`, handler interface, `PendingInput`; inbox with dynamic form; signed URLs; `ResumePendingInput`; email channel.
+Tool-list change notification [U]: **VERIFY** whether mcp/sdk 0.9.0 can emit `notifications/tools/list_changed` in the SSE response of a `tools/call` (per-request server, stateless 2026-07-28 and legacy wire) and whether MCP Inspector refreshes on it; if yes, emit it after every applied transition (library, synthetic-workflow test); if no, record why in `docs/decisions/` and leave it (agents re-list per step, decisions/005). Gap found in the M1 Inspector check.
 Acceptance:
 - Scripted resolver client calls `refund_issue` on C2 → `input_required`; inbox form submit → retry → `Refund` row; case `refunded`.
 - Duplicate retry → one refund. Tampered/expired/wrong-caller/mismatched-args `requestState` → clear rejection. Decline → stays `proposed`; `refund_revise` → `investigating`; a reject proposal then closes C7. Approver lowers the amount → `Refund` row has the lower amount.
