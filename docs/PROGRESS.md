@@ -57,6 +57,7 @@ Done-signal: `.claude/done.sh` exit 0, with these tests present and green:
 - 2026-11-06: Workflow metadata via `getMetadataStore()` + Transition instances; roles from metadata + `RoleResolverInterface`, guards for state/voters; `ActorSelector` runs token-less (`decisions/012`).
 - 2026-11-07: SchemaFactory wraps ai-platform `Contract\JsonSchema\Factory::buildProperties` + one normalizer (nullable/required, enum null, exclusiveMinimum); Serializer with COLLECT errors for input DTOs (`decisions/013`, proposed until SchemaFactoryTest pins it).
 - 2026-11-07: mcp/sdk API cheat sheet; server `RequestHandlerInterface` is covariant (no ignore needed); lib tests run in-process via `buildStateless()->handleInline()` with the `_meta` envelope (`decisions/014`).
+- 2026-11-07: Published inputSchema is structural only (types, enums, required, `additionalProperties: false`); Validator constraints stay server-side so violations are actionable `CallToolResult` errors, not SDK -32602. Tool closures read raw args via `RequestContext::getRequest()`; endpoint finds workflows via `#[AutowireLocator('workflow', indexAttribute: 'name')]` (`decisions/015`; 013 now accepted).
 
 ## Test changes
 

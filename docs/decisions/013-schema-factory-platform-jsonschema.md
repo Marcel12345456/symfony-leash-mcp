@@ -1,7 +1,7 @@
 # 013 — SchemaFactory: reuse Platform JsonSchema Factory for DTO input schemas
 
 - Date: 2026-11-07
-- Status: proposed (derived by code reading; flip to accepted once `SchemaFactoryTest` pins the output)
+- Status: accepted (output and the raw-factory quirks pinned by `tests/Unit/Lib/WorkflowMcp/SchemaFactoryTest.php`); refined by decision 015
 - PLAN reference: §3.2 WorkflowMcp `SchemaFactory`; builds on decisions 005 and 011
 
 ## Question
@@ -28,6 +28,7 @@ Can an existing factory in symfony/ai-platform 0.15.0 or mcp/sdk 0.9.0 build a t
 - drop `nullable`; boolean `exclusiveMinimum` → numeric 2020-12 form;
 - remove nullable fields from `required`; add `null` to a nullable enum's `enum`;
 - `null` result → `{type: object, properties: {}}` (stdClass properties so it encodes as `{}`).
+- (decision 015) publish only structural keywords (type, enum, items, description); constraint keywords stay with the Validator so violations are actionable instead of SDK -32602 errors.
 
 Denormalize with `Serializer([BackedEnumNormalizer, ObjectNormalizer])` + `COLLECT_DENORMALIZATION_ERRORS`; format one actionable line per field. Then validate with Symfony Validator (decision 011: the handler re-checks so messages stay actionable).
 

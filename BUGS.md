@@ -24,6 +24,13 @@
 - Expected: the configured `http_client` (and its timeout) is used.
 - Workaround: `default_socket_timeout=300` in `docker/php/leash.ini`.
 
+## symfony/ai-platform 0.15.0 — `JsonSchema\Factory` emits invalid/unusable schema for nullable and constrained properties
+
+- Repro: `(new Factory())->buildProperties(ReviewInput::class)` with `public ?Verdict $previous = null`, `public ?string $note`, `#[Assert\Positive] public int $score` (`tests/Unit/Lib/WorkflowMcp/SchemaFactoryTest::testPlatformFactoryRawOutputNeedsTheNormalizer`).
+- Actual: `previous` → `{type: ["string","null"], enum: ["keep","drop"]}` (null fails the enum); `note` is in `required` although nullable; `score` gets draft-4 boolean `exclusiveMinimum: true`; NotBlank emits OpenAPI `nullable`.
+- Expected: `enum` includes `null` for nullable enums; JSON Schema 2020-12 numeric `exclusiveMinimum`; no OpenAPI keywords. (Required-for-nullable is debatable; MCP clients then must send `null`.)
+- Workaround: `Leash\WorkflowMcp\Schema\SchemaFactory::normalize()` (decisions/013, 015).
+
 ## Candidates (from code reading, not yet reproduced)
 
 - **symfony/ai-agent 0.15.0 — tool list frozen per run.** `Execution/Runner.php:76` exposes `toolbox->getTools()` once; the comment at `:304` says toolbox tools can change during a run, but `$options['tools']` is never refreshed. Repro idea: toolbox whose `getTools()` changes after the first `execute()`; the second model request still carries the old list. Workaround: one agent run per workflow step (`decisions/006`).
