@@ -5,15 +5,15 @@
 
 ## Current
 
-- Phase: M2 — HumanInput / MRTR, **in progress** [R] (needs human review before merge). Done: request-state primitives, nonce store, server-side `input_required`/retry (`ApprovalFlowTest`); client side designed (decisions 020, 021; Messenger installed), not built.
+- Phase: M2 — HumanInput / MRTR, **in progress** [R] (needs human review before merge). Done: request-state primitives, nonce store, server-side `input_required`/retry (`ApprovalFlowTest`); client side built (`RawMcpClient`, `HumanInputToolCaller`, `PendingInput` + notifier, `ResumePendingInput`, `RunNextActor`).
 - Branch: m/phase-2-human-input (from main @ d43dd13).
 - Done-signal (agreed): `.claude/done.sh` exit 0 incl.
   - [x] HumanInput unit (sign/verify, rejections, nonce idempotency); synthetic workflow MRTR.
-  - [ ] Client: `input_required` → `PendingInput` + notification; answer → retry with original caller's token → `RunNextActor` dispatched. Tests: `DeferredInputFlowTest`, `RawMcpClientEndpointTest`, `RunNextActorOnResolvedTest`.
+  - [x] Client: `input_required` → `PendingInput` + notification; answer → retry with original caller's token → `RunNextActor` dispatched. Tests: `DeferredInputFlowTest`, `RawMcpClientEndpointTest`, `RunNextActorOnResolvedTest`.
   - [ ] Inbox: login redirect; signed URL works, expired not; submit dispatches resume; email has signed link.
   - [ ] `RefundApprovalFlowTest` (C2 approve, lowered amount, duplicate, decline, revise, C7 reject).
   - [ ] Manual Inspector 2.14.0 MRTR check, recorded here.
-- Packages still to add: form, twig-bundle, mailer.
+- Packages still to add: form, twig-bundle, mailer. (doctrine-messenger added.)
 - Blocked: none.
 
 ## Next prompt
@@ -58,6 +58,10 @@
 - 2026-11-07: Client MRTR parsing: SDK `InputRequiredResult` has no `fromArray` → Leash `InputRequired` VO (raw `inputRequests` + `requestState`), inlined `resultType` check, `CallToolResult::fromArray` otherwise; `PendingInput` stores raw wire asks; answers via `ElicitResult` under the same key, `inputResponses` as object (`decisions/020`).
 - 2026-11-07: Raw client wire: `RequestEnvelope::stamp` + `HeaderFactory::forMessage` (MCP-Protocol-Version, Mcp-Method, Mcp-Name required, else 400); `Accept: application/json` forces JSON; no session id; SSE `data:` fallback (`decisions/021`).
 - 2026-11-07: `RunNextActor` lives in `src/Agent/Message` (§3.4); lib's resume handler emits a generic `PendingInputResolved` event and an App listener dispatches `RunNextActor` (G2). Caller tokens for resume come from a lib `CallerTokens` interface implemented by `StaticTokenHandler`; no tokens stored in `PendingInput`. Agent toolset decorator and `ActorSelector` paused-subject skip deferred to M3.
+
+- 2026-11-07: Client side built in `lib/HumanInput`: `Client\RawMcpClient` (one `call()`, resume = same call + answers + state), `Client\HumanInputToolCaller` (handler loop, max 10 rounds; deferred → "paused, do not retry" result with `_meta.pendingInput`), `Pending\PendingInput` entity (string id, 12 hex; no token), `PendingInputAnswers` (answer → `ResumePendingInput`), `ResumePendingInputHandler` (retry with `CallerTokens`; JSON-RPC error → `Failed`; re-ask → back to `Pending` + notify; duplicate message no-op; emits `PendingInputResolved`). Default notifier logs (inbox/email come next). The handler interface's context argument is a `ToolCall` (endpoint, subjectRef, callerId, tool, arguments), not SDK `InputContext`.
+- 2026-11-07: `symfony/doctrine-messenger` added; `async` transport (`MESSENGER_TRANSPORT_DSN`, `in-memory://` in test) carries `ResumePendingInput` and `RunNextActor`, so `RunNextActor` without a handler (until M3) does not throw. Migration adds `pending_input` + `messenger_messages`.
+- 2026-11-07: A resume answer under an unknown key is "No answer" (gate result), not a server re-ask; `askAgain` only runs if a server answers a retry with `input_required` again.
 
 ## Test changes
 

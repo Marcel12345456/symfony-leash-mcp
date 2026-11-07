@@ -15,6 +15,7 @@ use Leash\WorkflowMcp\Schema\SchemaFactory;
 use Leash\WorkflowMcp\Server\WorkflowServerFactory;
 use Leash\WorkflowMcp\Tool\PlaceToolHandler;
 use Leash\WorkflowMcp\Tool\TransitionToolHandler;
+use Mcp\Server\Builder;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -65,7 +66,13 @@ final class Harness
     /** A stateless client for one caller on one subject, signing request states with the test key. */
     public function client(WorkflowInterface $workflow, object $subject, UserInterface $caller, string $subjectId = 'd1'): StatelessClient
     {
-        return new StatelessClient($this->servers->create($workflow, $subject, $caller, $subjectId)->setRequestState(self::requestStateKey(), RequestBinder::DEFAULT_TTL));
+        return new StatelessClient($this->builder($workflow, $subject, $caller, $subjectId));
+    }
+
+    /** The server builder for one caller on one subject, signing request states with the test key. */
+    public function builder(WorkflowInterface $workflow, object $subject, UserInterface $caller, string $subjectId = 'd1'): Builder
+    {
+        return $this->servers->create($workflow, $subject, $caller, $subjectId)->setRequestState(self::requestStateKey(), RequestBinder::DEFAULT_TTL);
     }
 
     public static function requestStateKey(): string
