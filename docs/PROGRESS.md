@@ -5,12 +5,17 @@
 
 ## Current
 
-- Phase: M1 — WorkflowMcp with roles, **done** (acceptance green, 81 tests). [R]: whole M1 branch needs human review before merge (public API of `lib/WorkflowMcp`).
-- Branch: m/phase-1-workflow-mcp (from main @ 2eb412b), pushed, not merged.
-- Done-signal: `.claude/done.sh` exit 0 incl. `RefundMcpEndpointTest`, provider/schema/handler/selector unit tests, refund visibility + actor tests, architecture test.
-- Blocked: — Before `/phase M2`: human reviews and merges m/phase-1-workflow-mcp (PR), so M2 branches from a main that has M1.
-- 2026-11-07 Inspector check (human, Node 24, `make inspector`): investigator on C1 lists only `refund_start_investigation`; its result shows `investigating` + the four investigating tools; resolver lists only `refund_search_policy`. M1 acceptance met.
-- Gap (not M1-blocking): no `list_changed` notification, so the Inspector UI keeps its old list until reconnect (PLAN §3.2 Caching: "where the transport supports them"). Agents re-list per step (decisions/005).
+- Phase: M2 — HumanInput / MRTR, **started** [R] (whole branch needs human review before merge). M1 merged to main (PR #4).
+- Branch: m/phase-2-human-input (from main @ d43dd13).
+- VERIFY done: decisions/016 (list_changed not pursued), 017 (raw client MRTR), 018 (Inspector MRTR, proposed).
+- Done-signal (agreed with human): `.claude/done.sh` exit 0 incl.
+  - HumanInput unit: request state sign/verify; tampered, expired, wrong caller, mismatched args rejected; nonce idempotency.
+  - Synthetic workflow: first call `input_required` with no side effects; valid retry applies once; duplicate retry idempotent; decline/cancel → no change.
+  - Client: `input_required` → `PendingInput` + notification; answer → retry with the original caller's token → `RunNextActor` dispatched (message class only; handler in M3).
+  - Inbox: no login → redirect; signed URL works without login; expired does not; form submit dispatches resume; email contains the signed link.
+  - `RefundApprovalFlowTest`: C2 `input_required` → inbox submit → retry → one `Refund`, case `refunded`; lowered amount; duplicate retry; decline stays `proposed`; `refund_revise` → `investigating`; C7 reject → `closed`.
+  - Manual: Inspector 2.14.0 MRTR check, result recorded here.
+- New packages for M2: symfony/messenger, form, twig-bundle, mailer.
 
 ## Next prompt
 
