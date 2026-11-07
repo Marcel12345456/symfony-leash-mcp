@@ -9,7 +9,7 @@
 - Branch: m/phase-1-workflow-mcp (from main @ 2eb412b), pushed, not merged.
 - Done-signal: `.claude/done.sh` exit 0 incl. `RefundMcpEndpointTest`, provider/schema/handler/selector unit tests, refund visibility + actor tests, architecture test.
 - Blocked: — Before `/phase M2`: human reviews and merges m/phase-1-workflow-mcp (PR), so M2 branches from a main that has M1.
-- Not done (optional per plan): `make inspector` target / manual Inspector check.
+- `make inspector TOKEN=…` added (PLAN M1 acceptance is phrased via the Inspector). Manual check pending (human): needs host Node ^22.23.4 / ^24.22.1; expected lists = `RefundMcpEndpointTest`.
 
 ## Next prompt
 
