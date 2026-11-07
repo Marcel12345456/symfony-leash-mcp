@@ -5,9 +5,9 @@
 
 ## Current
 
-- Phase: M2 — HumanInput / MRTR, **in progress** [R] (branch needs human review before merge). Done: request-state primitives, Doctrine nonce store, `input_required`/retry on the synthetic workflow (`ApprovalFlowTest`). Next: client side (raw MRTR client, `PendingInput`, notifier, `RunNextActor`).
+- Phase: M2 — HumanInput / MRTR, **in progress** [R] (branch needs human review before merge). Done: request-state primitives, Doctrine nonce store, `input_required`/retry on the synthetic workflow (`ApprovalFlowTest`). Client side designed (decisions 020, 021; Messenger installed), not yet built. Next: raw client, `InputRequestHandlerInterface`, `PendingInput` + notifier, `ResumePendingInput`, `PendingInputResolved` → `RunNextActor`.
 - Branch: m/phase-2-human-input (from main @ d43dd13).
-- VERIFY done: decisions/016 (list_changed not pursued), 017 (raw client MRTR), 018 (Inspector MRTR, proposed).
+- VERIFY done: decisions/016 (list_changed not pursued), 017 (raw client MRTR), 018 (Inspector MRTR, proposed), 020 (result parsing), 021 (raw client wire).
 - Done-signal (agreed with human): `.claude/done.sh` exit 0 incl.
   - HumanInput unit: request state sign/verify; tampered, expired, wrong caller, mismatched args rejected; nonce idempotency.
   - Synthetic workflow: first call `input_required` with no side effects; valid retry applies once; duplicate retry idempotent; decline/cancel → no change.
@@ -20,7 +20,7 @@
 
 ## Next prompt
 
-/phase M2 — continue: client side (raw MRTR client, InputRequestHandlerInterface, PendingInput + notification, RunNextActor)
+/phase M2 — continue: build client side per decisions 020/021 (raw client, InputRequestHandlerInterface, PendingInput + notifier, ResumePendingInput, RunNextActor)
 
 ## Decisions
 
@@ -69,6 +69,7 @@
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
 
+- 2026-11-07 — M2 continued (client side, research only). symfony/messenger installed (sync transport). VERIFY: decisions 020 (SDK `InputRequiredResult` has no `fromArray` → own VO; raw asks stored; `ElicitResult` answers) and 021 (`RequestEnvelope` + `HeaderFactory`; required MCP headers; `Accept: application/json`). Design: `PendingInputResolved` event in lib → App listener dispatches `RunNextActor` (`src/Agent/Message`); `CallerTokens` interface via `StaticTokenHandler`, no tokens in DB; toolset decorator and paused-subject skip deferred to M3. No code yet. Blocked: none. Needs review: M2 branch ([R]) incl. these design choices. Spend: $0.
 - 2026-11-07 — M2 continued. Doctrine `ProcessedInputRequest` store + migration (apply and record in one transaction). `HumanInputGate` + `ApprovalPolicyInterface`; `mcp_approval` transition metadata; `TransitionToolHandler` asks first, verifies the bound state, applies the amended input once, replays duplicates (also in `UnavailableCapabilityResponder`, via the SDK session's `InputContext`); decline/cancel change nothing. `ApprovalFlowTest` on the synthetic workflow covers the done-signal bullet. Test changes: none weakened; `TransitionToolHandlerTest` gained `assertInstanceOf` for the wider return type; `StatelessClient` declares `elicitation.form`. Open follow-up: narrow `\Throwable` in the `RequestBinderTest` tamper tests. Blocked: none. Needs review: M2 branch ([R]), incl. the session-key read in the responder. Spend: $0.
 - 2026-11-07 — M2 continued. Decision 019: SDK codec signs/verifies requestState and hands the decoded payload to the handler, so no second HMAC. `lib/HumanInput`: `RequestBinder` (issue/verify bound payload; reasons tampered/expired/wrong target/wrong caller/args mismatch), `RequestStateKey`, `ArgumentsHash`, `ProcessedInputRequests` + in-memory store; unit tests. Not yet wired into the synthetic workflow. Follow-up: tamper/wrong-key tests catch `\Throwable`; narrow to the SDK's `RequestStateException`. PROGRESS Current shortened (session-start handoff is cut at 2000 chars). Blocked: none. Needs review: M2 branch ([R]). Spend: $0.
 - 2026-11-07 — M2 started. Branch from main with M1 (PR #4). VERIFY: decisions 016 (list_changed not pursued), 017 (raw client MRTR), 018 (Inspector MRTR, proposed); BUGS.md: `Client::callTool` cannot defer `input_required`; Inspector pinned 2.14.0; done-signal agreed. Blocked: none. Needs review: whole M2 branch ([R]) once built. Spend: $0.
