@@ -60,6 +60,8 @@
 - 2026-11-07: Werewolf over MCP exists outside the hackathon (Mafia/Werewolf MCP servers, LLM benchmarks; not yet verified by us): video hook is mechanism first, README related work names them (links VERIFY before M8). Overlap scan of all 43 hackathon projects pending until the human pastes the list.
 - 2026-11-07: A resume answer under an unknown key is "No answer" (gate result), not a server re-ask; `askAgain` only runs if a server answers a retry with `input_required` again.
 
+- 2026-11-07: M3: `qwen3:8b` calls tools through the Symfony AI Ollama bridge (3/3) and Ollama direct (4/4); thinking ~8–12 s per tool step vs 1.1 s with `think: false`; `/no_think` soft switch has no effect through the bridge. Default stays thinking + replay; bridge `think` option is a VERIFY for M4 (`decisions/002` addendum).
+
 ## Test changes
 
 <!-- Every weakened, deleted, skipped or changed assertion: date, test, reason. -->
