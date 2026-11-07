@@ -51,4 +51,4 @@ inspector: ## make inspector TOKEN=<agent token from .env.local> [INSPECTOR_CASE
 	  || { echo "MCP Inspector needs Node ^22.23.4, ^24.22.1 or >=26.12.1 (found $$(node --version)); e.g. nvm install 24" >&2; exit 2; }
 	@docker compose --progress quiet run -d --rm --service-ports --no-deps --name leash-inspector-php php php -S 0.0.0.0:8000 -t public >/dev/null
 	@sh -c 'trap "docker stop leash-inspector-php >/dev/null" EXIT INT TERM; \
-	  npx -y @modelcontextprotocol/inspector --server-url "http://127.0.0.1:$${LEASH_PORT:-8000}/mcp/refund_case/$(INSPECTOR_CASE)" --transport http --header "Authorization: Bearer $(TOKEN)"'
+	  npx -y @modelcontextprotocol/inspector@2.14.0 --server-url "http://127.0.0.1:$${LEASH_PORT:-8000}/mcp/refund_case/$(INSPECTOR_CASE)" --transport http --header "Authorization: Bearer $(TOKEN)"'

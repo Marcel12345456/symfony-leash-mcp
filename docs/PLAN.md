@@ -222,7 +222,7 @@ framework:
 
 **Client side:**
 
-- `InputRequiredResult` value object (from the SDK result, or parsed raw if the SDK lacks it).
+- `InputRequiredResult` value object (from the SDK result, or parsed raw if the SDK lacks it). `Mcp\Client` cannot surface `input_required` or send a later retry, so first call and resume go through one small raw JSON-RPC client in `lib/HumanInput` (decisions/017).
 - `InputRequestHandlerInterface::handle(InputRequiredResult $r, InputContext $ctx): InputOutcome` → `Answered` (sync: tests, scripted approver) or `Deferred` (human later).
 - `DeferringInputRequestHandler` persists `PendingInput` (subject ref, capability, arguments, inputRequests, requestState, status, timestamps, response) and calls `HumanInputNotifier`.
 - `HumanInputNotifier` channels:
@@ -399,7 +399,7 @@ Acceptance:
 
 **M2 — HumanInput / MRTR (Tue 11-10 → Thu 11-12)** [R]
 Approval policy (incl. `applyAnswer()`); `input_required` with signed `requestState`; retry verification + idempotency; client `InputRequiredResult`, handler interface, `PendingInput`; inbox with dynamic form; signed URLs; `ResumePendingInput`; email channel.
-Tool-list change notification [U]: **VERIFY** whether mcp/sdk 0.9.0 can emit `notifications/tools/list_changed` in the SSE response of a `tools/call` (per-request server, stateless 2026-07-28 and legacy wire) and whether MCP Inspector refreshes on it; if yes, emit it after every applied transition (library, synthetic-workflow test); if no, record why in `docs/decisions/` and leave it (agents re-list per step, decisions/005). Gap found in the M1 Inspector check.
+Tool-list change notification [U]: (verified: decisions/016) — **not pursued**: the 2026-07-28 spec allows `list_changed` only on a `subscriptions/listen` stream, never in a `tools/call` stream, and our per-request registry never publishes; the `tools/call` result already names `availableTools`, agents re-list per step (decisions/005). Gap found in the M1 Inspector check.
 Acceptance:
 - Scripted resolver client calls `refund_issue` on C2 → `input_required`; inbox form submit → retry → `Refund` row; case `refunded`.
 - Duplicate retry → one refund. Tampered/expired/wrong-caller/mismatched-args `requestState` → clear rejection. Decline → stays `proposed`; `refund_revise` → `investigating`; a reject proposal then closes C7. Approver lowers the amount → `Refund` row has the lower amount.

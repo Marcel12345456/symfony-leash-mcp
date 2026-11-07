@@ -44,6 +44,9 @@
 - 2026-11-07: Published inputSchema is structural only (types, enums, required, `additionalProperties: false`); Validator constraints stay server-side so violations are actionable `CallToolResult` errors, not SDK -32602. Tool closures read raw args via `RequestContext::getRequest()`; endpoint finds workflows via `#[AutowireLocator('workflow', indexAttribute: 'name')]` (`decisions/015`; 013 now accepted).
 - 2026-11-07: RefundDesk M1 choices: seed adds closed history case H5 (refund of O5) so C5 is a duplicate; `issue` pays the proposed amount via `FakePaymentProvider` (`IssueRefundListener`); policy text authored in `data/policy/*.md` (keyword stub now, RAG in M3); `CaseEventLogger` ignores unmanaged subjects; `make install` now migrates and seeds.
 - 2026-11-07: `/mcp/` firewall: stateless `access_token` + `StaticTokenHandler` (env tokens, `hash_equals`, empty never matches) + `BearerEntryPoint`, because the access_token authenticator sends no `WWW-Authenticate` on a missing token (RFC 6750).
+- 2026-11-07: M2 list_changed not pursued: spec forbids it in a `tools/call` stream; `availableTools` in results + re-list per step (`decisions/016`).
+- 2026-11-07: Client MRTR via a raw JSON-RPC client in `lib/HumanInput` (first call + resume with the original caller's token); `Mcp\Client` auto-resolves and hides `requestState`. SDK rejects bad SDK state with -32602; our payload checks (caller, argsHash, nonce) give `CallToolResult` errors; SDK state TTL raised to ≥ 24 h (`decisions/017`).
+- 2026-11-07: Inspector 2.14 supports MRTR per release notes (proposed until the manual check); Inspector pinned to 2.14.0 (`decisions/018`).
 
 ## Test changes
 
