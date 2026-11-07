@@ -11,7 +11,7 @@
 - Done-signal (agreed with human): `.claude/done.sh` exit 0 incl.
   - HumanInput unit: request state sign/verify; tampered, expired, wrong caller, mismatched args rejected; nonce idempotency.
   - Synthetic workflow: first call `input_required` with no side effects; valid retry applies once; duplicate retry idempotent; decline/cancel → no change.
-  - Client: `input_required` → `PendingInput` + notification; answer → retry with the original caller's token → `RunNextActor` dispatched (message class only; handler in M3).
+  - Client: `input_required` → `PendingInput` + notification; answer → retry with the original caller's token → `RunNextActor` dispatched (message class only; handler in M3). Tests: `DeferredInputFlowTest` (synthetic workflow), `RawMcpClientEndpointTest` (C2 over HTTP), `RunNextActorOnResolvedTest`.
   - Inbox: no login → redirect; signed URL works without login; expired does not; form submit dispatches resume; email contains the signed link.
   - `RefundApprovalFlowTest`: C2 `input_required` → inbox submit → retry → one `Refund`, case `refunded`; lowered amount; duplicate retry; decline stays `proposed`; `refund_revise` → `investigating`; C7 reject → `closed`.
   - Manual: Inspector 2.14.0 MRTR check, result recorded here.
