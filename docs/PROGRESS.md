@@ -6,7 +6,7 @@
 ## Current
 
 - Plan v3 (`decisions/022`): Werewolf main, Doc Review second, Refund Desk retired in M6.
-- **M3 Werewolf rules [U]: done** on m/phase-3-werewolf-rules (pushed, unmerged; merge = human). Engine `src/Werewolf/Rules`, tests `tests/Unit/Werewolf/Rules` + `tests/Architecture/WerewolfRulesPurityTest`, qwen3 tool-call result in `decisions/002`. `.claude/done.sh` green.
+- Phase: **M3 Werewolf rules [U] done** on m/phase-3-werewolf-rules (pushed, unmerged; merge = human). Engine `src/Werewolf/Rules`, tests `tests/Unit/Werewolf/Rules` + `tests/Architecture/WerewolfRulesPurityTest`, qwen3 tool-call result in `decisions/002`. `.claude/done.sh` green.
 - Unattended run (human, 2026-11-07) continues: push branches yes, merge/force-push no. Next: M2 HumanInput [R] on m/phase-2-human-input: inbox + email (login, signed expiring URLs, enum → choice), Inspector check. Done-signal: PLAN M2 acceptance + `.claude/done.sh`. Stays unmerged, "needs review".
 - M2 branch's PROGRESS does not have the M3 entries yet; copy the M3 Log/Decisions lines over when the branches meet.
 - Blocked: none.
