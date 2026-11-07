@@ -5,7 +5,7 @@
 
 ## Current
 
-- Phase: M2 — HumanInput / MRTR, **in progress** [R] (needs human review before merge). Done: request-state primitives, nonce store, server-side `input_required`/retry (`ApprovalFlowTest`); client side built (`RawMcpClient`, `HumanInputToolCaller`, `PendingInput` + notifier, `ResumePendingInput`, `RunNextActor`).
+- Phase: M2 — HumanInput / MRTR, **in progress** [R] (needs human review before merge). Done: request-state primitives, nonce store, server-side `input_required`/retry (`ApprovalFlowTest`); client side built (`RawMcpClient`, `HumanInputToolCaller`, `PendingInput`, `ResumePendingInput`, `RunNextActor`). Left: inbox + email, `RefundApprovalFlowTest` (refund policy, HTTP round trip), Inspector check.
 - Branch: m/phase-2-human-input (from main @ d43dd13).
 - Done-signal (agreed): `.claude/done.sh` exit 0 incl.
   - [x] HumanInput unit (sign/verify, rejections, nonce idempotency); synthetic workflow MRTR.
@@ -18,7 +18,7 @@
 
 ## Next prompt
 
-/phase M2 — continue: build client side per decisions 020/021 (raw client, InputRequestHandlerInterface, PendingInput + notifier, ResumePendingInput, RunNextActor)
+/phase M2 — continue: inbox (form, twig-bundle, mailer; login, signed expiring item URLs, dynamic form from elicitation schema → PendingInputAnswers, email notifier with signed link)
 
 ## Decisions
 
@@ -71,6 +71,7 @@
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
 
+- 2026-11-07 — M2 continued (client side built). `lib/HumanInput/Client` (`RawMcpClient`, `HumanInputToolCaller`, `InputRequestHandlerInterface`, `CallerTokens`) and `Pending` (`PendingInput` entity, deferring handler, logging notifier, `PendingInputAnswers`, `ResumePendingInputHandler`, `PendingInputResolved`); App `RunNextActor` + listener; `StaticTokenHandler` implements `CallerTokens`. symfony/doctrine-messenger added, async transport; migration `pending_input` + `messenger_messages`. Tests: `DeferredInputFlowTest`, `RawMcpClientEndpointTest`, `RunNextActorOnResolvedTest`, `DoctrinePendingInputsTest`. Test changes: none (one new test corrected before its first commit). Blocked: none. Needs review: M2 branch ([R]), incl. async routing and `ToolCall` as handler context. Spend: $0.
 - 2026-11-07 — M2 continued (client side, research only). symfony/messenger installed (sync transport). VERIFY: decisions 020 (SDK `InputRequiredResult` has no `fromArray` → own VO; raw asks stored; `ElicitResult` answers) and 021 (`RequestEnvelope` + `HeaderFactory`; required MCP headers; `Accept: application/json`). Design: `PendingInputResolved` event in lib → App listener dispatches `RunNextActor` (`src/Agent/Message`); `CallerTokens` interface via `StaticTokenHandler`, no tokens in DB; toolset decorator and paused-subject skip deferred to M3. No code yet. Blocked: none. Needs review: M2 branch ([R]) incl. these design choices. Spend: $0.
 - 2026-11-07 — M2 continued. Doctrine `ProcessedInputRequest` store + migration (apply and record in one transaction). `HumanInputGate` + `ApprovalPolicyInterface`; `mcp_approval` transition metadata; `TransitionToolHandler` asks first, verifies the bound state, applies the amended input once, replays duplicates (also in `UnavailableCapabilityResponder`, via the SDK session's `InputContext`); decline/cancel change nothing. `ApprovalFlowTest` on the synthetic workflow covers the done-signal bullet. Test changes: none weakened; `TransitionToolHandlerTest` gained `assertInstanceOf` for the wider return type; `StatelessClient` declares `elicitation.form`. Open follow-up: narrow `\Throwable` in the `RequestBinderTest` tamper tests. Blocked: none. Needs review: M2 branch ([R]), incl. the session-key read in the responder. Spend: $0.
 - 2026-11-07 — M2 continued. Decision 019: SDK codec signs/verifies requestState and hands the decoded payload to the handler, so no second HMAC. `lib/HumanInput`: `RequestBinder` (issue/verify bound payload; reasons tampered/expired/wrong target/wrong caller/args mismatch), `RequestStateKey`, `ArgumentsHash`, `ProcessedInputRequests` + in-memory store; unit tests. Not yet wired into the synthetic workflow. Follow-up: tamper/wrong-key tests catch `\Throwable`; narrow to the SDK's `RequestStateException`. PROGRESS Current shortened (session-start handoff is cut at 2000 chars). Blocked: none. Needs review: M2 branch ([R]). Spend: $0.
