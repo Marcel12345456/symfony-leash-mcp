@@ -5,7 +5,7 @@
 
 ## Current
 
-- Phase: M2 — HumanInput / MRTR, **started** [R] (whole branch needs human review before merge). M1 merged to main (PR #4).
+- Phase: M2 — HumanInput / MRTR, **in progress** [R]: setup + VERIFY done, no code yet. Left: everything in the done-signal below, starting with request-state primitives in `lib/HumanInput`. (whole branch needs human review before merge). M1 merged to main (PR #4).
 - Branch: m/phase-2-human-input (from main @ d43dd13).
 - VERIFY done: decisions/016 (list_changed not pursued), 017 (raw client MRTR), 018 (Inspector MRTR, proposed).
 - Done-signal (agreed with human): `.claude/done.sh` exit 0 incl.
@@ -16,10 +16,11 @@
   - `RefundApprovalFlowTest`: C2 `input_required` → inbox submit → retry → one `Refund`, case `refunded`; lowered amount; duplicate retry; decline stays `proposed`; `refund_revise` → `investigating`; C7 reject → `closed`.
   - Manual: Inspector 2.14.0 MRTR check, result recorded here.
 - New packages for M2: symfony/messenger, form, twig-bundle, mailer.
+- Blocked: none.
 
 ## Next prompt
 
-/phase M2
+/phase M2 — continue: request-state primitives in lib/HumanInput (sign/verify, nonce idempotency) on the synthetic workflow
 
 ## Decisions
 
@@ -52,6 +53,7 @@
 - 2026-11-07: M2 list_changed not pursued: spec forbids it in a `tools/call` stream; `availableTools` in results + re-list per step (`decisions/016`).
 - 2026-11-07: Client MRTR via a raw JSON-RPC client in `lib/HumanInput` (first call + resume with the original caller's token); `Mcp\Client` auto-resolves and hides `requestState`. SDK rejects bad SDK state with -32602; our payload checks (caller, argsHash, nonce) give `CallToolResult` errors; SDK state TTL raised to ≥ 24 h (`decisions/017`).
 - 2026-11-07: Inspector 2.14 supports MRTR per release notes (proposed until the manual check); Inspector pinned to 2.14.0 (`decisions/018`).
+- 2026-11-07: M2 creates and dispatches `RunNextActor` (message class only); the handler comes with the agents in M3 (human).
 
 ## Test changes
 
@@ -61,6 +63,7 @@
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
 
+- 2026-11-07 — M2 started. Branch from main with M1 (PR #4). VERIFY: decisions 016 (list_changed not pursued), 017 (raw client MRTR), 018 (Inspector MRTR, proposed); BUGS.md: `Client::callTool` cannot defer `input_required`; Inspector pinned 2.14.0; done-signal agreed. Blocked: none. Needs review: whole M2 branch ([R]) once built. Spend: $0.
 - 2026-11-07 — M1 done. `lib/WorkflowMcp`: metadata reader, role resolvers (per-workflow override), `#[AsPlaceTool]` + registry, `ScopedCapabilityProvider`, `ActorSelector`, `SchemaFactory` (structural schemas), `InputMapper`, `TransitionToolHandler` + `PlaceToolHandler`, `UnavailableCapabilityResponder`, per-request `WorkflowServerFactory`, `WorkflowMcpController`; tests on a synthetic document workflow. `src/RefundDesk`: entities + migration, idempotent seed C1–C8 (+H5), workflow YAML, DTOs, `RefundIssueVoter`, 4 read-only place tools, `CaseEventLogger`, fake payment on `issue`. Bearer-token firewall. `RefundMcpEndpointTest` via mcp/sdk Client in-process. Decisions 013–015; BUGS.md: ai-platform JsonSchema Factory (nullable enum, draft-4 keywords). Blocked: none. Needs review: whole M1 branch ([R]). Spend: $0.
 - 2026-11-06 — M1 started. Done: deps, `lib/` autoload, architecture test, decisions 010–012 (invisible-tool handler, tool results/errors/cache, workflow metadata/guards), resolver-visibility decision. Blocked: none. Needs review: M1 public API once built ([R]). Spend: $0.
 - 2026-11-06 — Phase 0 done. Scaffold (Symfony 8.1, Docker toolchain, quiet `make qa`, CI green), library research (decisions 001, 003–007), Proof 1 MCP round-trip (008, in `make qa`), Proof 2 agent tool call on Ollama (009), Werewolf smoke on 3 local models (002). G0: path A, Werewolf go. BUGS.md: 3 confirmed (SDK handler generics, Ollama total tokens, Ollama client timeout) + 2 candidates. Blocked: none (HF credits unavailable → Ollama + replay). Needs review: whole phase-0 branch ([R]). Spend: $0. Note: vendor-guard hook blocks commands that combine `rm … vendor` with `grep` (false positive; split the command).
