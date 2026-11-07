@@ -9,7 +9,8 @@
 - Branch: m/phase-1-workflow-mcp (from main @ 2eb412b), pushed, not merged.
 - Done-signal: `.claude/done.sh` exit 0 incl. `RefundMcpEndpointTest`, provider/schema/handler/selector unit tests, refund visibility + actor tests, architecture test.
 - Blocked: — Before `/phase M2`: human reviews and merges m/phase-1-workflow-mcp (PR), so M2 branches from a main that has M1.
-- `make inspector TOKEN=…` added (PLAN M1 acceptance is phrased via the Inspector). Manual check pending (human): needs host Node ^22.23.4 / ^24.22.1; expected lists = `RefundMcpEndpointTest`.
+- 2026-11-07 Inspector check (human, Node 24, `make inspector`): investigator on C1 lists only `refund_start_investigation`; its result shows `investigating` + the four investigating tools; resolver lists only `refund_search_policy`. M1 acceptance met.
+- Gap (not M1-blocking): no `list_changed` notification, so the Inspector UI keeps its old list until reconnect (PLAN §3.2 Caching: "where the transport supports them"). Agents re-list per step (decisions/005).
 
 ## Next prompt
 
