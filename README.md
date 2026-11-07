@@ -13,11 +13,12 @@ nothing else is installed on the host.
 ## Commands
 
 ```
-make install      # composer install, warm the cache
+make install      # composer install, warm the cache, migrate, seed demo cases; generate APP_SECRET + agent tokens into .env.local
 make test         # phpunit
 make qa           # php-cs-fixer (changed files) + phpstan + phpunit, quiet
 make qa-verbose   # the same with full output, whole tree
 make cs-fix       # apply php-cs-fixer
+make inspector TOKEN=...  # MCP Inspector against /mcp/refund_case/C1 (INSPECTOR_CASE=…); needs host Node ^22.23.4 or ^24.22.1
 ```
 
 Inside the container, or with a local PHP 8.4, pass `NATIVE=1` to skip Docker.

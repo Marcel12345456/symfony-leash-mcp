@@ -5,32 +5,16 @@
 
 ## Current
 
-- Phase: M1 — WorkflowMcp with roles, **in progress**. Done: deps, `lib/` autoload, architecture test, decisions 010–012. **No library or RefundDesk code yet.** [R] public API, [U] tests.
-- Left: library core → RefundDesk → tokens → HTTP test. Steps, class design, scope choices and the full done-signal: "M1 build plan" below.
-- Branch: m/phase-1-workflow-mcp (from main @ 2eb412b)
-- Done-signal: `.claude/done.sh` exit 0 with the tests in "M1 build plan" present and green.
-- Blocked: —
+- Phase: M1 — WorkflowMcp with roles, **done** (acceptance green, 81 tests). [R]: whole M1 branch needs human review before merge (public API of `lib/WorkflowMcp`).
+- Branch: m/phase-1-workflow-mcp (from main @ 2eb412b), pushed, not merged.
+- Done-signal: `.claude/done.sh` exit 0 incl. `RefundMcpEndpointTest`, provider/schema/handler/selector unit tests, refund visibility + actor tests, architecture test.
+- Blocked: — Before `/phase M2`: human reviews and merges m/phase-1-workflow-mcp (PR), so M2 branches from a main that has M1.
+- 2026-11-07 Inspector check (human, Node 24, `make inspector`): investigator on C1 lists only `refund_start_investigation`; its result shows `investigating` + the four investigating tools; resolver lists only `refund_search_policy`. M1 acceptance met.
+- Gap (not M1-blocking): no `list_changed` notification, so the Inspector UI keeps its old list until reconnect (PLAN §3.2 Caching: "where the transport supports them"). Agents re-list per step (decisions/005).
 
 ## Next prompt
 
-/phase M1 — continue with step 1 (lib/WorkflowMcp core + synthetic-workflow unit tests), see "M1 build plan"
-
-## M1 build plan
-
-<!-- Detail for "Current"; not injected at session start (2000-char cap). Remove at M1 phase end. -->
-
-Remaining steps, in order:
-  1. `lib/WorkflowMcp` + unit tests on a synthetic non-domain workflow (`tests/Unit/Lib/WorkflowMcp`): `RoleResolverInterface` + `SecurityRoleResolver` (default; per-workflow override via metadata + typed locator); `#[AsPlaceTool(workflow, name, description, readOnly, input)]` + `PlaceToolInterface`; `ScopedCapabilityProvider` (enabled transitions ∩ `mcp_roles`, place `mcp_tools` role map, Transition instances for metadata, decisions/012); `SchemaFactory` (DTO + Validator → object JSON schema; output schema `{state, availableTools, message}`; unsupported → exception; elicitation schema waits for M2); `TransitionToolHandler` (denormalize + validate → actionable `CallToolResult::error` with Validator messages; re-check visibility + `can()`; `apply($subject, $t, ['input' => $dto])`; persist; returns structuredContent); `UnavailableCapabilityResponder` (request handler, `supports()` only for non-visible names, decisions/010) + events `CapabilityDenied`, `ToolCalled`; `ActorSelector` (roles with ≥1 visible non-read-only tool, token-less); `SubjectProviderInterface` (find/save) with a Doctrine impl using workflow metadata `mcp_subject` (class); endpoint controller `/mcp/{workflow}/{subjectId}` modelled on `src/Spike/SpikeMcpController.php` (`setCachePolicy(CachePolicy::default(0, CacheScope::Private))`, `ToolAnnotations(readOnlyHint:)`, named args on `addTool`, decisions/011).
-  2. `src/RefundDesk`: entities `Customer`, `Order`, `RefundCase` (`getStatus(): string`, `setStatus(string, array $context = [])`, `Decision` enum, `isRefundDecision()`/`isRejectDecision()`), `Refund`, `CaseEvent` (type enum); migration; `leash:demo:seed` (C1–C8, idempotent upsert by id); workflow YAML per PLAN §3.2; input DTOs `ProposeResolutionInput`, `RejectInput`; transition listeners copy input into the case; `RefundIssueVoter` (ROLE_RESOLVER and proposed amount ≤ order amount); place tools `refund_get_order`, `refund_get_customer_history`, `refund_get_proposal`, `refund_search_policy` (keyword stub over `data/policy/*.md`, real RAG in M3); CaseEvent listeners for `ToolCalled`, `CapabilityDenied`, workflow `completed`.
-  3. Security: stateless firewall `^/mcp/` with `access_token` + app `StaticTokenHandler` (tokens from env `LEASH_INVESTIGATOR_TOKEN`, `LEASH_RESOLVER_TOKEN`; fixed values in `.env.test`; `make install` generates them into `.env.local`); memory users `agent:investigator`/`agent:resolver`.
-  4. `tests/Integration/RefundMcpEndpointTest`: `Mcp\Client` over a PSR-18 adapter around `KernelBrowser` (in-process), schema via SchemaTool, seed; asserts the done-signal below. Optional `make inspector`.
-- Scope choices (not yet built): `refund_issue` takes no amount in M1 (amount input + approval come in M2); `refund_search_policy` is a keyword stub until M3.
-
-Done-signal: `.claude/done.sh` exit 0, with these tests present and green:
-  - `tests/Integration/RefundMcpEndpointTest` (mcp/sdk client, in-process HTTP, bearer tokens): investigator on C1 lists only `refund_start_investigation`; after calling it lists `refund_get_order`, `refund_get_customer_history`, `refund_search_policy`, `refund_propose_resolution`; resolver on C1 in `investigating` lists only `refund_search_policy` (read-only); invisible tool → actionable error naming visible tools + `capability_denied` CaseEvent, no state change; invalid `refund_propose_resolution` input → Validator messages as actionable error.
-  - Unit: `ScopedCapabilityProvider` (synthetic non-domain workflow + refund every place × role, guard/voter denial, custom `RoleResolverInterface`), `SchemaFactory`, `TransitionToolHandler`, `ActorSelector` (ignores read-only; refund role for every state).
-  - `tests/Architecture`: `lib/` never references `App\`, `RefundDesk`, `Werewolf`; `lib/HumanInput` never references `Leash\WorkflowMcp\`.
-  - Manual, not blocking: `make inspector TOKEN=…` shows the same lists (human check).
+/phase M2
 
 ## Decisions
 
@@ -55,6 +39,11 @@ Done-signal: `.claude/done.sh` exit 0, with these tests present and green:
 - 2026-11-06: Invisible tool calls are answered by a per-request `CallToolRequest` handler whose `supports()` matches only non-visible names; SDK default would be JSON-RPC -32602 (`decisions/010`).
 - 2026-11-06: Tools return `CallToolResult` with structuredContent `{state, availableTools, message}`; refusals via `CallToolResult::error`/`ToolCallException`; explicit `CachePolicy::default(0, Private)` (`decisions/011`).
 - 2026-11-06: Workflow metadata via `getMetadataStore()` + Transition instances; roles from metadata + `RoleResolverInterface`, guards for state/voters; `ActorSelector` runs token-less (`decisions/012`).
+- 2026-11-07: SchemaFactory wraps ai-platform `Contract\JsonSchema\Factory::buildProperties` + one normalizer (nullable/required, enum null, exclusiveMinimum); Serializer with COLLECT errors for input DTOs (`decisions/013`, proposed until SchemaFactoryTest pins it).
+- 2026-11-07: mcp/sdk API cheat sheet; server `RequestHandlerInterface` is covariant (no ignore needed); lib tests run in-process via `buildStateless()->handleInline()` with the `_meta` envelope (`decisions/014`).
+- 2026-11-07: Published inputSchema is structural only (types, enums, required, `additionalProperties: false`); Validator constraints stay server-side so violations are actionable `CallToolResult` errors, not SDK -32602. Tool closures read raw args via `RequestContext::getRequest()`; endpoint finds workflows via `#[AutowireLocator('workflow', indexAttribute: 'name')]` (`decisions/015`; 013 now accepted).
+- 2026-11-07: RefundDesk M1 choices: seed adds closed history case H5 (refund of O5) so C5 is a duplicate; `issue` pays the proposed amount via `FakePaymentProvider` (`IssueRefundListener`); policy text authored in `data/policy/*.md` (keyword stub now, RAG in M3); `CaseEventLogger` ignores unmanaged subjects; `make install` now migrates and seeds.
+- 2026-11-07: `/mcp/` firewall: stateless `access_token` + `StaticTokenHandler` (env tokens, `hash_equals`, empty never matches) + `BearerEntryPoint`, because the access_token authenticator sends no `WWW-Authenticate` on a missing token (RFC 6750).
 
 ## Test changes
 
@@ -64,5 +53,6 @@ Done-signal: `.claude/done.sh` exit 0, with these tests present and green:
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
 
+- 2026-11-07 — M1 done. `lib/WorkflowMcp`: metadata reader, role resolvers (per-workflow override), `#[AsPlaceTool]` + registry, `ScopedCapabilityProvider`, `ActorSelector`, `SchemaFactory` (structural schemas), `InputMapper`, `TransitionToolHandler` + `PlaceToolHandler`, `UnavailableCapabilityResponder`, per-request `WorkflowServerFactory`, `WorkflowMcpController`; tests on a synthetic document workflow. `src/RefundDesk`: entities + migration, idempotent seed C1–C8 (+H5), workflow YAML, DTOs, `RefundIssueVoter`, 4 read-only place tools, `CaseEventLogger`, fake payment on `issue`. Bearer-token firewall. `RefundMcpEndpointTest` via mcp/sdk Client in-process. Decisions 013–015; BUGS.md: ai-platform JsonSchema Factory (nullable enum, draft-4 keywords). Blocked: none. Needs review: whole M1 branch ([R]). Spend: $0.
 - 2026-11-06 — M1 started. Done: deps, `lib/` autoload, architecture test, decisions 010–012 (invisible-tool handler, tool results/errors/cache, workflow metadata/guards), resolver-visibility decision. Blocked: none. Needs review: M1 public API once built ([R]). Spend: $0.
 - 2026-11-06 — Phase 0 done. Scaffold (Symfony 8.1, Docker toolchain, quiet `make qa`, CI green), library research (decisions 001, 003–007), Proof 1 MCP round-trip (008, in `make qa`), Proof 2 agent tool call on Ollama (009), Werewolf smoke on 3 local models (002). G0: path A, Werewolf go. BUGS.md: 3 confirmed (SDK handler generics, Ollama total tokens, Ollama client timeout) + 2 candidates. Blocked: none (HF credits unavailable → Ollama + replay). Needs review: whole phase-0 branch ([R]). Spend: $0. Note: vendor-guard hook blocks commands that combine `rm … vendor` with `grep` (false positive; split the command).
