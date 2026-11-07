@@ -6,73 +6,20 @@
 ## Current
 
 - Plan v3 (`decisions/022`): Werewolf main, Doc Review second, Refund Desk retired in M6.
-- Phase: **M3 Werewolf rules [U]**, in progress on m/phase-3-werewolf-rules (from main + plan v3 docs). Unattended run (human, 2026-11-07): push branches yes, merge/force-push no.
-- Done-signal M3: `tests/Unit/Werewolf/Rules/` scripted games (wolves win, village wins, tie vote, wolf disagreement, seer inspects dead seat → rejected, draw at cap) + one test per §3.5 rule; `tests/Architecture` asserts `src/Werewolf/Rules` uses no Symfony/Doctrine/AI; qwen3 tool-call result in `decisions/002`; `.claude/done.sh` exit 0.
-- M2 HumanInput [R] on m/phase-2-human-input: left inbox + email, Inspector check. Next after M3.
+- **M3 Werewolf rules [U]: done** on m/phase-3-werewolf-rules (pushed, unmerged; merge = human). Engine `src/Werewolf/Rules`, tests `tests/Unit/Werewolf/Rules` + `tests/Architecture/WerewolfRulesPurityTest`, qwen3 tool-call result in `decisions/002`. `.claude/done.sh` green.
+- Unattended run (human, 2026-11-07) continues: push branches yes, merge/force-push no. Next: M2 HumanInput [R] on m/phase-2-human-input: inbox + email (login, signed expiring URLs, enum → choice), Inspector check. Done-signal: PLAN M2 acceptance + `.claude/done.sh`. Stays unmerged, "needs review".
+- M2 branch's PROGRESS does not have the M3 entries yet; copy the M3 Log/Decisions lines over when the branches meet.
 - Blocked: none.
 
 ## Next prompt
 
-/phase M3 — unattended run per "Current" (wrap in /loop); then /phase M2 inbox
-
-## Decisions
-
-- 2026-11-06: Plan v2 (roles + gated Werewolf track) adopted; review items 1–16 applied (`docs/REVIEW.md`).
-- 2026-11-06: Repo `symfony-leash-mcp`; session automation in `.claude/` (hooks, `/phase`, `/phase-end`, `/verify`).
-
-- 2026-11-06: Symfony 8.1; `symfony/ai-*` 0.15.0, `mcp/sdk` 0.9.0 pinned (`decisions/003`).
-- 2026-11-06: **G0 evidence — protocol path A proposed**: mcp/sdk 0.9.0 implements MRTR (`InputRequiredResult`, signed `requestState`, 2026-07-28, cache hints); HumanInput adds payload binding, single use, pending/notify (`decisions/001`). 
-- 2026-11-06: Own per-request controller + `Server::builder()` + `StreamableHttpTransport` + persistent session store; not via `mcp.servers` (`decisions/004`).
-- 2026-11-06: MCP client = `Mcp\Client` + `HttpTransport` (Bearer) + `nyholm/psr7`; explicit input/output schemas; agents re-list per step (`decisions/005`).
-- 2026-11-06: Reuse ai-mcp-tool `McpToolbox`; Runner freezes tools per run → one agent run per workflow step + forwarding decorator (`decisions/006`, accepted).
-- 2026-11-06: HF router chat w/ tool calling; replay via `RecordingProvider`/`Cassette`; RAG in pure-PHP `Sqlite\Store`; `MermaidDumper` (`decisions/007`).
-- 2026-11-06: **G0 protocol path = A** (SDK MRTR). Human delegated the call ("you decide to reduce resources"); A is least code.
-- 2026-11-06: CI (GitHub Actions `make qa`) green on `m/phase-0-spike-scaffold` (confirmed by human).
-- 2026-11-06: No HF credits. Models: Ollama (local, free) for dev/smoke, replay cassettes for demo/jurors/tests; paid/free-tier cloud key only if Ollama quality fails the Werewolf gate. Hackathon allows any Symfony AI provider (PLAN §2). Werewolf G0 still open until the smoke test runs.
-- 2026-11-06: **G0 evidence — Werewolf**: only `qwen3:8b` (thinking) plays coherently (seer claim, wolf deflection, votes grounded); qwen2.5 7b/14b too bland. Recommendation: go with qwen3 + replay for demo (`decisions/002`).
-- 2026-11-06: **G0 Werewolf = go** (human): `qwen3:8b` player model, replay for demo. Role in the video: 30–45 s closer showing state ∩ role tool visibility on the same libraries; never costs M time.
-- 2026-11-06: PHP `default_socket_timeout=300` in the toolchain image (`docker/php/leash.ini`): the Ollama platform ignores the configured HTTP client (BUGS.md). Ollama runs natively on the host (`OLLAMA_ENDPOINT=http://host.docker.internal:11434`).
-
-- 2026-11-06: M1: in `investigating` the resolver sees only read-only `refund_search_policy` (§3.2 YAML wins over the M1 acceptance wording "no tools"; human decision). ActorSelector still picks the investigator.
-
-- 2026-11-06: Invisible tool calls are answered by a per-request `CallToolRequest` handler whose `supports()` matches only non-visible names; SDK default would be JSON-RPC -32602 (`decisions/010`).
-- 2026-11-06: Tools return `CallToolResult` with structuredContent `{state, availableTools, message}`; refusals via `CallToolResult::error`/`ToolCallException`; explicit `CachePolicy::default(0, Private)` (`decisions/011`).
-- 2026-11-06: Workflow metadata via `getMetadataStore()` + Transition instances; roles from metadata + `RoleResolverInterface`, guards for state/voters; `ActorSelector` runs token-less (`decisions/012`).
-- 2026-11-07: SchemaFactory wraps ai-platform `Contract\JsonSchema\Factory::buildProperties` + one normalizer (nullable/required, enum null, exclusiveMinimum); Serializer with COLLECT errors for input DTOs (`decisions/013`, proposed until SchemaFactoryTest pins it).
-- 2026-11-07: mcp/sdk API cheat sheet; server `RequestHandlerInterface` is covariant (no ignore needed); lib tests run in-process via `buildStateless()->handleInline()` with the `_meta` envelope (`decisions/014`).
-- 2026-11-07: Published inputSchema is structural only (types, enums, required, `additionalProperties: false`); Validator constraints stay server-side so violations are actionable `CallToolResult` errors, not SDK -32602. Tool closures read raw args via `RequestContext::getRequest()`; endpoint finds workflows via `#[AutowireLocator('workflow', indexAttribute: 'name')]` (`decisions/015`; 013 now accepted).
-- 2026-11-07: RefundDesk M1 choices: seed adds closed history case H5 (refund of O5) so C5 is a duplicate; `issue` pays the proposed amount via `FakePaymentProvider` (`IssueRefundListener`); policy text authored in `data/policy/*.md` (keyword stub now, RAG in M3); `CaseEventLogger` ignores unmanaged subjects; `make install` now migrates and seeds.
-- 2026-11-07: `/mcp/` firewall: stateless `access_token` + `StaticTokenHandler` (env tokens, `hash_equals`, empty never matches) + `BearerEntryPoint`, because the access_token authenticator sends no `WWW-Authenticate` on a missing token (RFC 6750).
-- 2026-11-07: M2 list_changed not pursued: spec forbids it in a `tools/call` stream; `availableTools` in results + re-list per step (`decisions/016`).
-- 2026-11-07: Client MRTR via a raw JSON-RPC client in `lib/HumanInput` (first call + resume with the original caller's token); `Mcp\Client` auto-resolves and hides `requestState`. SDK rejects bad SDK state with -32602; our payload checks (caller, argsHash, nonce) give `CallToolResult` errors; SDK state TTL raised to ≥ 24 h (`decisions/017`).
-- 2026-11-07: Inspector 2.14 supports MRTR per release notes (proposed until the manual check); Inspector pinned to 2.14.0 (`decisions/018`).
-- 2026-11-07: M2 creates and dispatches `RunNextActor` (message class only); the handler comes with the agents in M3 (human).
-- 2026-11-07: requestState: SDK codec is the only signature; HumanInput issues/checks the bound payload read via `getInputContext()?->requestState()` (verified array); no second HMAC; key via one `RequestStateKey` helper (`decisions/019`).
-- 2026-11-07: Approval wiring: transition metadata `mcp_approval: <name>` → `ApprovalPolicyInterface` (tagged, `#[AsTaggedItem]` name) via `HumanInputGate` in `TransitionToolHandler`; state bound to `<workflow>:<subjectId>` + tool name + caller; decline/cancel return a non-error result with unchanged state and visible tools. `WorkflowServerFactory::create()` takes the subject id; the controller sets the request-state key.
-- 2026-11-07: Duplicate retries usually target a tool that is no longer visible, so `UnavailableCapabilityResponder` replays stored results first. It reads the verified `InputContext` from the session key `InputContext::class` (observed SDK 0.9.0 behaviour, not a documented API). Clients must declare `elicitation.form` or the SDK answers -32021 instead of `input_required` (matters for the raw client).
-- 2026-11-07: Client MRTR parsing: SDK `InputRequiredResult` has no `fromArray` → Leash `InputRequired` VO (raw `inputRequests` + `requestState`), inlined `resultType` check, `CallToolResult::fromArray` otherwise; `PendingInput` stores raw wire asks; answers via `ElicitResult` under the same key, `inputResponses` as object (`decisions/020`).
-- 2026-11-07: Raw client wire: `RequestEnvelope::stamp` + `HeaderFactory::forMessage` (MCP-Protocol-Version, Mcp-Method, Mcp-Name required, else 400); `Accept: application/json` forces JSON; no session id; SSE `data:` fallback (`decisions/021`).
-- 2026-11-07: `RunNextActor` lives in `src/Agent/Message` (§3.4); lib's resume handler emits a generic `PendingInputResolved` event and an App listener dispatches `RunNextActor` (G2). Caller tokens for resume come from a lib `CallerTokens` interface implemented by `StaticTokenHandler`; no tokens stored in `PendingInput`. Agent toolset decorator and `ActorSelector` paused-subject skip deferred to M3.
-
-- 2026-11-07: Client side built in `lib/HumanInput`: `Client\RawMcpClient` (one `call()`, resume = same call + answers + state), `Client\HumanInputToolCaller` (handler loop, max 10 rounds; deferred → "paused, do not retry" result with `_meta.pendingInput`), `Pending\PendingInput` entity (string id, 12 hex; no token), `PendingInputAnswers` (answer → `ResumePendingInput`), `ResumePendingInputHandler` (retry with `CallerTokens`; JSON-RPC error → `Failed`; re-ask → back to `Pending` + notify; duplicate message no-op; emits `PendingInputResolved`). Default notifier logs (inbox/email come next). The handler interface's context argument is a `ToolCall` (endpoint, subjectRef, callerId, tool, arguments), not SDK `InputContext`.
-- 2026-11-07: `symfony/doctrine-messenger` added; `async` transport (`MESSENGER_TRANSPORT_DSN`, `in-memory://` in test) carries `ResumePendingInput` and `RunNextActor`, so `RunNextActor` without a handler (until M3) does not throw. Migration adds `pending_input` + `messenger_messages`.
-- 2026-11-07: **Plan v3 — pivot** (human): Tool Guard (`acencyril/tool-guard-bundle`) already ships the refund-guard story (refund tagline, voters, Notifier approval, no agent resume). Werewolf becomes the headline, framed by mechanism (information hiding via scoped tools + resources, workflow as orchestrator, MRTR resume); Doc Review replaces the Refund Desk as the generality proof; RAG dropped; G1 (Fri 11-13) is the fallback switch; phases renumbered M3–M8, W track dissolved (`decisions/022`).
-- 2026-11-07: Werewolf over MCP exists outside the hackathon (Mafia/Werewolf MCP servers, LLM benchmarks; not yet verified by us): video hook is mechanism first, README related work names them (links VERIFY before M8). Overlap scan of all 43 hackathon projects pending until the human pastes the list.
-- 2026-11-07: A resume answer under an unknown key is "No answer" (gate result), not a server re-ask; `askAgain` only runs if a server answers a retry with `input_required` again.
-
-- 2026-11-07: M3: `qwen3:8b` calls tools through the Symfony AI Ollama bridge (3/3) and Ollama direct (4/4); thinking ~8–12 s per tool step vs 1.1 s with `think: false`; `/no_think` soft switch has no effect through the bridge. Default stays thinking + replay; bridge `think` option is a VERIFY for M4 (`decisions/002` addendum).
-
-- 2026-11-07: M3 rule choices where §3.5 is silent (all tested, easy to flip): wolves cannot target a wolf; no self-vote, no self-inspection; one action per seat per phase; no wolf choice by the deadline → nobody dies; dawn reveals the death, not the role; game over reveals all roles; votes are public; discussion order = living seats ascending, every day; dead seats keep their private knowledge; win checked after every death (dawn and vote). `Game::arranged()` fixes roles for the recorded demo game; `advance()` is also the deadline path (missing actions abstain).
-
-## Test changes
-
-<!-- Every weakened, deleted, skipped or changed assertion: date, test, reason. -->
-
-- 2026-11-07: `.claude/tests/bin.t.sh` "plan-section 3.2: has YAML" now expects `doc_review:` instead of `refund_case:`, because PLAN v3 §3.2 uses the Doc Review workflow as the metadata example (decisions/022). Same check, new content.
+/phase M2 — unattended run continues per "Current": inbox + email, then overnight summary
 
 ## Log
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
+
+- 2026-11-07 — M3 done (unattended). Branch m/phase-3-werewolf-rules from main + plan v3 docs. qwen3:8b tool-call check (bridge 3/3, direct 4/4; thinking ~8–12 s vs 1.1 s per step; `/no_think` ineffective through the bridge; `spike:llm-tool --no-think`). Rules engine `src/Werewolf/Rules` (Game, Seat, enums, action VOs, Rejection, SeededRandom, audience-scoped events). Tests: 6 scripted games (`ScriptedGamesTest`), 27 rule tests (`GameRulesTest`), `WerewolfRulesPurityTest`. Rule choices where §3.5 is silent in Decisions. Test changes: none. Blocked: none. Needs review: branch (merge), rule choices. Spend: $0 (local Ollama only).
 
 - 2026-11-07 — Handoff before the unattended run: plan v3 committed (9f8111d, e774b47), mechanism-first hook, unattended authorization recorded. Blocked: none. Needs review: plan v3 ([R]). Spend: $0.
 - 2026-11-07 — Plan v3 written (docs only, no code). PLAN §1–§12 rewritten around Werewolf main + Doc Review; decision 022; CLAUDE.md pitch, tracks, commands, safety rules; `/phase` skill keys M1–M8; one `.claude` test assertion updated (see Test changes). Blocked: none. Needs review: plan v3 ([R]). Spend: $0.
