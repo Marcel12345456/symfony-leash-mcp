@@ -20,7 +20,7 @@
 
 ## Next prompt
 
-/phase M2 — continue: request-state primitives in lib/HumanInput (sign/verify, nonce idempotency) on the synthetic workflow
+/phase M2 — continue: Doctrine ProcessedInputRequest store + input_required/retry on the synthetic workflow
 
 ## Decisions
 
@@ -64,6 +64,7 @@
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
 
+- 2026-11-07 — M2 continued. Decision 019: SDK codec signs/verifies requestState and hands the decoded payload to the handler, so no second HMAC. `lib/HumanInput`: `RequestBinder` (issue/verify bound payload; reasons tampered/expired/wrong target/wrong caller/args mismatch), `RequestStateKey`, `ArgumentsHash`, `ProcessedInputRequests` + in-memory store; unit tests. Not yet wired into the synthetic workflow. Follow-up: tamper/wrong-key tests catch `\Throwable`; narrow to the SDK's `RequestStateException`. PROGRESS Current shortened (session-start handoff is cut at 2000 chars). Blocked: none. Needs review: M2 branch ([R]). Spend: $0.
 - 2026-11-07 — M2 started. Branch from main with M1 (PR #4). VERIFY: decisions 016 (list_changed not pursued), 017 (raw client MRTR), 018 (Inspector MRTR, proposed); BUGS.md: `Client::callTool` cannot defer `input_required`; Inspector pinned 2.14.0; done-signal agreed. Blocked: none. Needs review: whole M2 branch ([R]) once built. Spend: $0.
 - 2026-11-07 — M1 done. `lib/WorkflowMcp`: metadata reader, role resolvers (per-workflow override), `#[AsPlaceTool]` + registry, `ScopedCapabilityProvider`, `ActorSelector`, `SchemaFactory` (structural schemas), `InputMapper`, `TransitionToolHandler` + `PlaceToolHandler`, `UnavailableCapabilityResponder`, per-request `WorkflowServerFactory`, `WorkflowMcpController`; tests on a synthetic document workflow. `src/RefundDesk`: entities + migration, idempotent seed C1–C8 (+H5), workflow YAML, DTOs, `RefundIssueVoter`, 4 read-only place tools, `CaseEventLogger`, fake payment on `issue`. Bearer-token firewall. `RefundMcpEndpointTest` via mcp/sdk Client in-process. Decisions 013–015; BUGS.md: ai-platform JsonSchema Factory (nullable enum, draft-4 keywords). Blocked: none. Needs review: whole M1 branch ([R]). Spend: $0.
 - 2026-11-06 — M1 started. Done: deps, `lib/` autoload, architecture test, decisions 010–012 (invisible-tool handler, tool results/errors/cache, workflow metadata/guards), resolver-visibility decision. Blocked: none. Needs review: M1 public API once built ([R]). Spend: $0.
