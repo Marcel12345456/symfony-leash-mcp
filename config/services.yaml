@@ -35,3 +35,14 @@ services:
             - '../lib/WorkflowMcp/Tool/ToolResults.php'
 
     Leash\WorkflowMcp\Subject\SubjectProviderInterface: '@Leash\WorkflowMcp\Subject\DoctrineSubjectProvider'
+
+    Leash\HumanInput\:
+        resource: '../lib/HumanInput/'
+        exclude:
+            - '../lib/HumanInput/Doctrine/ProcessedInputRequest.php'
+            - '../lib/HumanInput/Idempotency/ProcessedResult.php'
+            - '../lib/HumanInput/RequestState/BoundRequest.php'
+            - '../lib/HumanInput/RequestState/RejectionReason.php'
+            - '../lib/HumanInput/RequestState/RequestStateRejected.php'
+
+    Leash\HumanInput\Idempotency\ProcessedInputRequests: '@Leash\HumanInput\Doctrine\DoctrineProcessedInputRequests'
