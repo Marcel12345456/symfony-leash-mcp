@@ -5,16 +5,22 @@
 
 ## Current
 
-- Phase: M1 — WorkflowMcp with roles, **done** (acceptance green, 81 tests). [R]: whole M1 branch needs human review before merge (public API of `lib/WorkflowMcp`).
-- Branch: m/phase-1-workflow-mcp (from main @ 2eb412b), pushed, not merged.
-- Done-signal: `.claude/done.sh` exit 0 incl. `RefundMcpEndpointTest`, provider/schema/handler/selector unit tests, refund visibility + actor tests, architecture test.
-- Blocked: — Before `/phase M2`: human reviews and merges m/phase-1-workflow-mcp (PR), so M2 branches from a main that has M1.
-- 2026-11-07 Inspector check (human, Node 24, `make inspector`): investigator on C1 lists only `refund_start_investigation`; its result shows `investigating` + the four investigating tools; resolver lists only `refund_search_policy`. M1 acceptance met.
-- Gap (not M1-blocking): no `list_changed` notification, so the Inspector UI keeps its old list until reconnect (PLAN §3.2 Caching: "where the transport supports them"). Agents re-list per step (decisions/005).
+- Phase: M2 — HumanInput / MRTR, **in progress** [R] (branch needs human review before merge). Done: request-state primitives (`RequestBinder`, `ProcessedInputRequests` in-memory; decisions/019). Next: Doctrine nonce store + migration, `input_required`/retry on the synthetic workflow.
+- Branch: m/phase-2-human-input (from main @ d43dd13).
+- VERIFY done: decisions/016 (list_changed not pursued), 017 (raw client MRTR), 018 (Inspector MRTR, proposed).
+- Done-signal (agreed with human): `.claude/done.sh` exit 0 incl.
+  - HumanInput unit: request state sign/verify; tampered, expired, wrong caller, mismatched args rejected; nonce idempotency.
+  - Synthetic workflow: first call `input_required` with no side effects; valid retry applies once; duplicate retry idempotent; decline/cancel → no change.
+  - Client: `input_required` → `PendingInput` + notification; answer → retry with the original caller's token → `RunNextActor` dispatched (message class only; handler in M3).
+  - Inbox: no login → redirect; signed URL works without login; expired does not; form submit dispatches resume; email contains the signed link.
+  - `RefundApprovalFlowTest`: C2 `input_required` → inbox submit → retry → one `Refund`, case `refunded`; lowered amount; duplicate retry; decline stays `proposed`; `refund_revise` → `investigating`; C7 reject → `closed`.
+  - Manual: Inspector 2.14.0 MRTR check, result recorded here.
+- New packages for M2: symfony/messenger, form, twig-bundle, mailer.
+- Blocked: none.
 
 ## Next prompt
 
-/phase M2
+/phase M2 — continue: Doctrine ProcessedInputRequest store + input_required/retry on the synthetic workflow
 
 ## Decisions
 
@@ -44,6 +50,11 @@
 - 2026-11-07: Published inputSchema is structural only (types, enums, required, `additionalProperties: false`); Validator constraints stay server-side so violations are actionable `CallToolResult` errors, not SDK -32602. Tool closures read raw args via `RequestContext::getRequest()`; endpoint finds workflows via `#[AutowireLocator('workflow', indexAttribute: 'name')]` (`decisions/015`; 013 now accepted).
 - 2026-11-07: RefundDesk M1 choices: seed adds closed history case H5 (refund of O5) so C5 is a duplicate; `issue` pays the proposed amount via `FakePaymentProvider` (`IssueRefundListener`); policy text authored in `data/policy/*.md` (keyword stub now, RAG in M3); `CaseEventLogger` ignores unmanaged subjects; `make install` now migrates and seeds.
 - 2026-11-07: `/mcp/` firewall: stateless `access_token` + `StaticTokenHandler` (env tokens, `hash_equals`, empty never matches) + `BearerEntryPoint`, because the access_token authenticator sends no `WWW-Authenticate` on a missing token (RFC 6750).
+- 2026-11-07: M2 list_changed not pursued: spec forbids it in a `tools/call` stream; `availableTools` in results + re-list per step (`decisions/016`).
+- 2026-11-07: Client MRTR via a raw JSON-RPC client in `lib/HumanInput` (first call + resume with the original caller's token); `Mcp\Client` auto-resolves and hides `requestState`. SDK rejects bad SDK state with -32602; our payload checks (caller, argsHash, nonce) give `CallToolResult` errors; SDK state TTL raised to ≥ 24 h (`decisions/017`).
+- 2026-11-07: Inspector 2.14 supports MRTR per release notes (proposed until the manual check); Inspector pinned to 2.14.0 (`decisions/018`).
+- 2026-11-07: M2 creates and dispatches `RunNextActor` (message class only); the handler comes with the agents in M3 (human).
+- 2026-11-07: requestState: SDK codec is the only signature; HumanInput issues/checks the bound payload read via `getInputContext()?->requestState()` (verified array); no second HMAC; key via one `RequestStateKey` helper (`decisions/019`).
 
 ## Test changes
 
@@ -53,6 +64,8 @@
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
 
+- 2026-11-07 — M2 continued. Decision 019: SDK codec signs/verifies requestState and hands the decoded payload to the handler, so no second HMAC. `lib/HumanInput`: `RequestBinder` (issue/verify bound payload; reasons tampered/expired/wrong target/wrong caller/args mismatch), `RequestStateKey`, `ArgumentsHash`, `ProcessedInputRequests` + in-memory store; unit tests. Not yet wired into the synthetic workflow. Follow-up: tamper/wrong-key tests catch `\Throwable`; narrow to the SDK's `RequestStateException`. PROGRESS Current shortened (session-start handoff is cut at 2000 chars). Blocked: none. Needs review: M2 branch ([R]). Spend: $0.
+- 2026-11-07 — M2 started. Branch from main with M1 (PR #4). VERIFY: decisions 016 (list_changed not pursued), 017 (raw client MRTR), 018 (Inspector MRTR, proposed); BUGS.md: `Client::callTool` cannot defer `input_required`; Inspector pinned 2.14.0; done-signal agreed. Blocked: none. Needs review: whole M2 branch ([R]) once built. Spend: $0.
 - 2026-11-07 — M1 done. `lib/WorkflowMcp`: metadata reader, role resolvers (per-workflow override), `#[AsPlaceTool]` + registry, `ScopedCapabilityProvider`, `ActorSelector`, `SchemaFactory` (structural schemas), `InputMapper`, `TransitionToolHandler` + `PlaceToolHandler`, `UnavailableCapabilityResponder`, per-request `WorkflowServerFactory`, `WorkflowMcpController`; tests on a synthetic document workflow. `src/RefundDesk`: entities + migration, idempotent seed C1–C8 (+H5), workflow YAML, DTOs, `RefundIssueVoter`, 4 read-only place tools, `CaseEventLogger`, fake payment on `issue`. Bearer-token firewall. `RefundMcpEndpointTest` via mcp/sdk Client in-process. Decisions 013–015; BUGS.md: ai-platform JsonSchema Factory (nullable enum, draft-4 keywords). Blocked: none. Needs review: whole M1 branch ([R]). Spend: $0.
 - 2026-11-06 — M1 started. Done: deps, `lib/` autoload, architecture test, decisions 010–012 (invisible-tool handler, tool results/errors/cache, workflow metadata/guards), resolver-visibility decision. Blocked: none. Needs review: M1 public API once built ([R]). Spend: $0.
 - 2026-11-06 — Phase 0 done. Scaffold (Symfony 8.1, Docker toolchain, quiet `make qa`, CI green), library research (decisions 001, 003–007), Proof 1 MCP round-trip (008, in `make qa`), Proof 2 agent tool call on Ollama (009), Werewolf smoke on 3 local models (002). G0: path A, Werewolf go. BUGS.md: 3 confirmed (SDK handler generics, Ollama total tokens, Ollama client timeout) + 2 candidates. Blocked: none (HF credits unavailable → Ollama + replay). Needs review: whole phase-0 branch ([R]). Spend: $0. Note: vendor-guard hook blocks commands that combine `rm … vendor` with `grep` (false positive; split the command).
