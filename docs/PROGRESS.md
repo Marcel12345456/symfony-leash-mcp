@@ -3,17 +3,25 @@
 <!-- Handoff between sessions. SessionStart injects "Current" and "Next prompt".
      Keep both short; history goes below. Updated by /phase-end. -->
 
+## Overnight summary (2026-11-07, unattended run)
+
+- Done: **M3** Werewolf rules engine (branch m/phase-3-werewolf-rules, pushed): qwen3 tool-call check, pure-PHP engine, 6 scripted games + 27 rule tests + purity test. **M2 inbox + email** (m/phase-2-human-input, pushed): dynamic elicitation form (enum → choice), `/inbox` login, signed expiring item links, email with signed link, enum round trip on the synthetic workflow.
+- Blocked: none.
+- Needs review: both branches unmerged ([R]); M3 rule choices (Decisions); M2 inbox design (`decisions/023`, `024`). Run `make install` once so `.env.local` gets `APPROVER_PASSWORD` (not edited by the agent).
+- Needs a human: MCP Inspector 2.14.0 MRTR check (`make inspector TOKEN=…`), last M2 acceptance item.
+- Spend: $0 (local Ollama only).
+
 ## Current
 
 - Plan v3 (`decisions/022`): Werewolf main, Doc Review second, Refund Desk retired in M6.
-- Phase: M2 HumanInput [R], in progress on m/phase-2-human-input. Left: inbox + email (login, signed expiring URLs, enum → choice), Inspector check. Done-signal: PLAN M2 acceptance + `.claude/done.sh`.
-- M3 Werewolf rules [U], not started: qwen3:8b tool-call check first, then engine. Branch m/phase-3-werewolf-rules from main + plan v3 docs.
-- Unattended run authorized (human, 2026-11-07): push branches yes, merge/force-push no; Ollama qwen3:8b up. Order: M3, then M2 inbox ([R], unmerged). Overnight summary at end.
+- Phase: M2 HumanInput [R] on m/phase-2-human-input: inbox, login, signed links, email done and tested (`InboxTest`, `EnumAnswerRoundTripTest`, `ElicitationFormTest`). Left: Inspector MRTR check (human) → record in Decisions; then merge M2 and M3 (human).
+- M3 Werewolf rules [U] done on m/phase-3-werewolf-rules (pushed). Its PROGRESS entries live on that branch; resolve PROGRESS.md when merging.
+- Done-signal M2: PLAN M2 acceptance + `.claude/done.sh` (green).
 - Blocked: none.
 
 ## Next prompt
 
-/phase M3 — unattended run per "Current" (wrap in /loop); then /phase M2 inbox
+/phase M4 — after the human ran the Inspector check and merged M2 + M3 into main
 
 ## Decisions
 
@@ -73,6 +81,9 @@
 ## Log
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
+
+- 2026-11-07 — M2 inbox + email (unattended). symfony/form, twig-bundle, mailer, security-csrf added. VERIFY → decisions 023 (elicitation schema shapes, SDK does not validate content) and 024 (UriSigner, form_login + plaintext hasher, mailer tests). `lib/HumanInput/Inbox/ElicitationForm`; App `InboxController`, `InboxLinks`, `EmailHumanInputNotifier` (now the `HumanInputNotifier`); templates; `make install` writes `APPROVER_PASSWORD`. Tests: `ElicitationFormTest`, `EnumAnswerRoundTripTest`, `InboxTest`. Test changes: none weakened; `Harness` fixture takes an optional approval policy (default unchanged). Blocked: none. Needs review: M2 branch ([R]); Inspector check needs a human. Spend: $0.
+- 2026-11-07 — M3 done (unattended) on m/phase-3-werewolf-rules; see that branch's PROGRESS. qwen3 tool calls OK, rules engine + tests. Spend: $0.
 
 - 2026-11-07 — Handoff before the unattended run: plan v3 committed (9f8111d, e774b47), mechanism-first hook, unattended authorization recorded. Blocked: none. Needs review: plan v3 ([R]). Spend: $0.
 - 2026-11-07 — Plan v3 written (docs only, no code). PLAN §1–§12 rewritten around Werewolf main + Doc Review; decision 022; CLAUDE.md pitch, tracks, commands, safety rules; `/phase` skill keys M1–M8; one `.claude` test assertion updated (see Test changes). Blocked: none. Needs review: plan v3 ([R]). Spend: $0.
