@@ -30,5 +30,8 @@ services:
             - '../lib/WorkflowMcp/Event/'
             - '../lib/WorkflowMcp/Metadata/'
             - '../lib/WorkflowMcp/PlaceTool/AsPlaceTool.php'
+            - '../lib/WorkflowMcp/Server/UnavailableCapabilityResponder.php'
+            - '../lib/WorkflowMcp/Tool/InvalidInputException.php'
+            - '../lib/WorkflowMcp/Tool/ToolResults.php'
 
     Leash\WorkflowMcp\Subject\SubjectProviderInterface: '@Leash\WorkflowMcp\Subject\DoctrineSubjectProvider'
