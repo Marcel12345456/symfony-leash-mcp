@@ -8,12 +8,12 @@
 - Phase: M1 — WorkflowMcp with roles, **done** (acceptance green, 81 tests). [R]: whole M1 branch needs human review before merge (public API of `lib/WorkflowMcp`).
 - Branch: m/phase-1-workflow-mcp (from main @ 2eb412b), pushed, not merged.
 - Done-signal: `.claude/done.sh` exit 0 incl. `RefundMcpEndpointTest`, provider/schema/handler/selector unit tests, refund visibility + actor tests, architecture test.
-- Blocked: — (M2 should branch from main after M1 is merged; merge is a human decision.)
+- Blocked: — Before `/phase M2`: human reviews and merges m/phase-1-workflow-mcp (PR), so M2 branches from a main that has M1.
 - Not done (optional per plan): `make inspector` target / manual Inspector check.
 
 ## Next prompt
 
-Review and merge PR for m/phase-1-workflow-mcp, then: /phase M2
+/phase M2
 
 ## Decisions
 
