@@ -1,2 +1,69 @@
+# MCP metadata contract: PLAN §3.2, decisions/012. Tool names are {mcp_prefix}_{transition}.
+# M1 scope: `issue` takes no input and has no approval policy yet (both arrive in M2).
 framework:
-    workflows: null
+    workflows:
+        refund_case:
+            type: state_machine
+            metadata:
+                mcp_prefix: refund
+                mcp_subject: App\RefundDesk\Entity\RefundCase
+            marking_store: { type: method, property: status }
+            supports: [App\RefundDesk\Entity\RefundCase]
+            initial_marking: received
+            places:
+                received: ~
+                investigating:
+                    metadata:
+                        mcp_tools:
+                            refund_get_order: [ROLE_INVESTIGATOR]
+                            refund_get_customer_history: [ROLE_INVESTIGATOR]
+                            refund_search_policy: [ROLE_INVESTIGATOR, ROLE_RESOLVER]
+                proposed:
+                    metadata:
+                        mcp_tools:
+                            refund_get_proposal: [ROLE_RESOLVER]
+                            refund_search_policy: [ROLE_RESOLVER]
+                refunded: ~
+                rejected: ~
+                closed: ~
+            transitions:
+                start_investigation:
+                    from: received
+                    to: investigating
+                    metadata:
+                        mcp_roles: [ROLE_INVESTIGATOR]
+                        mcp_description: 'Begin investigating this refund case.'
+                propose_resolution:
+                    from: investigating
+                    to: proposed
+                    metadata:
+                        mcp_roles: [ROLE_INVESTIGATOR]
+                        mcp_description: 'Record your proposed resolution (refund or reject) with amount and rationale.'
+                        mcp_input: App\RefundDesk\Mcp\Input\ProposeResolutionInput
+                issue:
+                    from: proposed
+                    to: refunded
+                    guard: "is_granted('REFUND_ISSUE', subject) and subject.isRefundDecision()"
+                    metadata:
+                        mcp_roles: [ROLE_RESOLVER]
+                        mcp_description: 'Issue the proposed refund.'
+                reject:
+                    from: proposed
+                    to: rejected
+                    guard: "subject.isRejectDecision()"
+                    metadata:
+                        mcp_roles: [ROLE_RESOLVER]
+                        mcp_description: 'Reject the refund request with a reason for the customer.'
+                        mcp_input: App\RefundDesk\Mcp\Input\RejectInput
+                revise:
+                    from: proposed
+                    to: investigating
+                    metadata:
+                        mcp_roles: [ROLE_RESOLVER]
+                        mcp_description: 'Send the case back to investigation, e.g. after a human declined the refund.'
+                close:
+                    from: [refunded, rejected]
+                    to: closed
+                    metadata:
+                        mcp_roles: [ROLE_RESOLVER]
+                        mcp_description: 'Close a refunded or rejected case.'

@@ -18,6 +18,8 @@ install: ## Generates APP_SECRET into .env.local on first run; never overwrites 
 	@grep -qs '^APP_SECRET=.' .env.local || echo "APP_SECRET=$$(openssl rand -hex 16)" >> .env.local
 	$(RUN) composer install --no-interaction --no-progress -q
 	$(RUN) bin/console cache:warmup -q
+	$(RUN) bin/console doctrine:migrations:migrate -n -q
+	$(RUN) bin/console leash:demo:seed -q
 
 qa: ## Quiet: prints a tool's output only when it fails, plus one summary line
 	@$(RUN) sh -c 'quiet() { out=$$("$$@" 2>&1) || { printf "%s\n" "$$out"; exit 1; }; }; \
