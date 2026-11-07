@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Lib\WorkflowMcp\Fixture;
 
 use App\Tests\Unit\Lib\WorkflowMcp\InputMapperTest;
 use Leash\HumanInput\Idempotency\InMemoryProcessedInputRequests;
+use Leash\HumanInput\Policy\ApprovalPolicyInterface;
 use Leash\HumanInput\RequestState\RequestBinder;
 use Leash\HumanInput\RequestState\RequestStateKey;
 use Leash\HumanInput\Server\HumanInputGate;
@@ -33,8 +34,10 @@ final class Harness
     public readonly TransitionToolHandler $transitionTools;
     public readonly WorkflowServerFactory $servers;
 
-    public function __construct()
+    /** @param ApprovalPolicyInterface|null $approval the `doc_approval` policy; defaults to {@see ApproveApproval} */
+    public function __construct(?ApprovalPolicyInterface $approval = null)
     {
+        $approval ??= new ApproveApproval();
         $dispatcher = new EventDispatcher();
         foreach ([CapabilityDenied::class, ToolCalled::class] as $event) {
             $dispatcher->addListener($event, function (object $e): void {
@@ -51,7 +54,7 @@ final class Harness
             $this->subjects,
             $dispatcher,
             $gate = new HumanInputGate(new RequestBinder($this->clock), $this->processed),
-            new ServiceLocator(['doc_approval' => static fn(): ApproveApproval => new ApproveApproval()]),
+            new ServiceLocator(['doc_approval' => static fn(): ApprovalPolicyInterface => $approval]),
         );
         $this->servers = new WorkflowServerFactory(
             $provider,

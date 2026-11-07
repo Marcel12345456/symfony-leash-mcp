@@ -14,10 +14,11 @@ CHANGED_PHP := $(sort $(filter %.php,$(shell git diff --name-only --diff-filter=
 
 .PHONY: install qa qa-verbose test cs-fix inspector
 
-install: ## Generates APP_SECRET and agent tokens into .env.local on first run; never overwrites them
+install: ## Generates APP_SECRET, agent tokens and the inbox approver password into .env.local on first run; never overwrites them
 	@grep -qs '^APP_SECRET=.' .env.local || echo "APP_SECRET=$$(openssl rand -hex 16)" >> .env.local
 	@grep -qs '^LEASH_INVESTIGATOR_TOKEN=.' .env.local || echo "LEASH_INVESTIGATOR_TOKEN=$$(openssl rand -hex 24)" >> .env.local
 	@grep -qs '^LEASH_RESOLVER_TOKEN=.' .env.local || echo "LEASH_RESOLVER_TOKEN=$$(openssl rand -hex 24)" >> .env.local
+	@grep -qs '^APPROVER_PASSWORD=.' .env.local || echo "APPROVER_PASSWORD=$$(openssl rand -hex 12)" >> .env.local
 	$(RUN) composer install --no-interaction --no-progress -q
 	$(RUN) bin/console cache:warmup -q
 	$(RUN) bin/console doctrine:migrations:migrate -n -q

@@ -57,6 +57,6 @@ services:
 
     Leash\HumanInput\Idempotency\ProcessedInputRequests: '@Leash\HumanInput\Doctrine\DoctrineProcessedInputRequests'
     Leash\HumanInput\Pending\PendingInputs: '@Leash\HumanInput\Doctrine\DoctrinePendingInputs'
-    Leash\HumanInput\Pending\HumanInputNotifier: '@Leash\HumanInput\Pending\LoggingHumanInputNotifier'
+    Leash\HumanInput\Pending\HumanInputNotifier: '@App\Inbox\EmailHumanInputNotifier'
     Leash\HumanInput\Client\InputRequestHandlerInterface: '@Leash\HumanInput\Pending\DeferringInputRequestHandler'
     Leash\HumanInput\Client\CallerTokens: '@App\Security\StaticTokenHandler'

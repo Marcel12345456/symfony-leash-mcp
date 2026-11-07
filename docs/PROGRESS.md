@@ -60,6 +60,10 @@
 - 2026-11-07: Werewolf over MCP exists outside the hackathon (Mafia/Werewolf MCP servers, LLM benchmarks; not yet verified by us): video hook is mechanism first, README related work names them (links VERIFY before M8). Overlap scan of all 43 hackathon projects pending until the human pastes the list.
 - 2026-11-07: A resume answer under an unknown key is "No answer" (gate result), not a server re-ask; `askAgain` only runs if a server answers a retry with `input_required` again.
 
+- 2026-11-07: Inbox form: `lib/HumanInput/Inbox/ElicitationForm` maps the raw `requestedSchema` (all 7 SDK shapes; titled/legacy enum → `ChoiceType`) to a Symfony Form and back to typed content; the SDK does not validate answer content, policies' `applyAnswer()` stays the server-side check (`decisions/023`).
+- 2026-11-07: Inbox auth: `/inbox` behind form_login (in-memory `approver`, plaintext hasher on `InMemoryUser`, `APPROVER_PASSWORD` from `.env.local` via `make install`); `/inbox/item/{id}` is PUBLIC_ACCESS and the controller verifies the `UriSigner` link (expired 410, tampered 403) unless logged in; links expire after `LEASH_INBOX_LINK_TTL` (PT24H). Email channel `App\Inbox\EmailHumanInputNotifier` (also logs) is the `HumanInputNotifier`; `MAILER_DSN=null://null` default, Mailpit DSN in `.env` comment (`decisions/024`).
+- 2026-11-07: Inbox controller/templates live in App (`src/Controller`, `src/Inbox`), the form mapping in lib. Decline posts without the form's CSRF token (protected by the signed link or session + SameSite); revisit if the inbox ever leaves localhost.
+
 ## Test changes
 
 <!-- Every weakened, deleted, skipped or changed assertion: date, test, reason. -->
