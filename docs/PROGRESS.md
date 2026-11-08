@@ -14,14 +14,15 @@
 ## Current
 
 - Plan v3 (`decisions/022`): Werewolf main, Doc Review second, Refund Desk retired in M6.
-- Phase: M2 HumanInput [R] done except the Inspector MRTR check (human) → record in Decisions. Inbox, login, signed links, email tested (`InboxTest`, `EnumAnswerRoundTripTest`, `ElicitationFormTest`).
-- M3 Werewolf rules done (`src/Werewolf/Rules`, qwen3 tool-call result in `decisions/002`). M2 in main; M3 merges via its PR.
+- Phase: M2 HumanInput [R] done except Inspector MRTR part 2 (human, ~5 min): `make inspector TOKEN=$(grep '^LEASH_INVESTIGATOR_TOKEN=' .env.local | cut -d= -f2)`, then in the Inspector UI Servers tab add `http://127.0.0.1:8000/mcp-spike/demo` (Streamable HTTP, no header), run its tool, expect the approval form → accept → result. Record in `decisions/018` (part 1 done there).
+- M2 in main (PR #7). M3 Werewolf rules done on m/phase-3-werewolf-rules, main merged in, PR open → human merges.
+- Follow-up for M4 (`lib/`, [R]): always advertise the `tools` capability; a role with no visible tool currently gets none and the Inspector hides the Tools tab (`decisions/018`).
 - Done-signal M2: PLAN M2 acceptance + `.claude/done.sh` (green).
 - Blocked: none.
 
 ## Next prompt
 
-/phase M4 — after the human ran the Inspector check and merged M2 + M3 into main
+/phase M4 — after the Inspector MRTR part 2 is recorded in decisions/018 and the M3 PR is merged
 
 ## Decisions
 
@@ -70,6 +71,7 @@
 
 - 2026-11-07: Inbox form: `lib/HumanInput/Inbox/ElicitationForm` maps the raw `requestedSchema` (all 7 SDK shapes; titled/legacy enum → `ChoiceType`) to a Symfony Form and back to typed content; the SDK does not validate answer content, policies' `applyAnswer()` stays the server-side check (`decisions/023`).
 - 2026-11-07: Inbox auth: `/inbox` behind form_login (in-memory `approver`, plaintext hasher on `InMemoryUser`, `APPROVER_PASSWORD` from `.env.local` via `make install`); `/inbox/item/{id}` is PUBLIC_ACCESS and the controller verifies the `UriSigner` link (expired 410, tampered 403) unless logged in; links expire after `LEASH_INBOX_LINK_TTL` (PT24H). Email channel `App\Inbox\EmailHumanInputNotifier` (also logs) is the `HumanInputNotifier`; `MAILER_DSN=null://null` default, Mailpit DSN in `.env` comment (`decisions/024`).
+- 2026-11-08: Inspector check part 1 (human): Tools tab OK with the investigator token; resolver token on C1 gets no `tools` capability → no tab; follow-up in M4 to always advertise `tools`. MRTR only demonstrable on `/mcp-spike/{id}` (refund workflow has no `mcp_approval`); part 2 open (`decisions/018`).
 - 2026-11-07: Inbox controller/templates live in App (`src/Controller`, `src/Inbox`), the form mapping in lib. Decline posts without the form's CSRF token (protected by the signed link or session + SameSite); revisit if the inbox ever leaves localhost.
 
 - 2026-11-07: M3: `qwen3:8b` calls tools through the Symfony AI Ollama bridge (3/3) and Ollama direct (4/4); thinking ~8–12 s per tool step vs 1.1 s with `think: false`; `/no_think` soft switch has no effect through the bridge. Default stays thinking + replay; bridge `think` option is a VERIFY for M4 (`decisions/002` addendum).
@@ -84,6 +86,8 @@
 ## Log
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
+
+- 2026-11-08 — Merge + Inspector session (with human). Merged main (M2) into M3, PROGRESS conflict resolved, M3 PR mergeable. Inspector part 1 done: missing Tools tab traced to the resolver token (no visible tool → no `tools` capability); investigator token shows the tool. MRTR part 2 on the spike endpoint still open (human). Test changes: none. Blocked: none. Needs review: M3 PR. Spend: $0.
 
 - 2026-11-07 — M2 inbox + email (unattended). symfony/form, twig-bundle, mailer, security-csrf added. VERIFY → decisions 023 (elicitation schema shapes, SDK does not validate content) and 024 (UriSigner, form_login + plaintext hasher, mailer tests). `lib/HumanInput/Inbox/ElicitationForm`; App `InboxController`, `InboxLinks`, `EmailHumanInputNotifier` (now the `HumanInputNotifier`); templates; `make install` writes `APPROVER_PASSWORD`. Tests: `ElicitationFormTest`, `EnumAnswerRoundTripTest`, `InboxTest`. Test changes: none weakened; `Harness` fixture takes an optional approval policy (default unchanged). Blocked: none. Needs review: M2 branch ([R]); Inspector check needs a human. Spend: $0.
 - 2026-11-07 — M3 done (unattended). Branch m/phase-3-werewolf-rules from main + plan v3 docs. qwen3:8b tool-call check (bridge 3/3, direct 4/4; thinking ~8–12 s vs 1.1 s per step; `/no_think` ineffective through the bridge; `spike:llm-tool --no-think`). Rules engine `src/Werewolf/Rules` (Game, Seat, enums, action VOs, Rejection, SeededRandom, audience-scoped events). Tests: 6 scripted games (`ScriptedGamesTest`), 27 rule tests (`GameRulesTest`), `WerewolfRulesPurityTest`. Rule choices where §3.5 is silent in Decisions. Test changes: none. Blocked: none. Needs review: branch (merge), rule choices. Spend: $0 (local Ollama only).

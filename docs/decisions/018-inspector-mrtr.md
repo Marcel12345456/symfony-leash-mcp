@@ -27,3 +27,10 @@ Run the M2 manual Inspector check with a pinned Inspector 2.14.0, record the neg
 - `Makefile`: pin `@modelcontextprotocol/inspector@2.14.0`.
 - Note for M2: a deferred human approval does not fit the Inspector flow (it answers live in the modal); the Inspector check exercises the synchronous accept/decline path.
 - No BUGS.md entry.
+
+## Manual check, part 1 (human, 2026-11-08)
+
+- `make inspector TOKEN=<investigator>` against `/mcp/refund_case/C1`: Inspector 2.14.0 UI connects, Tools tab lists `refund_start_investigation`. Inspector `--cli --method tools/list` returns the same.
+- With the **resolver** token the UI showed only the Servers tab: capabilities `{logging, completions}`, no `tools`. In state `received` the resolver sees no tool, and the server then omits the `tools` capability, so the Inspector hides the tab. Follow-up (M4, `lib/`): always advertise `tools` so an empty list is shown instead.
+- UI GET for the standalone SSE stream gets 405 (allowed by the spec); the UI keeps working.
+- The refund workflow has no `mcp_approval` transition, so MRTR can only be shown on the spike endpoint `/mcp-spike/{id}` (no auth). **Part 2 open:** in the Inspector UI add server `http://127.0.0.1:8000/mcp-spike/demo` (Streamable HTTP, no header), run its tool, expect the approval form, accept, see the result. (Opening that URL in a browser returns JSON-RPC 405 "Method Not Allowed"; that is expected.)
