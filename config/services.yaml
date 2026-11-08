@@ -35,3 +35,28 @@ services:
             - '../lib/WorkflowMcp/Tool/ToolResults.php'
 
     Leash\WorkflowMcp\Subject\SubjectProviderInterface: '@Leash\WorkflowMcp\Subject\DoctrineSubjectProvider'
+
+    Leash\HumanInput\:
+        resource: '../lib/HumanInput/'
+        exclude:
+            - '../lib/HumanInput/Client/InputOutcome.php'
+            - '../lib/HumanInput/Client/InputRequired.php'
+            - '../lib/HumanInput/Client/McpCallFailed.php'
+            - '../lib/HumanInput/Client/ToolCall.php'
+            - '../lib/HumanInput/Doctrine/ProcessedInputRequest.php'
+            - '../lib/HumanInput/Event/'
+            - '../lib/HumanInput/Idempotency/ProcessedResult.php'
+            - '../lib/HumanInput/Pending/PendingInput.php'
+            - '../lib/HumanInput/Pending/PendingInputStatus.php'
+            - '../lib/HumanInput/Pending/ResumePendingInput.php'
+            - '../lib/HumanInput/RequestState/BoundRequest.php'
+            - '../lib/HumanInput/RequestState/RejectionReason.php'
+            - '../lib/HumanInput/RequestState/RequestStateRejected.php'
+            - '../lib/HumanInput/Server/Decision.php'
+            - '../lib/HumanInput/Server/Verdict.php'
+
+    Leash\HumanInput\Idempotency\ProcessedInputRequests: '@Leash\HumanInput\Doctrine\DoctrineProcessedInputRequests'
+    Leash\HumanInput\Pending\PendingInputs: '@Leash\HumanInput\Doctrine\DoctrinePendingInputs'
+    Leash\HumanInput\Pending\HumanInputNotifier: '@App\Inbox\EmailHumanInputNotifier'
+    Leash\HumanInput\Client\InputRequestHandlerInterface: '@Leash\HumanInput\Pending\DeferringInputRequestHandler'
+    Leash\HumanInput\Client\CallerTokens: '@App\Security\StaticTokenHandler'

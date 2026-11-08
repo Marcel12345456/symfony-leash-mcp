@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace App\Security;
 
+use Leash\HumanInput\Client\CallerTokens;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
-/** Bearer token → agent user (PLAN §3.2 Authentication). Tokens live in `.env.local`; an empty token never matches. */
-final readonly class StaticTokenHandler implements AccessTokenHandlerInterface
+/**
+ * Bearer token → agent user (PLAN §3.2 Authentication). Tokens live in `.env.local`; an empty token never matches.
+ * Also the reverse lookup a resume needs: the original caller's token (decisions/017).
+ */
+final readonly class StaticTokenHandler implements AccessTokenHandlerInterface, CallerTokens
 {
     /** @var array<string, string> user identifier => token */
     private array $tokens;
@@ -33,5 +37,15 @@ final readonly class StaticTokenHandler implements AccessTokenHandlerInterface
         }
 
         throw new BadCredentialsException('Invalid access token.');
+    }
+
+    public function tokenFor(string $callerId): string
+    {
+        $token = $this->tokens[$callerId] ?? '';
+        if ('' === $token) {
+            throw new \OutOfBoundsException(\sprintf('No token configured for caller "%s".', $callerId));
+        }
+
+        return $token;
     }
 }

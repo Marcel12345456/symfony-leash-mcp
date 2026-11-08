@@ -35,3 +35,10 @@
 
 - **symfony/ai-agent 0.15.0 — tool list frozen per run.** `Execution/Runner.php:76` exposes `toolbox->getTools()` once; the comment at `:304` says toolbox tools can change during a run, but `$options['tools']` is never refreshed. Repro idea: toolbox whose `getTools()` changes after the first `execute()`; the second model request still carries the old list. Workaround: one agent run per workflow step (`decisions/006`).
 - **mcp/sdk 0.9.0 — `requestState` TTL is global.** `RequestStateCodec` TTL is set once on the builder; no per-state expiry. Workaround: own `expiresAt` in the payload (`decisions/001`).
+
+## mcp/sdk 0.9.0 — `Client::callTool()` cannot defer `input_required` or send a later retry
+
+- Repro: `$client->callTool('x', [...])` against a tool that returns `InputRequiredResult`, with a client that wants to park the request for a human answering hours later.
+- Actual: `Client\Protocol::request()` always auto-resolves rounds through elicitation handlers (max 10, `Client/Protocol.php:555-620`); `requestState` is never exposed, and `callTool()` has no parameter for `inputResponses`/`requestState`. Throwing from the callback yields a message-only `RuntimeException`.
+- Expected: an option to return the raw `InputRequiredResult`, and a way to send a retry with `inputResponses` + `requestState` (MRTR is designed for exactly this deferral).
+- Workaround: raw JSON-RPC client `Leash\HumanInput\Client\RawMcpClient` (decisions/017, 021).

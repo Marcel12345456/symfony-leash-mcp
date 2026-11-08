@@ -17,12 +17,12 @@ use Symfony\Component\Workflow\Transition;
 
 /**
  * Synthetic workflow: draft → review → published, archive from draft and from published (same name, two instances).
- * `approve` is guarded: a locked document cannot be approved.
+ * `approve` is guarded: a locked document cannot be approved; with `$approvalOnApprove` it also needs a human (MRTR).
  */
 final class DocumentWorkflow
 {
     /** @param array<string, mixed> $workflowMetadata */
-    public static function create(array $workflowMetadata = ['mcp_prefix' => 'doc']): StateMachine
+    public static function create(array $workflowMetadata = ['mcp_prefix' => 'doc'], bool $approvalOnApprove = false): StateMachine
     {
         $transitions = [
             'submit' => new Transition('submit', 'draft', 'review'),
@@ -35,7 +35,8 @@ final class DocumentWorkflow
         /** @var \SplObjectStorage<Transition, array<mixed>> $transitionMetadata */
         $transitionMetadata = new \SplObjectStorage();
         $transitionMetadata[$transitions['submit']] = ['mcp_roles' => ['ROLE_AUTHOR'], 'mcp_description' => 'Submit for review.'];
-        $transitionMetadata[$transitions['approve']] = ['mcp_roles' => ['ROLE_EDITOR'], 'mcp_input' => ApproveInput::class];
+        $transitionMetadata[$transitions['approve']] = ['mcp_roles' => ['ROLE_EDITOR'], 'mcp_input' => ApproveInput::class]
+            + ($approvalOnApprove ? ['mcp_approval' => 'doc_approval'] : []);
         $transitionMetadata[$transitions['reject']] = ['mcp_roles' => ['ROLE_EDITOR']];
         $transitionMetadata[$transitions['archive_draft']] = ['mcp_roles' => ['ROLE_AUTHOR']];
         $transitionMetadata[$transitions['archive_published']] = ['mcp_roles' => ['ROLE_EDITOR']];
