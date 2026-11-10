@@ -9,6 +9,7 @@ use Symfony\AI\Platform\Message\Message;
 use Symfony\AI\Platform\Message\MessageBag;
 use Symfony\AI\Platform\TokenUsage\TokenUsageAggregation;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -25,9 +26,13 @@ final readonly class SpikeLlmToolCommand
         private string $model,
     ) {}
 
-    public function __invoke(SymfonyStyle $io): int
-    {
-        $result = $this->agent->call(new MessageBag(Message::ofUser('What is the order amount of case C1 in euros?')));
+    public function __invoke(
+        SymfonyStyle $io,
+        #[Option('Append the qwen3 soft switch /no_think to the question')]
+        bool $noThink = false,
+    ): int {
+        $question = 'What is the order amount of case C1 in euros?' . ($noThink ? ' /no_think' : '');
+        $result = $this->agent->call(new MessageBag(Message::ofUser($question)));
         $answer = $result->getContent();
         $answer = \is_string($answer) ? $answer : get_debug_type($answer);
 

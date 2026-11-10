@@ -39,3 +39,18 @@ If the human prefers to drop W: the evidence also supports that (2 of 3 models f
 
 - If go: W1 may start after the human confirms; `LEASH_MODEL_WEREWOLF=qwen3:latest`; turn timeout ≥ 300 s (`docker/php/leash.ini`).
 - Smoke script stays as a spike (not library code); transcripts committed for the record.
+
+## Addendum 2026-11-07 — qwen3 tool calling (M3)
+
+Plan v3 makes Werewolf the headline, so the player model must call tools. Proof 2 used `qwen2.5:7b`; re-run with `qwen3:latest` (= qwen3:8b, the only qwen3 pulled), Apple Silicon, Ollama native, $0.
+
+| Path | Thinking | Tool call | Model time (tool-call step) | Completion tokens |
+|---|---|---|---|---|
+| `spike:llm-tool` (Symfony AI Ollama bridge, agent + tool, 2 model calls) | on (default) | `C1`, answer 42.50 EUR ✓ | 15.0–21.6 s wall incl. container start | 320–388 |
+| same, `--no-think` (appends qwen3 soft switch `/no_think`) | soft switch | ✓ | 15.6–22.4 s wall | 351–471 → **soft switch has no effect** |
+| Ollama `/api/chat` direct, same tool schema, `think: true` | on | `case_amount{caseId: C1}` ✓ | 7.8–12.5 s | 172–287 |
+| Ollama `/api/chat` direct, `think: false` | off | `case_amount{caseId: C1}` ✓ | **1.1 s** | 22 |
+
+Result: qwen3:8b calls tools reliably through the bridge (3/3) and directly (4/4). Thinking costs ~10× latency per step. The smoke test (above) showed thinking is what makes qwen3 play well, so the default stays **thinking on**, replay for the demo.
+
+Open (M4, `/verify` before use): does the Symfony AI Ollama bridge forward a `think: false` option? Useful for cheap turns (e.g. votes) if quality holds. Not needed for M3. `spike:llm-tool --no-think` is kept as the soft-switch probe.
