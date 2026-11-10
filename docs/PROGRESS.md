@@ -122,6 +122,9 @@
 - 2026-11-10: `RunNextActorHandler` queues the next `RunNextActor` after a played step until the game ends; locked/paused/missing/over stop the chain (a resumed input queues a new one via `RunNextActorOnResolved`). Workflows without agents (refund_case, doc_review for now) are logged and dropped.
 - 2026-11-10: `ModelChoiceFactory` reads `LEASH_MODEL` (`ollama` | `replay`; replay throws until `ReplayPlatform`, 028), `LEASH_OLLAMA_MODEL` (qwen3:8b), `LEASH_THINK`, `LEASH_TURN_TIMEOUT` (own HttpClient `timeout`/`max_duration`, marked workaround, 029). Test env: Ollama on closed port `127.0.0.1:9`, so handler tests run on the deadline path with no model. Transcripts: parameter `leash.werewolf.transcripts` (`var/werewolf`, tests: cache dir); `TranscriptWriter` leaves out the system prompt and thinking (non-streaming Ollama drops it, 029).
 
+- 2026-11-10: Replay is own code: recording decorator around `Ollama\Factory::createProvider` + `ReplayProvider` (per-seat FIFO over `ResultSerializer::toArray/fromArray`, prompt hash, explicit `--record`); no `RecordingProvider`/`Cassette` (no read-all API, content-blind default signature) (`decisions/033`, revises 028).
+- 2026-11-10: `leash:werewolf:play [--seed=7] [--game=seed-<seed>] [--model] [--max-steps=60]` in `App\Agent\Werewolf\PlayGameCommand`: replaces the game and transcript, steps until a winner; exit 1 and `Result: unfinished` otherwise (`PlayGameCommandTest`).
+
 ## Test changes
 
 <!-- Every weakened, deleted, skipped or changed assertion: date, test, reason. -->
