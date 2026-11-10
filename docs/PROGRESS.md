@@ -15,20 +15,25 @@
 
 - Plan v3 (`decisions/022`): Werewolf main, Doc Review second, Refund Desk retired in M6.
 - Phase: **M4 Werewolf over MCP**, branch `m/phase-4-werewolf-mcp` (from main), in progress. `lib/` changes are [R] (needs review before merge).
-- M4 done-signal: `.claude/done.sh` exit 0, plus these tests green:
-  - `tests/Unit/Lib/WorkflowMcp/ScopedCapabilityProviderTest` + `WorkflowServerTest`: synthetic workflow resources role-filtered per place × role; `resources/list`/`resources/read` show only visible ones; an invisible URI gets an actionable error + `CapabilityDenied`; `tools` capability advertised with zero visible tools.
-  - `tests/Unit/Lib/WorkflowMcp/ActorSelectorTest`: per-caller form `actorsAmong()` picks the right callers.
-  - `tests/Integration/Werewolf/WerewolfVisibilityTest`: villager never lists `wolf-den` or `ww_choose_victim`; dead seat sees only `public-log`; moderator transitions never visible to seats; forbidden call denied and logged.
-  - `tests/Integration/Werewolf/WerewolfMcpGameTest`: scripted seat clients play a full game over HTTP MCP (no LLM); same seed → same game.
+- M4 done-signal and design intent: see "M4 notes" below.
 - M2 (PR #7) and M3 (PR #6) in main. M2 Inspector check complete (`decisions/018` part 2, 2026-11-10: approval round trip works; likely legacy elicitation, not MRTR wire format).
-- Follow-ups for M4 (`lib/`, [R]): always advertise the `tools` capability; a role with no visible tool currently gets none and the Inspector hides the Tools tab (`decisions/018`). Makefile: `php -S` needs `PHP_CLI_SERVER_WORKERS` > 1, otherwise a streamed `tools/call` deadlocks the server (`decisions/018`).
-- M4 done so far (50070a1): `ActorSelector::actorsAmong()` + test, place tools get the caller, `tools`/`resources` always advertised. Next: place resources in lib (`#[AsPlaceResource]`, `mcp_resources`, responder per decisions/025), then `src/Werewolf`.
-- M4 design intent (not built yet): role lists stay any-of. `WerewolfSeatRoleResolver` gives a dead seat only `ROLE_DEAD`; a living seat gets `ROLE_ALIVE` + identity role, plus `ROLE_ON_TURN` when in `Game::pendingSeats()`, and at night `ROLE_WOLF_ON_TURN` / `ROLE_SEER_ON_TURN`, so a seat that already acted loses its tool without an all-of lib feature. Moderator transitions guarded by a peek on a cloned `Game` (target phase, all actions in or deadline); a transition listener calls `Game::advance()`. Game persisted as `serialize()` with allowed classes. Seat tokens HMAC-derived from one env secret.
+- Follow-up for M4 Makefile: `php -S` needs `PHP_CLI_SERVER_WORKERS` > 1, otherwise a streamed `tools/call` deadlocks the server (`decisions/018`).
+- M4 done so far (50070a1): `actorsAmong()`, caller for place tools, `tools`/`resources` always advertised. Next: place resources in lib, then `src/Werewolf`.
 - Blocked: none.
 
 ## Next prompt
 
-/phase M4
+/phase M4 (continue: place resources in `lib/`, then `src/Werewolf`)
+
+## M4 notes
+
+- Done-signal: `.claude/done.sh` exit 0, plus these tests green:
+  - `tests/Unit/Lib/WorkflowMcp/ScopedCapabilityProviderTest` + `WorkflowServerTest`: synthetic workflow resources role-filtered per place × role; `resources/list`/`resources/read` show only visible ones; an invisible URI gets an actionable error + `CapabilityDenied`; `tools` capability advertised with zero visible tools.
+  - `tests/Unit/Lib/WorkflowMcp/ActorSelectorTest`: per-caller form `actorsAmong()` picks the right callers.
+  - `tests/Integration/Werewolf/WerewolfVisibilityTest`: villager never lists `wolf-den` or `ww_choose_victim`; dead seat sees only `public-log`; moderator transitions never visible to seats; forbidden call denied and logged.
+  - `tests/Integration/Werewolf/WerewolfMcpGameTest`: scripted seat clients play a full game over HTTP MCP (no LLM); same seed → same game.
+- Done so far (50070a1): `ActorSelector::actorsAmong()` + test, place tools get the caller, `tools`/`resources` always advertised. Next: place resources in lib (`#[AsPlaceResource]`, `mcp_resources`, responder per decisions/025), then `src/Werewolf`.
+- Design intent (not built yet): role lists stay any-of. `WerewolfSeatRoleResolver` gives a dead seat only `ROLE_DEAD`; a living seat gets `ROLE_ALIVE` + identity role, plus `ROLE_ON_TURN` when in `Game::pendingSeats()`, and at night `ROLE_WOLF_ON_TURN` / `ROLE_SEER_ON_TURN`, so a seat that already acted loses its tool without an all-of lib feature. Moderator transitions guarded by a peek on a cloned `Game` (target phase, all actions in or deadline); a transition listener calls `Game::advance()`. Game persisted as `serialize()` with allowed classes. Seat tokens HMAC-derived from one env secret.
 
 ## Decisions
 
