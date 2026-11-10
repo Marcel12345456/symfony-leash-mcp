@@ -14,15 +14,14 @@
 ## Current
 
 - Plan v3 (`decisions/022`): Werewolf main, Doc Review second, Refund Desk retired in M6.
-- Phase: M2 HumanInput [R] done except Inspector MRTR part 2 (human, ~5 min): `make inspector TOKEN=$(grep '^LEASH_INVESTIGATOR_TOKEN=' .env.local | cut -d= -f2)`, then in the Inspector UI Servers tab add `http://127.0.0.1:8000/mcp-spike/demo` (Streamable HTTP, no header), run its tool, expect the approval form → accept → result. Record in `decisions/018` (part 1 done there).
-- M2 in main (PR #7). M3 Werewolf rules done on m/phase-3-werewolf-rules, main merged in, PR open → human merges.
-- Follow-up for M4 (`lib/`, [R]): always advertise the `tools` capability; a role with no visible tool currently gets none and the Inspector hides the Tools tab (`decisions/018`).
-- Done-signal M2: PLAN M2 acceptance + `.claude/done.sh` (green).
+- Phase: M4 Werewolf over MCP, branch `m/phase-4-werewolf-mcp` (from main), not started yet: run `/phase M4` for the task list, done-signal and VERIFYs.
+- M2 (PR #7) and M3 (PR #6) in main. M2 Inspector check complete (`decisions/018` part 2, 2026-11-10: approval round trip works; likely legacy elicitation, not MRTR wire format).
+- Follow-ups for M4 (`lib/`, [R]): always advertise the `tools` capability; a role with no visible tool currently gets none and the Inspector hides the Tools tab (`decisions/018`). Makefile: `php -S` needs `PHP_CLI_SERVER_WORKERS` > 1, otherwise a streamed `tools/call` deadlocks the server (`decisions/018`).
 - Blocked: none.
 
 ## Next prompt
 
-/phase M4 — after the Inspector MRTR part 2 is recorded in decisions/018 and the M3 PR is merged
+/phase M4
 
 ## Decisions
 
