@@ -7,6 +7,8 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    # Werewolf transcripts (decisions/032); tests write into the cache dir.
+    leash.werewolf.transcripts: '%kernel.project_dir%/var/werewolf'
 
 services:
     # default configuration for services in *this* file
@@ -18,6 +20,11 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+
+    # Agents reach the MCP endpoints through this app's kernel, no web server needed.
+    App\Agent\McpConnector:
+        arguments:
+            $http: '@App\Agent\InProcessPsr18Client'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
@@ -63,3 +70,7 @@ services:
     Leash\HumanInput\Pending\HumanInputNotifier: '@App\Inbox\EmailHumanInputNotifier'
     Leash\HumanInput\Client\InputRequestHandlerInterface: '@Leash\HumanInput\Pending\DeferringInputRequestHandler'
     Leash\HumanInput\Client\CallerTokens: '@App\Security\StaticTokenHandler'
+
+when@test:
+    parameters:
+        leash.werewolf.transcripts: '%kernel.cache_dir%/werewolf'

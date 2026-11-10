@@ -15,18 +15,21 @@
 
 - Plan v3 (`decisions/022`): Werewolf main, Doc Review second, Refund Desk retired in M6.
 - Phase: **M5 Agents play — in progress**, branch `m/phase-5-agents-play`, stacked on `m/phase-4-werewolf-mcp` (M4 not merged yet; rebase onto main after the M4 merge).
-- M5 done so far: VERIFY → decisions 027–029; `symfony/lock`; turn deadline (`Game::skipSpeaker()`, `GameModerator::expire()`, no own test yet).
-- M5 left, in order: `McpClientToolbox` (lib, + unit test), `TurnBudgetToolbox`, prompts `config/prompts/werewolf/*.md`, seat turn runner (resources → prompt, one Agent per turn, transcript), next-actor runner (lock, paused skip, `actorsAmong`, deadline via `expire()`) + `RunNextActor` handler, `leash:werewolf:play --seed --record`, `ReplayPlatform` + signature pin test (028), agent tests, live qwen3 game + cassette, `make werewolf`.
+- M5 done so far: decisions 027–032; `symfony/lock`; turn deadline (`skipSpeaker()`, `expire()`); lib `McpClientToolbox` + `TurnBudgetToolbox`; `SeatTurnRunner` + `McpConnector` over `InProcessPsr18Client` + prompt `player.md`.
+- M5 runner stretch done: `TranscriptWriter`, `NextActorRunner`, `RunNextActorHandler`, `ModelChoiceFactory` (details: M5 notes, Decisions).
+- M5 left, in order: `leash:werewolf:play --seed --record` (`ModelChoice` from `LEASH_MODEL`), `ReplayPlatform` + signature pin test (028), full-game agent test (`ScriptedSeatPlatform`, 030), live qwen3 game + cassette, `make werewolf`.
 - M5 done-signal and design: see "M5 notes".
 - M2 (PR #7) and M3 (PR #6) in main. M4 branch pushed, needs review ([R] `lib/`), then merge (human).
 - Blocked: none.
 
 ## Next prompt
 
-/phase M5 — continue with McpClientToolbox (decisions/027), then the seat turn runner
+/phase M5 — continue with the leash:werewolf:play command, then ReplayPlatform and the full-game agent test
 
 ## M5 notes
 
+- Built in that stretch: `TranscriptWriter` (`TranscriptWriterTest`), `NextActorRunner` (`NextActorRunnerTest`: night round with a timed-out wolf → expire, held lock, paused game), `RunNextActorHandler` + `ModelChoiceFactory` (`RunNextActorHandlerTest`), test helper `ScriptedSeatPlatform`.
+- Stretch 2026-11-10 (runner): `tests/Unit/Agent/TranscriptWriterTest` (turn sections, last line `Result: …`), `tests/Integration/Agent/NextActorRunnerTest` (held lock skipped, paused subject skipped, one night round with a silent wolf → `expire()`), `tests/Integration/Agent/RunNextActorHandlerTest` (step runs, next `RunNextActor` dispatched until the game ends), `.claude/done.sh`.
 - Done-signal: `.claude/done.sh` exit 0, plus:
   - `tests/Integration/Agent/WerewolfAgentsTest`: agents on a scripted fake platform play a full game over MCP (in-process HTTP); a villager's `ww_choose_victim` call is denied, logged as a denial, and the game goes on; max 3 tool calls per turn; a seat that does not act within its turn abstains (deadline path).
   - `tests/Unit/Agent/NextActorRunnerTest` (or equivalent): paused subject skipped, held lock skipped.
@@ -111,6 +114,13 @@
 - 2026-11-10: Replay: record with `RecordingProvider`, replay with own per-seat FIFO `ReplayPlatform`; the default cassette signature is content-blind (`decisions/028`, proposed until pinned by a test).
 - 2026-11-10: One `Agent` per seat turn built in PHP; `TurnBudgetToolbox` caps 3 calls (built-in `maxToolCalls` counts rounds and throws); transcript from the mutated `MessageBag`; `think` on by default (`LEASH_THINK=0` off); per-turn timeout via own Ollama platform with an explicit HTTP client (`decisions/029`).
 - 2026-11-10: Turn deadline: `GameModerator::expire()` skips the current speaker in day_discussion (`Game::skipSpeaker()`, public `turn_skipped` event) and otherwise resolves the phase with missing actions abstaining (transient `deadlinePassed` flag read by `PhaseGuard`, for one transition).
+- 2026-11-10: Agent tests script the model with `MockPlatformFactory::createPlatform(closure)` (closure sees the normalized payload + call options incl. `tools`); helper `ScriptedSeatPlatform` in tests; `Agent::call()` returns `Execution` (`decisions/030`).
+- 2026-11-10: `McpClientToolbox`/`TurnBudgetToolbox` API cheat sheet; server errors stay model-visible text (027); lib test runs the Builder behind `HttpTransport` via a PSR-18 fixture with one shared `InMemorySessionStore` (`decisions/031`).
+- 2026-11-10: `McpClientToolbox` drops the schema when `properties` is empty; the SDK keeps it as an empty `stdClass`, not `[]`. In-process `Mcp\Client` → `Builder` works with one shared `InMemorySessionStore` (`ServerPsr18Client` fixture); 031 in-process part pinned.
+- 2026-11-10: Turn runner catches raw HttpClient `TransportExceptionInterface` (timeout, unwrapped by the platform), `MaxIterationsExceededException`, then agent/platform exceptions; all end the turn without action (`decisions/032`). Agents reach MCP in-process via `App\Agent\InProcessPsr18Client` (HttpKernel), so `leash:werewolf:play` needs no web server; `LEASH_MCP_BASE_URL` only fills URLs.
+- 2026-11-10: `NextActorRunner::step()` = one round under the non-blocking lock `leash.subject.werewolf_game.{id}`: the seats `actorsAmong` returns (seat order) each play one turn, re-checked before each turn, stopping when the phase changes; if a round seat is still an actor in the same day/phase afterwards, the round missed the deadline → `GameModerator::expire()`, then `advance()`. Paused = a `Pending` or `Answered` `PendingInput` with subject ref `werewolf_game:{id}`. The game is re-read after each turn (`clear()` + `find()`), because tools flush through the MCP endpoint.
+- 2026-11-10: `RunNextActorHandler` queues the next `RunNextActor` after a played step until the game ends; locked/paused/missing/over stop the chain (a resumed input queues a new one via `RunNextActorOnResolved`). Workflows without agents (refund_case, doc_review for now) are logged and dropped.
+- 2026-11-10: `ModelChoiceFactory` reads `LEASH_MODEL` (`ollama` | `replay`; replay throws until `ReplayPlatform`, 028), `LEASH_OLLAMA_MODEL` (qwen3:8b), `LEASH_THINK`, `LEASH_TURN_TIMEOUT` (own HttpClient `timeout`/`max_duration`, marked workaround, 029). Test env: Ollama on closed port `127.0.0.1:9`, so handler tests run on the deadline path with no model. Transcripts: parameter `leash.werewolf.transcripts` (`var/werewolf`, tests: cache dir); `TranscriptWriter` leaves out the system prompt and thinking (non-streaming Ollama drops it, 029).
 
 ## Test changes
 
@@ -124,6 +134,10 @@
 ## Log
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
+
+- 2026-11-10 — M5 continued (with human). Built: `TranscriptWriter` (`var/werewolf/<game>.md`, last line `Result: …`), `NextActorRunner` + `Step`/`StepOutcome` (lock, pause, `actorsAmong` round, deadline via `expire()`), `RunNextActorHandler` (chains until game over), `ModelChoiceFactory` (`LEASH_MODEL`, own Ollama HttpClient timeout), test helper `ScriptedSeatPlatform`; new env vars in `.env`/`.env.test`; parameter `leash.werewolf.transcripts`. Tests: `TranscriptWriterTest` (3), `NextActorRunnerTest` (3), `RunNextActorHandlerTest` (3). Test changes: none. Blocked: none. Needs review: prompt `player.md` and M4/M5 `lib/` ([R], unchanged this stretch). Spend: $0.
+
+- 2026-11-10 — M5 continued (with human). VERIFY → decisions 030 (scripted fake platform via `MockPlatformFactory`), 031 (MCP client toolbox API, in-process session pinned), 032 (turn exceptions: raw HttpClient transport errors, transcript accessors). Built: lib `McpClientToolbox` (bare names, server errors as text, empty-properties schema → null) + `TurnBudgetToolbox`; App `McpConnector`, `InProcessPsr18Client`, `ModelChoice`, `TurnOutcome`, `SeatTurnRunner`, `SeatTurn`; prompt `player.md`. Tests: `McpClientToolboxTest` (5), `SeatTurnRunnerTest` (4). BUGS.md: candidate (Ollama HTTP errors lose the body). Test changes: none. Blocked: none. Needs review: `lib/WorkflowMcp/Client` ([R]), prompt `player.md` ([R]). Spend: $0.
 
 - 2026-11-10 — M5 start (with human). Branch stacked on M4. VERIFY → decisions 027 (own `McpClientToolbox`, revises 006), 028 (record with `RecordingProvider`, replay per seat; default signature content-blind, proposed), 029 (Agent per turn, `TurnBudgetToolbox`, `think` on, own Ollama platform for the timeout). `symfony/lock` (flock). Turn deadline in rules + moderator. BUGS.md: two candidates (McpToolbox prefix, content-blind cassette signature). Test changes: none (one new rules test). Blocked: none. Needs review: M4 + M5 branches ([R]); `expire()` still untested. Spend: $0.
 
