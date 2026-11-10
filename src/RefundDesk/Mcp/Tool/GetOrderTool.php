@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\RefundDesk\Mcp\Tool;
 
+use Symfony\Component\Security\Core\User\UserInterface;
 use App\RefundDesk\Entity\RefundCase;
 use Leash\WorkflowMcp\PlaceTool\AsPlaceTool;
 use Leash\WorkflowMcp\PlaceTool\PlaceToolInterface;
@@ -14,7 +15,7 @@ final readonly class GetOrderTool implements PlaceToolInterface
 {
     public function __construct(private ClockInterface $clock) {}
 
-    public function __invoke(object $subject, ?object $input): array
+    public function __invoke(object $subject, ?object $input, UserInterface $caller): array
     {
         \assert($subject instanceof RefundCase);
         $order = $subject->getOrder();

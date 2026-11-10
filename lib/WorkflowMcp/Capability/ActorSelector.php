@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Leash\WorkflowMcp\Capability;
 
 use Leash\WorkflowMcp\Metadata\WorkflowMetadata;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
@@ -30,5 +31,26 @@ final readonly class ActorSelector
         sort($actors);
 
         return $actors;
+    }
+
+    /**
+     * Per-caller form, for subjects whose actors are individual callers (game seats): the callers that hold at least
+     * one visible acting tool, through the workflow's role resolver. Keeps the given order.
+     *
+     * @template T of UserInterface
+     *
+     * @param list<T> $callers
+     *
+     * @return list<T>
+     */
+    public function actorsAmong(WorkflowInterface $workflow, object $subject, array $callers): array
+    {
+        return array_values(array_filter(
+            $callers,
+            fn(UserInterface $caller): bool => [] !== array_filter(
+                $this->capabilities->visibleTools($workflow, $subject, $caller),
+                static fn(VisibleTool $tool): bool => !$tool->readOnly,
+            ),
+        ));
     }
 }

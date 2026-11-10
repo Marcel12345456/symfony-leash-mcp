@@ -9,6 +9,8 @@ use App\Tests\Unit\Lib\WorkflowMcp\Fixture\Document;
 use App\Tests\Unit\Lib\WorkflowMcp\Fixture\DocumentWorkflow;
 use App\Tests\Unit\Lib\WorkflowMcp\Fixture\OwnerRoleResolver;
 use Leash\WorkflowMcp\Capability\VisibleTool;
+use Leash\WorkflowMcp\Capability\VisibleResource;
+use Leash\WorkflowMcp\PlaceResource\PlaceResourceRegistry;
 use Leash\WorkflowMcp\PlaceTool\PlaceToolRegistry;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -93,12 +95,51 @@ final class ScopedCapabilityProviderTest extends TestCase
 
     public function testUnknownPlaceToolIsAConfigurationError(): void
     {
-        $provider = new \Leash\WorkflowMcp\Capability\ScopedCapabilityProvider(new PlaceToolRegistry([]), new \Symfony\Component\DependencyInjection\ServiceLocator([]));
+        $provider = new \Leash\WorkflowMcp\Capability\ScopedCapabilityProvider(new PlaceToolRegistry([]), new PlaceResourceRegistry([]), new \Symfony\Component\DependencyInjection\ServiceLocator([]));
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('doc_read_comments');
 
         $provider->visibleTools(DocumentWorkflow::create(), new Document('review'), new InMemoryUser('a', null, ['ROLE_AUTHOR']));
+    }
+
+    /** @return iterable<string, array{string, string, list<string>}> */
+    public static function resourcesForEveryPlaceAndRole(): iterable
+    {
+        foreach (['draft', 'published', 'archived'] as $place) {
+            yield $place . ' × author' => [$place, 'ROLE_AUTHOR', []];
+            yield $place . ' × editor' => [$place, 'ROLE_EDITOR', []];
+        }
+        yield 'review × author' => ['review', 'ROLE_AUTHOR', ['doc://guidelines']];
+        yield 'review × editor' => ['review', 'ROLE_EDITOR', ['doc://guidelines', 'doc://{subjectId}/rubric']];
+        yield 'review × stranger' => ['review', 'ROLE_USER', []];
+    }
+
+    /** @param list<string> $expected URIs */
+    #[DataProvider('resourcesForEveryPlaceAndRole')]
+    public function testResourceVisibilityForEveryPlaceAndRole(string $place, string $role, array $expected): void
+    {
+        $resources = DocumentWorkflow::provider()->visibleResources(DocumentWorkflow::create(), new Document($place), new InMemoryUser('bob', null, [$role]));
+
+        self::assertSame($expected, array_map(static fn(VisibleResource $r): string => $r->uri, $resources));
+    }
+
+    public function testPlaceResourceCarriesAttribute(): void
+    {
+        $resources = DocumentWorkflow::provider()->visibleResources(DocumentWorkflow::create(), new Document('review'), new InMemoryUser('bob', null, ['ROLE_EDITOR']));
+
+        self::assertSame(['doc_guidelines', 'text/markdown', 'Writing guidelines.'], [$resources[0]->name, $resources[0]->mimeType, $resources[0]->description]);
+        self::assertSame(['doc_rubric', 'application/json'], [$resources[1]->name, $resources[1]->mimeType]);
+    }
+
+    public function testUnknownPlaceResourceIsAConfigurationError(): void
+    {
+        $provider = new \Leash\WorkflowMcp\Capability\ScopedCapabilityProvider(new PlaceToolRegistry([]), new PlaceResourceRegistry([]), new \Symfony\Component\DependencyInjection\ServiceLocator([]));
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('doc_guidelines');
+
+        $provider->visibleResources(DocumentWorkflow::create(), new Document('review'), new InMemoryUser('a', null, ['ROLE_AUTHOR']));
     }
 
     /**

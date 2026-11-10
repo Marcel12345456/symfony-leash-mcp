@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\RefundDesk\Mcp\Tool;
 
+use Symfony\Component\Security\Core\User\UserInterface;
 use App\RefundDesk\Entity\Refund;
 use App\RefundDesk\Entity\RefundCase;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,7 +16,7 @@ final readonly class GetCustomerHistoryTool implements PlaceToolInterface
 {
     public function __construct(private EntityManagerInterface $entityManager) {}
 
-    public function __invoke(object $subject, ?object $input): array
+    public function __invoke(object $subject, ?object $input, UserInterface $caller): array
     {
         \assert($subject instanceof RefundCase);
         $customer = $subject->getCustomer();

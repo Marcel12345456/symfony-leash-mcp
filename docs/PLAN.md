@@ -107,7 +107,7 @@ Submission tags: **MCP, Agents, Human-in-the-loop**.
 - *Transition tools:* `{mcp_prefix}_{transition_name}`.
 - *Place tools:* tagged services, `#[AsPlaceTool(workflow: '...', name: '...', readOnly: true|false)]`, attached via place metadata `mcp_tools`. `readOnly` becomes the MCP `readOnlyHint` and decides whether the tool counts for `ActorSelector` (G3). Reading tools are read-only; Werewolf actions (`ww_vote`, …) are not.
 - *Lookup:* place tools, place resources, approval policies and role resolvers are found through typed tagged locators (`#[AutowireLocator]`), keyed by name or class. Injecting the container is not allowed.
-- *Place resources:* tagged services, `#[AsPlaceResource(workflow: '...', uri: '...')]`, attached via place metadata `mcp_resources`, role-filtered like tools. (verified: decisions/004 — `addResource`/`addResourceTemplate` per request.) **Built in M4**; generic and tested with the synthetic workflow (G1).
+- *Place resources:* tagged services, `#[AsPlaceResource(workflow: '...', uri: '...')]`, attached via place metadata `mcp_resources`, role-filtered like tools. (verified: decisions/004 — `addResource`/`addResourceTemplate` per request; decisions/025 — handler, not-found routing, cache.) **Built in M4**; generic and tested with the synthetic workflow (G1).
 
 **Metadata contract** (Doc Review, `config/packages/workflow.yaml`; the shape is the one built in M1):
 
@@ -189,6 +189,8 @@ framework:
 **Library dependency direction.** `Leash\WorkflowMcp\` may depend on `Leash\HumanInput\`; `Leash\HumanInput\` never depends on `Leash\WorkflowMcp\`. Architecture test.
 
 **Building the server per request.** (verified: decisions/004) `Server::builder()` per HTTP request, hosted in our controller via Streamable HTTP.
+
+**Capabilities.** `tools` and `resources` are always advertised, the same for every caller (decisions/026).
 
 **Caching.** Lists are state- and caller-dependent: `CachePolicy` `ttlMs: 0`, private (decisions/011). `list_changed` not pursued (decisions/016); results carry `availableTools`; clients re-list per step.
 

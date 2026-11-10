@@ -41,7 +41,7 @@ final readonly class PlaceToolHandler
         }
 
         try {
-            $output = ($tool->placeTool)($subject, $this->inputs->map($tool->inputClass, $arguments));
+            $output = ($tool->placeTool)($subject, $this->inputs->map($tool->inputClass, $arguments), $caller);
             if (!$tool->readOnly) {
                 $this->subjects->save($subject);
             }

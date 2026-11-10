@@ -14,14 +14,35 @@
 ## Current
 
 - Plan v3 (`decisions/022`): Werewolf main, Doc Review second, Refund Desk retired in M6.
-- Phase: M4 Werewolf over MCP, branch `m/phase-4-werewolf-mcp` (from main), not started yet: run `/phase M4` for the task list, done-signal and VERIFYs.
-- M2 (PR #7) and M3 (PR #6) in main. M2 Inspector check complete (`decisions/018` part 2, 2026-11-10: approval round trip works; likely legacy elicitation, not MRTR wire format).
-- Follow-ups for M4 (`lib/`, [R]): always advertise the `tools` capability; a role with no visible tool currently gets none and the Inspector hides the Tools tab (`decisions/018`). Makefile: `php -S` needs `PHP_CLI_SERVER_WORKERS` > 1, otherwise a streamed `tools/call` deadlocks the server (`decisions/018`).
+- Phase: **M5 Agents play — in progress**, branch `m/phase-5-agents-play`, stacked on `m/phase-4-werewolf-mcp` (M4 not merged yet; rebase onto main after the M4 merge).
+- M5 done so far: VERIFY → decisions 027–029; `symfony/lock`; turn deadline (`Game::skipSpeaker()`, `GameModerator::expire()`, no own test yet).
+- M5 left, in order: `McpClientToolbox` (lib, + unit test), `TurnBudgetToolbox`, prompts `config/prompts/werewolf/*.md`, seat turn runner (resources → prompt, one Agent per turn, transcript), next-actor runner (lock, paused skip, `actorsAmong`, deadline via `expire()`) + `RunNextActor` handler, `leash:werewolf:play --seed --record`, `ReplayPlatform` + signature pin test (028), agent tests, live qwen3 game + cassette, `make werewolf`.
+- M5 done-signal and design: see "M5 notes".
+- M2 (PR #7) and M3 (PR #6) in main. M4 branch pushed, needs review ([R] `lib/`), then merge (human).
 - Blocked: none.
 
 ## Next prompt
 
-/phase M4
+/phase M5 — continue with McpClientToolbox (decisions/027), then the seat turn runner
+
+## M5 notes
+
+- Done-signal: `.claude/done.sh` exit 0, plus:
+  - `tests/Integration/Agent/WerewolfAgentsTest`: agents on a scripted fake platform play a full game over MCP (in-process HTTP); a villager's `ww_choose_victim` call is denied, logged as a denial, and the game goes on; max 3 tool calls per turn; a seat that does not act within its turn abstains (deadline path).
+  - `tests/Unit/Agent/NextActorRunnerTest` (or equivalent): paused subject skipped, held lock skipped.
+  - `tests/Integration/Agent/WerewolfReplayTest`: `leash:werewolf:play` with `LEASH_MODEL=replay` replays the committed cassette to the end of the game (no model, no network).
+  - `make werewolf` exit 0 with Ollama unreachable (replay).
+  - Live: `LEASH_MODEL=ollama bin/console leash:werewolf:play --seed=N --record` with `qwen3:8b` ends with a winner or draw; transcript under `var/werewolf/` (check: file exists, last line names the result).
+
+## M4 notes
+
+- Done-signal: `.claude/done.sh` exit 0, plus these tests green:
+  - `tests/Unit/Lib/WorkflowMcp/ScopedCapabilityProviderTest` + `WorkflowServerTest`: synthetic workflow resources role-filtered per place × role; `resources/list`/`resources/read` show only visible ones; an invisible URI gets an actionable error + `CapabilityDenied`; `tools` capability advertised with zero visible tools.
+  - `tests/Unit/Lib/WorkflowMcp/ActorSelectorTest`: per-caller form `actorsAmong()` picks the right callers.
+  - `tests/Integration/Werewolf/WerewolfVisibilityTest`: villager never lists `wolf-den` or `ww_choose_victim`; dead seat sees only `public-log`; moderator transitions never visible to seats; forbidden call denied and logged.
+  - `tests/Integration/Werewolf/WerewolfMcpGameTest`: scripted seat clients play a full game over HTTP MCP (no LLM); same seed → same game.
+- Done: all four bullets green (d1a9888, 9691cd6, a6e7924, 72d8345).
+- Design (built as described, except deadlines): role lists stay any-of. `WerewolfSeatRoleResolver` gives a dead seat only `ROLE_DEAD`; a living seat gets `ROLE_ALIVE` + identity role, plus `ROLE_ON_TURN` when in `Game::pendingSeats()`, and at night `ROLE_WOLF_ON_TURN` / `ROLE_SEER_ON_TURN`, so a seat that already acted loses its tool without an all-of lib feature. Moderator transitions guarded by a peek on a cloned `Game` (target phase, all actions in or deadline); a transition listener calls `Game::advance()`. Game persisted as `serialize()` with allowed classes. Seat tokens HMAC-derived from one env secret.
 
 ## Decisions
 
@@ -76,15 +97,39 @@
 - 2026-11-07: M3: `qwen3:8b` calls tools through the Symfony AI Ollama bridge (3/3) and Ollama direct (4/4); thinking ~8–12 s per tool step vs 1.1 s with `think: false`; `/no_think` soft switch has no effect through the bridge. Default stays thinking + replay; bridge `think` option is a VERIFY for M4 (`decisions/002` addendum).
 - 2026-11-07: M3 rule choices where §3.5 is silent (all tested, easy to flip): wolves cannot target a wolf; no self-vote, no self-inspection; one action per seat per phase; no wolf choice by the deadline → nobody dies; dawn reveals the death, not the role; game over reveals all roles; votes are public; discussion order = living seats ascending, every day; dead seats keep their private knowledge; win checked after every death (dawn and vote). `Game::arranged()` fixes roles for the recorded demo game; `advance()` is also the deadline path (missing actions abstain).
 
+- 2026-11-10: Place resources: register only visible ones per request; hidden `resources/read` → own responder, `CapabilityDenied` + -32602 with the visible URIs; cache policy covers resources (`decisions/025`).
+- 2026-11-10: `WorkflowServerFactory` always advertises `tools` + `resources` (explicit `ServerCapabilities`, logging/completions kept, listChanged false), fixes the 018 Inspector follow-up (`decisions/026`).
+
+- 2026-11-10: Werewolf over MCP (`src/Werewolf`): transitions `break_dawn`, `open_discussion`, `open_vote`, `fall_night`, `end_game` (from night and day_vote) are `ROLE_MODERATOR` only; `PhaseGuard` enables one only when `pendingSeats()` is empty and a peek on a cloned `Game` lands in its target; the transition listener calls `Game::advance()`. `GameModerator` applies enabled transitions after every accepted seat action (`ToolCalled` listener), in-process, no deadline yet. Tools: night `ww_choose_victim` [ROLE_WOLF_ON_TURN], `ww_inspect` [ROLE_SEER_ON_TURN]; `ww_say`/`ww_vote` [ROLE_ON_TURN]. Resources in every place: `public-log` (alive, dead, moderator), `me` (alive), `wolf-den` (ROLE_WOLF), `seer-notes` (ROLE_SEER); a dead seat holds only ROLE_DEAD. `WerewolfGame` stores the `Game` as base64(serialize) with allowed classes; denials are a JSON list on the game plus a log warning. Callers `seat:1`…`seat:6`, `werewolf:moderator`; tokens = HMAC-SHA256 of the caller id with `LEASH_WEREWOLF_SECRET` (`make install` generates it).
+
+- 2026-11-10: Place resources built ([R], `lib/`): `#[AsPlaceResource(workflow, name, uri, description, mimeType='application/json')]` + `PlaceResourceInterface::__invoke(subject, caller): array|string`; place metadata `mcp_resources` is name => roles (like `mcp_tools`); `{subjectId}` in the URI is replaced by the endpoint's subject id (PLAN §3.5 `werewolf://game/{id}/…`). Hidden/unknown URI → `UnavailableResourceResponder` (-32602, data `{uri, visible}`) and `CapabilityDenied` with the URI in `tool` (no new event field).
+
+- 2026-11-10: `PlaceToolInterface::__invoke()` gets the caller (`UserInterface $caller`, required) so a place tool can act for the calling seat; Refund Desk tools and test fixtures updated, the parameter is unused there ([R], `lib/`).
+
+- 2026-11-10: M5 branch `m/phase-5-agents-play` stacked on M4 (M4 not merged); `symfony/lock` added (`LOCK_DSN=flock`).
+- 2026-11-10: Own generic `McpClientToolbox` (bare names, every call reaches the server, errors as model-visible text) instead of `McpToolbox` (mandatory prefix, final, lost JSON-RPC messages); resources read via `readResource` and injected into the turn prompt (`decisions/027`, revises 006).
+- 2026-11-10: Replay: record with `RecordingProvider`, replay with own per-seat FIFO `ReplayPlatform`; the default cassette signature is content-blind (`decisions/028`, proposed until pinned by a test).
+- 2026-11-10: One `Agent` per seat turn built in PHP; `TurnBudgetToolbox` caps 3 calls (built-in `maxToolCalls` counts rounds and throws); transcript from the mutated `MessageBag`; `think` on by default (`LEASH_THINK=0` off); per-turn timeout via own Ollama platform with an explicit HTTP client (`decisions/029`).
+- 2026-11-10: Turn deadline: `GameModerator::expire()` skips the current speaker in day_discussion (`Game::skipSpeaker()`, public `turn_skipped` event) and otherwise resolves the phase with missing actions abstaining (transient `deadlinePassed` flag read by `PhaseGuard`, for one transition).
+
 ## Test changes
 
 <!-- Every weakened, deleted, skipped or changed assertion: date, test, reason. -->
 
+- 2026-11-10: `ScopedCapabilityProviderTest` / `WorkflowServerTest` resource tests (added in d1a9888) expect `doc://{subjectId}/rubric` (provider) and `doc://d1/rubric` (server): the rubric fixture now uses the new `{subjectId}` URI placeholder. Same checks, new URI.
+- 2026-11-10: `tests/Unit/Lib/WorkflowMcp/ScopedCapabilityProviderTest::testUnknownPlaceToolIsAConfigurationError` passes an empty `PlaceResourceRegistry`, because `ScopedCapabilityProvider` now takes one. Call site only; no assertion changed.
+- 2026-11-10: `tests/Unit/RefundDesk/SearchPolicyToolTest` passes an `InMemoryUser` caller to the tool, because `PlaceToolInterface::__invoke()` now requires one. Call site only; no assertion changed.
 - 2026-11-07: `.claude/tests/bin.t.sh` "plan-section 3.2: has YAML" now expects `doc_review:` instead of `refund_case:`, because PLAN v3 §3.2 uses the Doc Review workflow as the metadata example (decisions/022). Same check, new content.
 
 ## Log
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
+
+- 2026-11-10 — M5 start (with human). Branch stacked on M4. VERIFY → decisions 027 (own `McpClientToolbox`, revises 006), 028 (record with `RecordingProvider`, replay per seat; default signature content-blind, proposed), 029 (Agent per turn, `TurnBudgetToolbox`, `think` on, own Ollama platform for the timeout). `symfony/lock` (flock). Turn deadline in rules + moderator. BUGS.md: two candidates (McpToolbox prefix, content-blind cassette signature). Test changes: none (one new rules test). Blocked: none. Needs review: M4 + M5 branches ([R]); `expire()` still untested. Spend: $0.
+
+- 2026-11-10 — M4 done (with human). lib: place resources (`#[AsPlaceResource]`, `PlaceResourceInterface`, registry, `mcp_resources`, `UnavailableResourceResponder`, `{subjectId}` URI placeholder) with synthetic-workflow tests. src/Werewolf: `WerewolfGame` entity + migration, `werewolf_game` workflow, `WerewolfSeatRoleResolver`, `PhaseGuard`, `GameModerator`, 4 place tools, 4 resources, denial log, HMAC seat/moderator tokens (`LEASH_WEREWOLF_SECRET`, `make install`). Tests: `WerewolfVisibilityTest` (7), `WerewolfMcpGameTest` (full game, same seed → same game). Test changes: two call-site/URI updates (see Test changes). Blocked: none. Needs review: `lib/` changes ([R]); `StaticTokenHandler` now knows Werewolf callers; moderator advances in-process on `ToolCalled`. Spend: $0.
+
+- 2026-11-10 — M4 start (with human). VERIFY → decisions 025 (place resources in mcp/sdk: visible-only registration, own not-found responder, cache covered) and 026 (explicit `ServerCapabilities`: `tools`/`resources` always advertised). Built: `ActorSelector::actorsAmong()` + test, caller passed to place tools, capabilities fix (closes the 018 Inspector follow-up). Done-signal and Werewolf design intent in "M4 notes". PROGRESS Current shortened under the 2000-char handoff cap. Test changes: `SearchPolicyToolTest` call site passes a caller (no assertion changed). Blocked: none. Needs review: `lib/` changes ([R]); Werewolf combined-role design (`ROLE_WOLF_ON_TURN` etc. instead of an all-of role list in lib). Spend: $0.
 
 - 2026-11-08 — Merge + Inspector session (with human). Merged main (M2) into M3, PROGRESS conflict resolved, M3 PR mergeable. Inspector part 1 done: missing Tools tab traced to the resolver token (no visible tool → no `tools` capability); investigator token shows the tool. MRTR part 2 on the spike endpoint still open (human). Test changes: none. Blocked: none. Needs review: M3 PR. Spend: $0.
 

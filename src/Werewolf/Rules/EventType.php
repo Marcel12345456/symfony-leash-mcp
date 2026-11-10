@@ -14,6 +14,7 @@ enum EventType: string
     case SeatKilled = 'seat_killed';
     case NobodyKilled = 'nobody_killed';
     case Statement = 'statement';
+    case TurnSkipped = 'turn_skipped';
     case VoteCast = 'vote_cast';
     case SeatEliminated = 'seat_eliminated';
     case NobodyEliminated = 'nobody_eliminated';

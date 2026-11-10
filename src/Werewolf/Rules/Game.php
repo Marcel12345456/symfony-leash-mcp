@@ -203,6 +203,14 @@ final class Game
         return null;
     }
 
+    /** Deadline in day_discussion: the current speaker's statement is skipped and the next seat speaks. */
+    public function skipSpeaker(): void
+    {
+        $speaker = $this->currentSpeaker() ?? throw new \LogicException('Nobody is speaking.');
+        $this->log(EventType::TurnSkipped, Audience::Public, \sprintf('%s stays silent.', $this->seats[$speaker]->label()), $speaker);
+        ++$this->turn;
+    }
+
     /** Resolves the current phase (missing actions abstain) and moves to the next one. */
     public function advance(): void
     {

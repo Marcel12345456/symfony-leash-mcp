@@ -6,6 +6,7 @@ namespace Leash\WorkflowMcp\Server;
 
 use Leash\HumanInput\Server\HumanInputGate;
 use Leash\WorkflowMcp\Capability\ScopedCapabilityProvider;
+use Leash\WorkflowMcp\Capability\VisibleResource;
 use Leash\WorkflowMcp\Capability\VisibleTool;
 use Leash\WorkflowMcp\Schema\SchemaFactory;
 use Leash\WorkflowMcp\Tool\PlaceToolHandler;
@@ -15,6 +16,7 @@ use Mcp\Schema\Enum\CacheScope;
 use Mcp\Schema\Request\CallToolRequest;
 use Mcp\Schema\Result\CallToolResult;
 use Mcp\Schema\Result\InputRequiredResult;
+use Mcp\Schema\ServerCapabilities;
 use Mcp\Schema\ToolAnnotations;
 use Mcp\Server;
 use Mcp\Server\Builder;
@@ -25,8 +27,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
- * Builds the MCP server for one request: only the tools visible to this caller on this subject are registered
- * (decisions/004, 010, 011). Transport, sessions and the request-state key are the caller's concern.
+ * Builds the MCP server for one request: only the tools and resources visible to this caller on this subject
+ * are registered (decisions/004, 010, 011, 025). Transport, sessions and the request-state key are the caller's concern.
  */
 final readonly class WorkflowServerFactory
 {
@@ -44,11 +46,25 @@ final readonly class WorkflowServerFactory
     {
         $subjectRef = $workflow->getName() . ':' . $subjectId;
         $visible = $this->capabilities->visibleTools($workflow, $subject, $caller);
+        $resources = $this->capabilities->visibleResources($workflow, $subject, $caller);
+        $uri = static fn(VisibleResource $r): string => str_replace('{subjectId}', $subjectId, $r->uri);
         $places = array_map(strval(...), array_keys($workflow->getMarking($subject)->getPlaces()));
 
         $builder = Server::builder()
             ->setServerInfo('leash-' . $workflow->getName(), '0.1')
             ->setCachePolicy(CachePolicy::default(0, CacheScope::Private))
+            // Same capabilities for every caller, so an empty tool list still shows as one (decisions/026).
+            ->setCapabilities(new ServerCapabilities(
+                tools: true,
+                toolsListChanged: false,
+                resources: true,
+                resourcesSubscribe: false,
+                resourcesListChanged: false,
+                prompts: false,
+                promptsListChanged: false,
+                logging: true,
+                completions: true,
+            ))
             ->addRequestHandler(new UnavailableCapabilityResponder(
                 $workflow->getName(),
                 $subject,
@@ -58,7 +74,26 @@ final readonly class WorkflowServerFactory
                 $this->dispatcher,
                 $this->humanInput,
                 $subjectRef,
+            ))
+            ->addRequestHandler(new UnavailableResourceResponder(
+                $workflow->getName(),
+                $subject,
+                $caller,
+                $places,
+                array_map($uri, $resources),
+                $this->dispatcher,
             ));
+
+        foreach ($resources as $resource) {
+            $read = $resource->resource;
+            $builder->addResource(
+                handler: static fn(): array|string => $read($subject, $caller),
+                uri: $uri($resource),
+                name: $resource->name,
+                description: $resource->description,
+                mimeType: $resource->mimeType,
+            );
+        }
 
         foreach ($visible as $tool) {
             $transitionTools = $this->transitionTools;

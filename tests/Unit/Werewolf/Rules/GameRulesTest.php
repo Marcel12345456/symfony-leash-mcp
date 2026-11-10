@@ -204,6 +204,21 @@ final class GameRulesTest extends TestCase
         self::assertSame(RejectionReason::NotYourTurn, $game->submit(new Say(T::ADA, 'One more.'))?->reason);
     }
 
+    public function testASkippedSpeakerStaysSilentAndTheNextSeatSpeaks(): void
+    {
+        $game = T::game();
+        $game->advance();
+        $game->advance();
+
+        $game->skipSpeaker();
+
+        self::assertSame(2, $game->currentSpeaker());
+        $last = $game->events()[\count($game->events()) - 1];
+        self::assertSame(EventType::TurnSkipped, $last->type);
+        self::assertSame(Audience::Public, $last->audience);
+        self::assertSame('Ada (seat 1) stays silent.', $last->text);
+    }
+
     public function testSpeakingOutOfTurnIsRejected(): void
     {
         $game = T::game();
