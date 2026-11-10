@@ -18,6 +18,7 @@ install: ## Generates APP_SECRET, agent tokens and the inbox approver password i
 	@grep -qs '^APP_SECRET=.' .env.local || echo "APP_SECRET=$$(openssl rand -hex 16)" >> .env.local
 	@grep -qs '^LEASH_INVESTIGATOR_TOKEN=.' .env.local || echo "LEASH_INVESTIGATOR_TOKEN=$$(openssl rand -hex 24)" >> .env.local
 	@grep -qs '^LEASH_RESOLVER_TOKEN=.' .env.local || echo "LEASH_RESOLVER_TOKEN=$$(openssl rand -hex 24)" >> .env.local
+	@grep -qs '^LEASH_WEREWOLF_SECRET=.' .env.local || echo "LEASH_WEREWOLF_SECRET=$$(openssl rand -hex 24)" >> .env.local
 	@grep -qs '^APPROVER_PASSWORD=.' .env.local || echo "APPROVER_PASSWORD=$$(openssl rand -hex 12)" >> .env.local
 	$(RUN) composer install --no-interaction --no-progress -q
 	$(RUN) bin/console cache:warmup -q

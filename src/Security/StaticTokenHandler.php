@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Security;
 
+use App\Werewolf\Security\WerewolfCallers;
 use Leash\HumanInput\Client\CallerTokens;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -12,6 +13,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
 /**
  * Bearer token → agent user (PLAN §3.2 Authentication). Tokens live in `.env.local`; an empty token never matches.
+ * Werewolf seat and moderator tokens are derived from one secret (WerewolfCallers).
  * Also the reverse lookup a resume needs: the original caller's token (decisions/017).
  */
 final readonly class StaticTokenHandler implements AccessTokenHandlerInterface, CallerTokens
@@ -24,8 +26,15 @@ final readonly class StaticTokenHandler implements AccessTokenHandlerInterface, 
         string $investigatorToken,
         #[Autowire('%env(LEASH_RESOLVER_TOKEN)%')]
         string $resolverToken,
+        #[Autowire('%env(LEASH_WEREWOLF_SECRET)%')]
+        #[\SensitiveParameter]
+        string $werewolfSecret,
     ) {
-        $this->tokens = ['agent:investigator' => $investigatorToken, 'agent:resolver' => $resolverToken];
+        $tokens = ['agent:investigator' => $investigatorToken, 'agent:resolver' => $resolverToken];
+        foreach (WerewolfCallers::all() as $caller) {
+            $tokens[$caller] = WerewolfCallers::token($werewolfSecret, $caller);
+        }
+        $this->tokens = $tokens;
     }
 
     public function getUserBadgeFrom(#[\SensitiveParameter] string $accessToken): UserBadge

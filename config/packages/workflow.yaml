@@ -67,3 +67,73 @@ framework:
                     metadata:
                         mcp_roles: [ROLE_RESOLVER]
                         mcp_description: 'Close a refunded or rejected case.'
+
+        # Werewolf (PLAN §3.5): transitions are the moderator's; seats act through place tools while it is their turn.
+        # Roles come from WerewolfSeatRoleResolver: ROLE_ALIVE/ROLE_DEAD, ROLE_WOLF/SEER/VILLAGER, *_ON_TURN.
+        werewolf_game:
+            type: state_machine
+            metadata:
+                mcp_prefix: ww
+                mcp_subject: App\Werewolf\Entity\WerewolfGame
+                mcp_role_resolver: App\Werewolf\Workflow\WerewolfSeatRoleResolver
+            marking_store: { type: method, property: status }
+            supports: [App\Werewolf\Entity\WerewolfGame]
+            initial_marking: night
+            places:
+                night:
+                    metadata:
+                        mcp_tools:
+                            ww_choose_victim: [ROLE_WOLF_ON_TURN]
+                            ww_inspect: [ROLE_SEER_ON_TURN]
+                        mcp_resources: &werewolf_resources
+                            public-log: [ROLE_ALIVE, ROLE_DEAD, ROLE_MODERATOR]
+                            me: [ROLE_ALIVE]
+                            wolf-den: [ROLE_WOLF]
+                            seer-notes: [ROLE_SEER]
+                dawn:
+                    metadata:
+                        mcp_resources: *werewolf_resources
+                day_discussion:
+                    metadata:
+                        mcp_tools:
+                            ww_say: [ROLE_ON_TURN]
+                        mcp_resources: *werewolf_resources
+                day_vote:
+                    metadata:
+                        mcp_tools:
+                            ww_vote: [ROLE_ON_TURN]
+                        mcp_resources: *werewolf_resources
+                over:
+                    metadata:
+                        mcp_resources: *werewolf_resources
+            transitions:
+                break_dawn:
+                    from: night
+                    to: dawn
+                    metadata:
+                        mcp_roles: [ROLE_MODERATOR]
+                        mcp_description: 'Resolve the night: the wolves kill, dawn reveals the death.'
+                open_discussion:
+                    from: dawn
+                    to: day_discussion
+                    metadata:
+                        mcp_roles: [ROLE_MODERATOR]
+                        mcp_description: 'Open the day discussion.'
+                open_vote:
+                    from: day_discussion
+                    to: day_vote
+                    metadata:
+                        mcp_roles: [ROLE_MODERATOR]
+                        mcp_description: 'Close the discussion and open the vote.'
+                fall_night:
+                    from: day_vote
+                    to: night
+                    metadata:
+                        mcp_roles: [ROLE_MODERATOR]
+                        mcp_description: 'Count the votes and let night fall.'
+                end_game:
+                    from: [night, day_vote]
+                    to: over
+                    metadata:
+                        mcp_roles: [ROLE_MODERATOR]
+                        mcp_description: 'Resolve the phase; a side has won (or the day cap is reached).'
