@@ -1,7 +1,7 @@
 # 031 — API cheat sheet for McpClientToolbox and TurnBudgetToolbox
 
 - Date: 2026-11-10
-- Status: accepted for signatures; proposed for the in-process session reuse (pinned by the toolbox unit test)
+- Status: accepted (in-process session reuse pinned by `McpClientToolboxTest`)
 - PLAN reference: §3.4 McpToolbox; follow-up to 027 and 014
 
 ## Question

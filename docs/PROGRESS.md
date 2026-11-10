@@ -15,8 +15,8 @@
 
 - Plan v3 (`decisions/022`): Werewolf main, Doc Review second, Refund Desk retired in M6.
 - Phase: **M5 Agents play — in progress**, branch `m/phase-5-agents-play`, stacked on `m/phase-4-werewolf-mcp` (M4 not merged yet; rebase onto main after the M4 merge).
-- M5 done so far: VERIFY → decisions 027–029; `symfony/lock`; turn deadline (`Game::skipSpeaker()`, `GameModerator::expire()`, no own test yet).
-- M5 left, in order: `McpClientToolbox` (lib, + unit test), `TurnBudgetToolbox`, prompts `config/prompts/werewolf/*.md`, seat turn runner (resources → prompt, one Agent per turn, transcript), next-actor runner (lock, paused skip, `actorsAmong`, deadline via `expire()`) + `RunNextActor` handler, `leash:werewolf:play --seed --record`, `ReplayPlatform` + signature pin test (028), agent tests, live qwen3 game + cassette, `make werewolf`.
+- M5 done so far: VERIFY → decisions 027–031; `symfony/lock`; turn deadline (`Game::skipSpeaker()`, `GameModerator::expire()`, no own test yet); `McpClientToolbox` + `TurnBudgetToolbox` in `lib/WorkflowMcp/Client` with `McpClientToolboxTest` ([R] `lib/`).
+- M5 left, in order: prompts `config/prompts/werewolf/*.md`, seat turn runner (resources → prompt, one Agent per turn, transcript), next-actor runner (lock, paused skip, `actorsAmong`, deadline via `expire()`) + `RunNextActor` handler, `leash:werewolf:play --seed --record`, `ReplayPlatform` + signature pin test (028), agent tests, live qwen3 game + cassette, `make werewolf`.
 - M5 done-signal and design: see "M5 notes".
 - M2 (PR #7) and M3 (PR #6) in main. M4 branch pushed, needs review ([R] `lib/`), then merge (human).
 - Blocked: none.
@@ -113,6 +113,7 @@
 - 2026-11-10: Turn deadline: `GameModerator::expire()` skips the current speaker in day_discussion (`Game::skipSpeaker()`, public `turn_skipped` event) and otherwise resolves the phase with missing actions abstaining (transient `deadlinePassed` flag read by `PhaseGuard`, for one transition).
 - 2026-11-10: Agent tests script the model with `MockPlatformFactory::createPlatform(closure)` (closure sees the normalized payload + call options incl. `tools`); helper `ScriptedSeatPlatform` in tests; `Agent::call()` returns `Execution` (`decisions/030`, proposed until a test uses it).
 - 2026-11-10: `McpClientToolbox`/`TurnBudgetToolbox` API cheat sheet; server errors stay model-visible text (027); lib test runs the Builder behind `HttpTransport` via a PSR-18 fixture with one shared `InMemorySessionStore` (`decisions/031`).
+- 2026-11-10: `McpClientToolbox` drops the schema when `properties` is empty; the SDK keeps it as an empty `stdClass`, not `[]`. In-process `Mcp\Client` → `Builder` works with one shared `InMemorySessionStore` (`ServerPsr18Client` fixture); 031 in-process part pinned.
 
 ## Test changes
 
