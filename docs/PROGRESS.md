@@ -14,7 +14,12 @@
 ## Current
 
 - Plan v3 (`decisions/022`): Werewolf main, Doc Review second, Refund Desk retired in M6.
-- Phase: M4 Werewolf over MCP, branch `m/phase-4-werewolf-mcp` (from main), not started yet: run `/phase M4` for the task list, done-signal and VERIFYs.
+- Phase: **M4 Werewolf over MCP**, branch `m/phase-4-werewolf-mcp` (from main), in progress. `lib/` changes are [R] (needs review before merge).
+- M4 done-signal: `.claude/done.sh` exit 0, plus these tests green:
+  - `tests/Unit/Lib/WorkflowMcp/ScopedCapabilityProviderTest` + `WorkflowServerTest`: synthetic workflow resources role-filtered per place × role; `resources/list`/`resources/read` show only visible ones; an invisible URI gets an actionable error + `CapabilityDenied`; `tools` capability advertised with zero visible tools.
+  - `tests/Unit/Lib/WorkflowMcp/ActorSelectorTest`: per-caller form `actorsAmong()` picks the right callers.
+  - `tests/Integration/Werewolf/WerewolfVisibilityTest`: villager never lists `wolf-den` or `ww_choose_victim`; dead seat sees only `public-log`; moderator transitions never visible to seats; forbidden call denied and logged.
+  - `tests/Integration/Werewolf/WerewolfMcpGameTest`: scripted seat clients play a full game over HTTP MCP (no LLM); same seed → same game.
 - M2 (PR #7) and M3 (PR #6) in main. M2 Inspector check complete (`decisions/018` part 2, 2026-11-10: approval round trip works; likely legacy elicitation, not MRTR wire format).
 - Follow-ups for M4 (`lib/`, [R]): always advertise the `tools` capability; a role with no visible tool currently gets none and the Inspector hides the Tools tab (`decisions/018`). Makefile: `php -S` needs `PHP_CLI_SERVER_WORKERS` > 1, otherwise a streamed `tools/call` deadlocks the server (`decisions/018`).
 - Blocked: none.
@@ -75,6 +80,9 @@
 
 - 2026-11-07: M3: `qwen3:8b` calls tools through the Symfony AI Ollama bridge (3/3) and Ollama direct (4/4); thinking ~8–12 s per tool step vs 1.1 s with `think: false`; `/no_think` soft switch has no effect through the bridge. Default stays thinking + replay; bridge `think` option is a VERIFY for M4 (`decisions/002` addendum).
 - 2026-11-07: M3 rule choices where §3.5 is silent (all tested, easy to flip): wolves cannot target a wolf; no self-vote, no self-inspection; one action per seat per phase; no wolf choice by the deadline → nobody dies; dawn reveals the death, not the role; game over reveals all roles; votes are public; discussion order = living seats ascending, every day; dead seats keep their private knowledge; win checked after every death (dawn and vote). `Game::arranged()` fixes roles for the recorded demo game; `advance()` is also the deadline path (missing actions abstain).
+
+- 2026-11-10: Place resources: register only visible ones per request; hidden `resources/read` → own responder, `CapabilityDenied` + -32602 with the visible URIs; cache policy covers resources (`decisions/025`).
+- 2026-11-10: `WorkflowServerFactory` always advertises `tools` + `resources` (explicit `ServerCapabilities`, logging/completions kept, listChanged false), fixes the 018 Inspector follow-up (`decisions/026`).
 
 ## Test changes
 

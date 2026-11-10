@@ -8,12 +8,13 @@ use App\RefundDesk\Mcp\Input\SearchPolicyInput;
 use App\RefundDesk\Mcp\Tool\SearchPolicyTool;
 use App\Tests\Integration\RefundDesk\RefundCaseFactory;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 final class SearchPolicyToolTest extends TestCase
 {
     public function testKeywordSearchRanksTheMatchingSectionFirst(): void
     {
-        $result = (new SearchPolicyTool(__DIR__ . '/../../../data/policy'))(RefundCaseFactory::create(), new SearchPolicyInput('IBAN payout account'));
+        $result = (new SearchPolicyTool(__DIR__ . '/../../../data/policy'))(RefundCaseFactory::create(), new SearchPolicyInput('IBAN payout account'), new InMemoryUser('agent:investigator', null));
 
         self::assertIsArray($result['results']);
         self::assertNotEmpty($result['results']);

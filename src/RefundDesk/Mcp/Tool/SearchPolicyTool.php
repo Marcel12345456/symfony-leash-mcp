@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\RefundDesk\Mcp\Tool;
 
+use Symfony\Component\Security\Core\User\UserInterface;
 use App\RefundDesk\Mcp\Input\SearchPolicyInput;
 use Leash\WorkflowMcp\PlaceTool\AsPlaceTool;
 use Leash\WorkflowMcp\PlaceTool\PlaceToolInterface;
@@ -21,7 +22,7 @@ final readonly class SearchPolicyTool implements PlaceToolInterface
         private string $policyDir,
     ) {}
 
-    public function __invoke(object $subject, ?object $input): array
+    public function __invoke(object $subject, ?object $input, UserInterface $caller): array
     {
         \assert($input instanceof SearchPolicyInput);
         $words = array_filter(self::split('/\W+/u', mb_strtolower($input->query)), static fn(string $w): bool => mb_strlen($w) > 2);

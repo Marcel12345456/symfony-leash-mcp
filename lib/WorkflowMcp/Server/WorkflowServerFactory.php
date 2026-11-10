@@ -15,6 +15,7 @@ use Mcp\Schema\Enum\CacheScope;
 use Mcp\Schema\Request\CallToolRequest;
 use Mcp\Schema\Result\CallToolResult;
 use Mcp\Schema\Result\InputRequiredResult;
+use Mcp\Schema\ServerCapabilities;
 use Mcp\Schema\ToolAnnotations;
 use Mcp\Server;
 use Mcp\Server\Builder;
@@ -49,6 +50,18 @@ final readonly class WorkflowServerFactory
         $builder = Server::builder()
             ->setServerInfo('leash-' . $workflow->getName(), '0.1')
             ->setCachePolicy(CachePolicy::default(0, CacheScope::Private))
+            // Same capabilities for every caller, so an empty tool list still shows as one (decisions/026).
+            ->setCapabilities(new ServerCapabilities(
+                tools: true,
+                toolsListChanged: false,
+                resources: true,
+                resourcesSubscribe: false,
+                resourcesListChanged: false,
+                prompts: false,
+                promptsListChanged: false,
+                logging: true,
+                completions: true,
+            ))
             ->addRequestHandler(new UnavailableCapabilityResponder(
                 $workflow->getName(),
                 $subject,

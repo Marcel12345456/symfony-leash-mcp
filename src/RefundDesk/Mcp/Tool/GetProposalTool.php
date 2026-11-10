@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\RefundDesk\Mcp\Tool;
 
+use Symfony\Component\Security\Core\User\UserInterface;
 use App\RefundDesk\Entity\RefundCase;
 use Leash\WorkflowMcp\PlaceTool\AsPlaceTool;
 use Leash\WorkflowMcp\PlaceTool\PlaceToolInterface;
@@ -11,7 +12,7 @@ use Leash\WorkflowMcp\PlaceTool\PlaceToolInterface;
 #[AsPlaceTool(workflow: 'refund_case', name: 'refund_get_proposal', description: "Get the investigator's proposed resolution: decision, amount in cents, rationale, and the order amount.")]
 final readonly class GetProposalTool implements PlaceToolInterface
 {
-    public function __invoke(object $subject, ?object $input): array
+    public function __invoke(object $subject, ?object $input, UserInterface $caller): array
     {
         \assert($subject instanceof RefundCase);
 
