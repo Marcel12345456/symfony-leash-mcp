@@ -15,10 +15,10 @@
 
 - Plan v3 (`decisions/022`): Werewolf main, Doc Review second, Refund Desk retired in M6.
 - Phase: **M5 Agents play — in progress**, branch `m/phase-5-agents-play`, stacked on `m/phase-4-werewolf-mcp` (M4 not merged yet; rebase onto main after the M4 merge).
-- M5 done so far: decisions 027–032; `symfony/lock`; turn deadline (`Game::skipSpeaker()`, `GameModerator::expire()`, covered by `NextActorRunnerTest` via a timed-out wolf); lib `McpClientToolbox` + `TurnBudgetToolbox` (`McpClientToolboxTest`); `SeatTurnRunner` + `McpConnector` over `InProcessPsr18Client` (no web server needed) + prompt `config/prompts/werewolf/player.md` (`SeatTurnRunnerTest`).
-- M5 done this stretch: `TranscriptWriter` (`TranscriptWriterTest`), `NextActorRunner` (`NextActorRunnerTest`: night round with a timed-out wolf → expire, held lock, paused game), `RunNextActorHandler` + `ModelChoiceFactory` (`RunNextActorHandlerTest`), test helper `ScriptedSeatPlatform`.
+- M5 done so far: decisions 027–032; `symfony/lock`; turn deadline (`skipSpeaker()`, `expire()`); lib `McpClientToolbox` + `TurnBudgetToolbox`; `SeatTurnRunner` + `McpConnector` over `InProcessPsr18Client` + prompt `player.md`.
+- M5 runner stretch done: `TranscriptWriter`, `NextActorRunner`, `RunNextActorHandler`, `ModelChoiceFactory` (details: M5 notes, Decisions).
 - M5 left, in order: `leash:werewolf:play --seed --record` (`ModelChoice` from `LEASH_MODEL`), `ReplayPlatform` + signature pin test (028), full-game agent test (`ScriptedSeatPlatform`, 030), live qwen3 game + cassette, `make werewolf`.
-- M5 done-signal and design: see "M5 notes". This stretch: `tests/Unit/Agent/TranscriptWriterTest` (turn sections, last line `Result: …`), `tests/Integration/Agent/NextActorRunnerTest` (held lock skipped, paused subject skipped, one night round with a silent wolf → `expire()`), `tests/Integration/Agent/RunNextActorHandlerTest` (step runs, next `RunNextActor` dispatched until the game ends), `.claude/done.sh`.
+- M5 done-signal and design: see "M5 notes".
 - M2 (PR #7) and M3 (PR #6) in main. M4 branch pushed, needs review ([R] `lib/`), then merge (human).
 - Blocked: none.
 
@@ -28,6 +28,8 @@
 
 ## M5 notes
 
+- Built in that stretch: `TranscriptWriter` (`TranscriptWriterTest`), `NextActorRunner` (`NextActorRunnerTest`: night round with a timed-out wolf → expire, held lock, paused game), `RunNextActorHandler` + `ModelChoiceFactory` (`RunNextActorHandlerTest`), test helper `ScriptedSeatPlatform`.
+- Stretch 2026-11-10 (runner): `tests/Unit/Agent/TranscriptWriterTest` (turn sections, last line `Result: …`), `tests/Integration/Agent/NextActorRunnerTest` (held lock skipped, paused subject skipped, one night round with a silent wolf → `expire()`), `tests/Integration/Agent/RunNextActorHandlerTest` (step runs, next `RunNextActor` dispatched until the game ends), `.claude/done.sh`.
 - Done-signal: `.claude/done.sh` exit 0, plus:
   - `tests/Integration/Agent/WerewolfAgentsTest`: agents on a scripted fake platform play a full game over MCP (in-process HTTP); a villager's `ww_choose_victim` call is denied, logged as a denial, and the game goes on; max 3 tool calls per turn; a seat that does not act within its turn abstains (deadline path).
   - `tests/Unit/Agent/NextActorRunnerTest` (or equivalent): paused subject skipped, held lock skipped.
