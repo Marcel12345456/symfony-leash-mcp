@@ -1,7 +1,7 @@
 # 033 — Replay: own per-seat ReplayProvider over ResultSerializer; RecordingProvider facts
 
 - Date: 2026-11-10
-- Status: accepted (default-signature collision still to be pinned by a test, then BUGS.md)
+- Status: accepted (default-signature collision pinned by `ReplayPlatformTest`, BUGS.md)
 - PLAN reference: §3.4 Replay mode (follow-up to 028)
 
 ## Question

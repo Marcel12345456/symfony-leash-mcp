@@ -31,6 +31,13 @@
 - Expected: `enum` includes `null` for nullable enums; JSON Schema 2020-12 numeric `exclusiveMinimum`; no OpenAPI keywords. (Required-for-nullable is debatable; MCP clients then must send `null`.)
 - Workaround: `Leash\WorkflowMcp\Schema\SchemaFactory::normalize()` (decisions/013, 015).
 
+## symfony/ai-platform 0.15.0 — `RecordingProvider` default signature is content-blind
+
+- Repro: `new Platform([new RecordingProvider($provider, new Cassette($path), record: true)])`, invoke model `m` with `new MessageBag(Message::ofUser('a'))` and with `new MessageBag(Message::ofUser('b'))`, read both `signature`s from the cassette JSON (`tests/Unit/Agent/ReplayPlatformTest::testUpstreamDefaultSignatureIsContentBlind`).
+- Actual: equal. `defaultSignature` hashes `json_encode([model, $input, $options])`; `MessageBag` has only private properties and no `JsonSerializable`, so it encodes as `{}`. Replay matches FIFO in global call order and serves wrong answers silently after a prompt change. `Cassette` also has no way to read all interactions.
+- Expected: the signature reflects the messages (normalize the bag, or serialize messages), or the docs require a custom signature closure.
+- Workaround: own per-seat cassette `App\Agent\Replay\RecordingSeatProvider` + `ReplayPlatform` (decisions/033).
+
 ## Candidates (from code reading, not yet reproduced)
 
 - **symfony/ai-ollama-platform 0.15.0 — HTTP errors lose the Ollama error body.** `OllamaResultConverter` ignores the status code; a 4xx/5xx `{"error": "…"}` body becomes `RuntimeException('Response does not contain message.')` (`OllamaResultConverter.php:70-72`). Repro idea: `MockHttpClient` with status 500 and `{"error":"boom"}`. Workaround: the seat turn runner treats it as a failed turn (`decisions/032`).

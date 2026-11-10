@@ -124,6 +124,7 @@
 
 - 2026-11-10: Replay is own code: recording decorator around `Ollama\Factory::createProvider` + `ReplayProvider` (per-seat FIFO over `ResultSerializer::toArray/fromArray`, prompt hash, explicit `--record`); no `RecordingProvider`/`Cassette` (no read-all API, content-blind default signature) (`decisions/033`, revises 028).
 - 2026-11-10: `leash:werewolf:play [--seed=7] [--game=seed-<seed>] [--model] [--max-steps=60]` in `App\Agent\Werewolf\PlayGameCommand`: replaces the game and transcript, steps until a winner; exit 1 and `Result: unfinished` otherwise (`PlayGameCommandTest`).
+- 2026-11-10: Replay built: `App\Agent\Replay\SeatCassette` (`data/werewolf/seed-<seed>.json`: model, prompt hash, interactions `{seat, result|timeout|error}`), `RecordingSeatProvider` (marked workaround), `ReplayPlatform` (per-seat FIFO over `MockPlatformFactory`, recorded failures fail again, exhausted seat → `LogicException`). `ModelChoiceFactory::create($model, $cassette)`; `leash:werewolf:play --record [--cassette]`; a replay that ends with unused answers fails (diverged). Seat from the first `You are seat N.` in the input (bag or normalized payload).
 
 ## Test changes
 
