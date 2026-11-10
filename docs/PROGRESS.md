@@ -91,15 +91,20 @@
 - 2026-11-10: Place resources: register only visible ones per request; hidden `resources/read` → own responder, `CapabilityDenied` + -32602 with the visible URIs; cache policy covers resources (`decisions/025`).
 - 2026-11-10: `WorkflowServerFactory` always advertises `tools` + `resources` (explicit `ServerCapabilities`, logging/completions kept, listChanged false), fixes the 018 Inspector follow-up (`decisions/026`).
 
+- 2026-11-10: `PlaceToolInterface::__invoke()` gets the caller (`UserInterface $caller`, required) so a place tool can act for the calling seat; Refund Desk tools and test fixtures updated, the parameter is unused there ([R], `lib/`).
+
 ## Test changes
 
 <!-- Every weakened, deleted, skipped or changed assertion: date, test, reason. -->
 
+- 2026-11-10: `tests/Unit/RefundDesk/SearchPolicyToolTest` passes an `InMemoryUser` caller to the tool, because `PlaceToolInterface::__invoke()` now requires one. Call site only; no assertion changed.
 - 2026-11-07: `.claude/tests/bin.t.sh` "plan-section 3.2: has YAML" now expects `doc_review:` instead of `refund_case:`, because PLAN v3 §3.2 uses the Doc Review workflow as the metadata example (decisions/022). Same check, new content.
 
 ## Log
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
+
+- 2026-11-10 — M4 start (with human). VERIFY → decisions 025 (place resources in mcp/sdk: visible-only registration, own not-found responder, cache covered) and 026 (explicit `ServerCapabilities`: `tools`/`resources` always advertised). Built: `ActorSelector::actorsAmong()` + test, caller passed to place tools, capabilities fix (closes the 018 Inspector follow-up). Done-signal and Werewolf design intent in "M4 notes". PROGRESS Current shortened under the 2000-char handoff cap. Test changes: `SearchPolicyToolTest` call site passes a caller (no assertion changed). Blocked: none. Needs review: `lib/` changes ([R]); Werewolf combined-role design (`ROLE_WOLF_ON_TURN` etc. instead of an all-of role list in lib). Spend: $0.
 
 - 2026-11-08 — Merge + Inspector session (with human). Merged main (M2) into M3, PROGRESS conflict resolved, M3 PR mergeable. Inspector part 1 done: missing Tools tab traced to the resolver token (no visible tool → no `tools` capability); investigator token shows the tool. MRTR part 2 on the spike endpoint still open (human). Test changes: none. Blocked: none. Needs review: M3 PR. Spend: $0.
 
