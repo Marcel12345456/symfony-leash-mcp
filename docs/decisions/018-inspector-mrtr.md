@@ -33,4 +33,12 @@ Run the M2 manual Inspector check with a pinned Inspector 2.14.0, record the neg
 - `make inspector TOKEN=<investigator>` against `/mcp/refund_case/C1`: Inspector 2.14.0 UI connects, Tools tab lists `refund_start_investigation`. Inspector `--cli --method tools/list` returns the same.
 - With the **resolver** token the UI showed only the Servers tab: capabilities `{logging, completions}`, no `tools`. In state `received` the resolver sees no tool, and the server then omits the `tools` capability, so the Inspector hides the tab. Follow-up (M4, `lib/`): always advertise `tools` so an empty list is shown instead.
 - UI GET for the standalone SSE stream gets 405 (allowed by the spec); the UI keeps working.
-- The refund workflow has no `mcp_approval` transition, so MRTR can only be shown on the spike endpoint `/mcp-spike/{id}` (no auth). **Part 2 open:** in the Inspector UI add server `http://127.0.0.1:8000/mcp-spike/demo` (Streamable HTTP, no header), run its tool, expect the approval form, accept, see the result. (Opening that URL in a browser returns JSON-RPC 405 "Method Not Allowed"; that is expected.)
+- The refund workflow has no `mcp_approval` transition, so MRTR can only be shown on the spike endpoint `/mcp-spike/{id}` (no auth). Part 2 below.
+
+## Manual check, part 2 (human, 2026-11-10)
+
+- Result: **works.** Inspector 2.14.0 (Node 24.22.2) → `spike_ask` with `reason=test` → approval form "Approve: test?" → accept → `approved: test`.
+- Correct URL is `/mcp-spike/open`, not `/mcp-spike/demo`: the spike adds `spike_ask` only for subject `open` (`src/Spike/SpikeMcpController.php`); `demo` lists no tools.
+- Launch: the Inspector UI cannot add servers when started with `--server-url` (read-only list), so start it pointed at the spike directly: PHP container as in `make inspector`, then `npx -y @modelcontextprotocol/inspector@2.14.0 --server-url http://127.0.0.1:8000/mcp-spike/open --transport http`.
+- **Single-worker deadlock:** with plain `php -S` the `tools/call` hung and blocked the whole server (even `ping` timed out). It worked after restarting with `PHP_CLI_SERVER_WORKERS=4`. The Inspector negotiated `2025-11-25` (the server answered `initialize` with that version), and the call was answered as an SSE stream (`CallbackStream`), so this is most likely the legacy server→client elicitation path, whose answer needs a second request while the stream holds the only worker. Not verified in `vendor/`. So the Inspector check shows the human-approval round trip, but probably **not** the 2026-07-28 MRTR wire format; MRTR itself is covered by the in-process tests.
+- Follow-up: `make inspector` (and later `make demo`) should start `php -S` with `PHP_CLI_SERVER_WORKERS` > 1.
