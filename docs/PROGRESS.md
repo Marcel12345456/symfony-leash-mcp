@@ -129,6 +129,7 @@
 
 <!-- Every weakened, deleted, skipped or changed assertion: date, test, reason. -->
 
+- 2026-11-10: `.claude/tests/hooks.t.sh` context checks now use usage lines (tokens) instead of zero-filled KB files; "small transcript quiet" became "110k tokens quiet (700 KB transcript is fine)", plus a bytes/4 fallback check. Reason: the hook now measures real context tokens (human: warning fired at ~10% of the 1M context).
 - 2026-11-10: `ScopedCapabilityProviderTest` / `WorkflowServerTest` resource tests (added in d1a9888) expect `doc://{subjectId}/rubric` (provider) and `doc://d1/rubric` (server): the rubric fixture now uses the new `{subjectId}` URI placeholder. Same checks, new URI.
 - 2026-11-10: `tests/Unit/Lib/WorkflowMcp/ScopedCapabilityProviderTest::testUnknownPlaceToolIsAConfigurationError` passes an empty `PlaceResourceRegistry`, because `ScopedCapabilityProvider` now takes one. Call site only; no assertion changed.
 - 2026-11-10: `tests/Unit/RefundDesk/SearchPolicyToolTest` passes an `InMemoryUser` caller to the tool, because `PlaceToolInterface::__invoke()` now requires one. Call site only; no assertion changed.

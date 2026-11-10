@@ -2,8 +2,10 @@
 # UserPromptSubmit: three nudges, never blocking.
 #  1. Work order without a done-signal  -> Claude proposes one before coding.
 #  2. Decision wording                  -> Claude records it right away.
-#  3. Transcript over LEASH_CTX_WARN_KB (default 400), then every LEASH_CTX_STEP_KB (200)
-#                                       -> visible reminder to /phase-end and /clear.
+#  3. Context over LEASH_CTX_WARN_TOKENS (default 300000 = 30% of 1M), then every
+#     LEASH_CTX_STEP_TOKENS (100000)    -> visible reminder to /phase-end and /clear.
+#     Tokens = input + cache read + cache creation of the latest model reply in the transcript;
+#     without usage lines, transcript bytes / 4 (the JSONL is much larger than the context).
 set -uo pipefail
 payload=$(cat)
 proj="${CLAUDE_PROJECT_DIR:-$(printf '%s' "$payload" | jq -r '.cwd // empty')}"
@@ -30,15 +32,16 @@ esac
 tp=$(printf '%s' "$payload" | jq -r '.transcript_path // empty')
 sid=$(printf '%s' "$payload" | jq -r '.session_id // "nosession"')
 if [ -n "$tp" ] && [ -f "$tp" ] && [ -n "$proj" ] && [ -d "$proj/.claude" ]; then
-  warn=${LEASH_CTX_WARN_KB:-400}; step=${LEASH_CTX_STEP_KB:-200}
-  kb=$(( $(wc -c < "$tp" | tr -d ' ') / 1024 ))
-  if [ "$kb" -ge "$warn" ]; then
-    bucket=$(( (kb - warn) / step ))
+  warn=${LEASH_CTX_WARN_TOKENS:-300000}; step=${LEASH_CTX_STEP_TOKENS:-100000}
+  tokens=$(grep '"usage"' "$tp" | tail -1 | jq -r '.message.usage // empty | (.input_tokens // 0) + (.cache_read_input_tokens // 0) + (.cache_creation_input_tokens // 0)' 2>/dev/null)
+  [ -n "$tokens" ] || tokens=$(( $(wc -c < "$tp" | tr -d ' ') / 4 ))
+  if [ "$tokens" -ge "$warn" ]; then
+    bucket=$(( (tokens - warn) / step ))
     state="$proj/.claude/.ctx-$sid"
     last=$(cat "$state" 2>/dev/null || echo -1)
     if [ "$bucket" -gt "$last" ]; then
       echo "$bucket" > "$state"
-      msg="Context is large (~${kb} KB transcript). Good moment for /phase-end, then /clear — docs/PROGRESS.md carries the handoff."
+      msg="Context is large (~$(( tokens / 1000 ))k tokens). Good moment for /phase-end, then /clear — docs/PROGRESS.md carries the handoff."
       ctx="${ctx:+$ctx }The context is large. At the next natural stopping point, suggest /phase-end and /clear to the user."
     fi
   fi
