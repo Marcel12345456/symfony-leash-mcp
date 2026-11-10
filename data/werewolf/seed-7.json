@@ -1,0 +1,112 @@
+{
+    "model": "qwen3:latest",
+    "prompt": "0ede85b9deb9715db01f4e11d6e9c8fc",
+    "interactions": [
+        {
+            "seat": 2,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_choose_victim",
+                        "arguments": {
+                            "target": 1
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1008,
+                        "completion_tokens": 549,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 2,
+            "result": {
+                "type": "text",
+                "content": "I, Ben (seat 2), have chosen Anna (seat 1) as the wolf pack's victim for tonight.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1075,
+                        "completion_tokens": 246,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 3,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_choose_victim",
+                        "arguments": {
+                            "target": 1
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1083,
+                        "completion_tokens": 325,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        }
+    ]
+}
