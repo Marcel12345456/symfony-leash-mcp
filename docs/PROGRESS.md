@@ -22,6 +22,8 @@
   - `tests/Integration/Werewolf/WerewolfMcpGameTest`: scripted seat clients play a full game over HTTP MCP (no LLM); same seed → same game.
 - M2 (PR #7) and M3 (PR #6) in main. M2 Inspector check complete (`decisions/018` part 2, 2026-11-10: approval round trip works; likely legacy elicitation, not MRTR wire format).
 - Follow-ups for M4 (`lib/`, [R]): always advertise the `tools` capability; a role with no visible tool currently gets none and the Inspector hides the Tools tab (`decisions/018`). Makefile: `php -S` needs `PHP_CLI_SERVER_WORKERS` > 1, otherwise a streamed `tools/call` deadlocks the server (`decisions/018`).
+- M4 done so far (50070a1): `ActorSelector::actorsAmong()` + test, place tools get the caller, `tools`/`resources` always advertised. Next: place resources in lib (`#[AsPlaceResource]`, `mcp_resources`, responder per decisions/025), then `src/Werewolf`.
+- M4 design intent (not built yet): role lists stay any-of. `WerewolfSeatRoleResolver` gives a dead seat only `ROLE_DEAD`; a living seat gets `ROLE_ALIVE` + identity role, plus `ROLE_ON_TURN` when in `Game::pendingSeats()`, and at night `ROLE_WOLF_ON_TURN` / `ROLE_SEER_ON_TURN`, so a seat that already acted loses its tool without an all-of lib feature. Moderator transitions guarded by a peek on a cloned `Game` (target phase, all actions in or deadline); a transition listener calls `Game::advance()`. Game persisted as `serialize()` with allowed classes. Seat tokens HMAC-derived from one env secret.
 - Blocked: none.
 
 ## Next prompt
