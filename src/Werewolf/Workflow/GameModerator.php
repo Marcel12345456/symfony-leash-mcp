@@ -21,6 +21,37 @@ final readonly class GameModerator
         private EntityManagerInterface $entityManager,
     ) {}
 
+    /**
+     * The current turn's deadline passed (PLAN §3.5): in day_discussion the speaker is skipped; in any other phase
+     * the missing actions abstain and the phase resolves. Then the moderator advances as usual.
+     *
+     * @return list<string> the transitions applied, in order
+     */
+    public function expire(WerewolfGame $game): array
+    {
+        $rules = $game->game();
+        if (null !== $rules->currentSpeaker()) {
+            $rules->skipSpeaker();
+            $this->entityManager->flush();
+
+            return $this->advance($game);
+        }
+
+        $game->setDeadlinePassed(true);
+        try {
+            $transition = $this->workflow->getEnabledTransitions($game)[0] ?? null;
+            if (null === $transition) {
+                return [];
+            }
+            $this->workflow->apply($game, $transition->getName());
+        } finally {
+            $game->setDeadlinePassed(false);
+        }
+        $this->entityManager->flush();
+
+        return [$transition->getName(), ...$this->advance($game)];
+    }
+
     /** @return list<string> the transitions applied, in order */
     public function advance(WerewolfGame $game): array
     {

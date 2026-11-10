@@ -14,16 +14,23 @@
 ## Current
 
 - Plan v3 (`decisions/022`): Werewolf main, Doc Review second, Refund Desk retired in M6.
-- Phase: **M4 Werewolf over MCP — done** (all acceptance tests green), branch `m/phase-4-werewolf-mcp`, pushed, not merged. `lib/` changes are [R] (needs review before merge).
-- M4 done-signal and what was built: see "M4 notes" and Decisions 2026-11-10.
-- M2 (PR #7) and M3 (PR #6) in main. M2 Inspector check complete (`decisions/018` part 2, 2026-11-10: approval round trip works; likely legacy elicitation, not MRTR wire format).
-- Follow-up for M5 `make demo`/`make werewolf`: `php -S` needs `PHP_CLI_SERVER_WORKERS` > 1, otherwise a streamed `tools/call` deadlocks the server (`decisions/018`). Phase deadlines (moderator advance on timeout) not built yet; M5 per-turn timeout covers it.
-- Next: M5 (agents play). Needs review: M4 branch, then merge (human).
+- Phase: **M5 Agents play — in progress**, branch `m/phase-5-agents-play`, stacked on `m/phase-4-werewolf-mcp` (M4 not merged yet; rebase onto main after the M4 merge).
+- M5 done-signal and design: see "M5 notes".
+- M2 (PR #7) and M3 (PR #6) in main. M4 branch pushed, needs review ([R] `lib/`), then merge (human).
 - Blocked: none.
 
 ## Next prompt
 
 /phase M5
+
+## M5 notes
+
+- Done-signal: `.claude/done.sh` exit 0, plus:
+  - `tests/Integration/Agent/WerewolfAgentsTest`: agents on a scripted fake platform play a full game over MCP (in-process HTTP); a villager's `ww_choose_victim` call is denied, logged as a denial, and the game goes on; max 3 tool calls per turn; a seat that does not act within its turn abstains (deadline path).
+  - `tests/Unit/Agent/NextActorRunnerTest` (or equivalent): paused subject skipped, held lock skipped.
+  - `tests/Integration/Agent/WerewolfReplayTest`: `leash:werewolf:play` with `LEASH_MODEL=replay` replays the committed cassette to the end of the game (no model, no network).
+  - `make werewolf` exit 0 with Ollama unreachable (replay).
+  - Live: `LEASH_MODEL=ollama bin/console leash:werewolf:play --seed=N --record` with `qwen3:8b` ends with a winner or draw; transcript under `var/werewolf/` (check: file exists, last line names the result).
 
 ## M4 notes
 
@@ -96,6 +103,12 @@
 - 2026-11-10: Place resources built ([R], `lib/`): `#[AsPlaceResource(workflow, name, uri, description, mimeType='application/json')]` + `PlaceResourceInterface::__invoke(subject, caller): array|string`; place metadata `mcp_resources` is name => roles (like `mcp_tools`); `{subjectId}` in the URI is replaced by the endpoint's subject id (PLAN §3.5 `werewolf://game/{id}/…`). Hidden/unknown URI → `UnavailableResourceResponder` (-32602, data `{uri, visible}`) and `CapabilityDenied` with the URI in `tool` (no new event field).
 
 - 2026-11-10: `PlaceToolInterface::__invoke()` gets the caller (`UserInterface $caller`, required) so a place tool can act for the calling seat; Refund Desk tools and test fixtures updated, the parameter is unused there ([R], `lib/`).
+
+- 2026-11-10: M5 branch `m/phase-5-agents-play` stacked on M4 (M4 not merged); `symfony/lock` added (`LOCK_DSN=flock`).
+- 2026-11-10: Own generic `McpClientToolbox` (bare names, every call reaches the server, errors as model-visible text) instead of `McpToolbox` (mandatory prefix, final, lost JSON-RPC messages); resources read via `readResource` and injected into the turn prompt (`decisions/027`, revises 006).
+- 2026-11-10: Replay: record with `RecordingProvider`, replay with own per-seat FIFO `ReplayPlatform`; the default cassette signature is content-blind (`decisions/028`, proposed until pinned by a test).
+- 2026-11-10: One `Agent` per seat turn built in PHP; `TurnBudgetToolbox` caps 3 calls (built-in `maxToolCalls` counts rounds and throws); transcript from the mutated `MessageBag`; `think` on by default (`LEASH_THINK=0` off); per-turn timeout via own Ollama platform with an explicit HTTP client (`decisions/029`).
+- 2026-11-10: Turn deadline: `GameModerator::expire()` skips the current speaker in day_discussion (`Game::skipSpeaker()`, public `turn_skipped` event) and otherwise resolves the phase with missing actions abstaining (transient `deadlinePassed` flag read by `PhaseGuard`, for one transition).
 
 ## Test changes
 

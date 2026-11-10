@@ -9,7 +9,7 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Workflow\Event\GuardEvent;
 
 /**
- * A moderator transition is enabled only when the phase waits for nobody and the rules engine would land in
+ * A moderator transition is enabled only when the phase waits for nobody (or its deadline passed) and the rules engine would land in
  * exactly the transition's target place (checked on a clone: Game holds only arrays and immutable values).
  */
 #[AsEventListener('workflow.werewolf_game.guard')]
@@ -25,7 +25,7 @@ final readonly class PhaseGuard
 
         $game = $subject->game();
         $pending = $game->pendingSeats();
-        if ([] !== $pending) {
+        if ([] !== $pending && !$subject->deadlinePassed()) {
             $event->setBlocked(true, \sprintf('Waiting for seats %s.', implode(', ', $pending)));
 
             return;

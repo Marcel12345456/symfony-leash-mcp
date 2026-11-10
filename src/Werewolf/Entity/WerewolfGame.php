@@ -39,6 +39,9 @@ class WerewolfGame
     /** Decoded from $state on first use; written back before every flush. */
     private ?Game $game = null;
 
+    /** Not persisted: set by GameModerator::expire() for exactly one moderator transition. */
+    private bool $deadlinePassed = false;
+
     public function __construct(
         #[ORM\Id, ORM\Column(length: 32)]
         private string $id,
@@ -84,6 +87,16 @@ class WerewolfGame
     public function denials(): array
     {
         return $this->denials;
+    }
+
+    public function deadlinePassed(): bool
+    {
+        return $this->deadlinePassed;
+    }
+
+    public function setDeadlinePassed(bool $passed): void
+    {
+        $this->deadlinePassed = $passed;
     }
 
     #[ORM\PreFlush]
