@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final readonly class TranscriptWriter
 {
     public function __construct(
-        #[Autowire('%kernel.project_dir%/var/werewolf')]
+        #[Autowire('%leash.werewolf.transcripts%')]
         private string $directory,
     ) {}
 

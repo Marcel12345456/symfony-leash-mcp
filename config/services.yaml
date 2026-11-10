@@ -7,6 +7,8 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    # Werewolf transcripts (decisions/032); tests write into the cache dir.
+    leash.werewolf.transcripts: '%kernel.project_dir%/var/werewolf'
 
 services:
     # default configuration for services in *this* file
@@ -68,3 +70,7 @@ services:
     Leash\HumanInput\Pending\HumanInputNotifier: '@App\Inbox\EmailHumanInputNotifier'
     Leash\HumanInput\Client\InputRequestHandlerInterface: '@Leash\HumanInput\Pending\DeferringInputRequestHandler'
     Leash\HumanInput\Client\CallerTokens: '@App\Security\StaticTokenHandler'
+
+when@test:
+    parameters:
+        leash.werewolf.transcripts: '%kernel.cache_dir%/werewolf'
