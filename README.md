@@ -14,6 +14,7 @@ nothing else is installed on the host.
 
 ```
 make install      # composer install, warm the cache, migrate, seed demo cases; generate APP_SECRET + agent tokens into .env.local
+make werewolf     # play one Werewolf game: replays data/werewolf/seed-7.json (SEED=…, LEASH_MODEL=ollama for live)
 make test         # phpunit
 make qa           # php-cs-fixer (changed files) + phpstan + phpunit, quiet
 make qa-verbose   # the same with full output, whole tree

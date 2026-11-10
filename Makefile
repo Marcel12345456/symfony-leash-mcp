@@ -12,7 +12,7 @@ endif
 BASE := $(shell git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main 2>/dev/null)
 CHANGED_PHP := $(sort $(filter %.php,$(shell git diff --name-only --diff-filter=ACMR $(BASE) 2>/dev/null; git ls-files --others --exclude-standard 2>/dev/null)))
 
-.PHONY: install qa qa-verbose test cs-fix inspector
+.PHONY: install qa qa-verbose test cs-fix inspector werewolf
 
 install: ## Generates APP_SECRET, agent tokens and the inbox approver password into .env.local on first run; never overwrites them
 	@grep -qs '^APP_SECRET=.' .env.local || echo "APP_SECRET=$$(openssl rand -hex 16)" >> .env.local
@@ -41,6 +41,11 @@ qa-verbose: ## Full output, whole tree
 
 test:
 	$(RUN) vendor/bin/phpunit --no-progress
+
+# Replays the committed cassette data/werewolf/seed-$(SEED).json (no model, no network); LEASH_MODEL=ollama plays live.
+SEED ?= 7
+werewolf: ## make werewolf [SEED=7] [LEASH_MODEL=ollama]; transcript in var/werewolf/seed-<seed>.md
+	$(RUN) bin/console leash:werewolf:play --seed=$(SEED) $(if $(LEASH_MODEL),--model=$(LEASH_MODEL))
 
 cs-fix:
 	$(RUN) vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php
