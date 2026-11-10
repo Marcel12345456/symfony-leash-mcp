@@ -47,6 +47,7 @@ final readonly class WorkflowServerFactory
         $subjectRef = $workflow->getName() . ':' . $subjectId;
         $visible = $this->capabilities->visibleTools($workflow, $subject, $caller);
         $resources = $this->capabilities->visibleResources($workflow, $subject, $caller);
+        $uri = static fn(VisibleResource $r): string => str_replace('{subjectId}', $subjectId, $r->uri);
         $places = array_map(strval(...), array_keys($workflow->getMarking($subject)->getPlaces()));
 
         $builder = Server::builder()
@@ -79,7 +80,7 @@ final readonly class WorkflowServerFactory
                 $subject,
                 $caller,
                 $places,
-                array_map(static fn(VisibleResource $r): string => $r->uri, $resources),
+                array_map($uri, $resources),
                 $this->dispatcher,
             ));
 
@@ -87,7 +88,7 @@ final readonly class WorkflowServerFactory
             $read = $resource->resource;
             $builder->addResource(
                 handler: static fn(): array|string => $read($subject, $caller),
-                uri: $resource->uri,
+                uri: $uri($resource),
                 name: $resource->name,
                 description: $resource->description,
                 mimeType: $resource->mimeType,

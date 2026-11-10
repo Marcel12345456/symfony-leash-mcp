@@ -91,7 +91,7 @@
 - 2026-11-10: Place resources: register only visible ones per request; hidden `resources/read` → own responder, `CapabilityDenied` + -32602 with the visible URIs; cache policy covers resources (`decisions/025`).
 - 2026-11-10: `WorkflowServerFactory` always advertises `tools` + `resources` (explicit `ServerCapabilities`, logging/completions kept, listChanged false), fixes the 018 Inspector follow-up (`decisions/026`).
 
-- 2026-11-10: Place resources built ([R], `lib/`): `#[AsPlaceResource(workflow, name, uri, description, mimeType='application/json')]` + `PlaceResourceInterface::__invoke(subject, caller): array|string`; place metadata `mcp_resources` is name => roles (like `mcp_tools`); URIs are per endpoint, so they carry no subject id. Hidden/unknown URI → `UnavailableResourceResponder` (-32602, data `{uri, visible}`) and `CapabilityDenied` with the URI in `tool` (no new event field).
+- 2026-11-10: Place resources built ([R], `lib/`): `#[AsPlaceResource(workflow, name, uri, description, mimeType='application/json')]` + `PlaceResourceInterface::__invoke(subject, caller): array|string`; place metadata `mcp_resources` is name => roles (like `mcp_tools`); `{subjectId}` in the URI is replaced by the endpoint's subject id (PLAN §3.5 `werewolf://game/{id}/…`). Hidden/unknown URI → `UnavailableResourceResponder` (-32602, data `{uri, visible}`) and `CapabilityDenied` with the URI in `tool` (no new event field).
 
 - 2026-11-10: `PlaceToolInterface::__invoke()` gets the caller (`UserInterface $caller`, required) so a place tool can act for the calling seat; Refund Desk tools and test fixtures updated, the parameter is unused there ([R], `lib/`).
 
@@ -99,6 +99,7 @@
 
 <!-- Every weakened, deleted, skipped or changed assertion: date, test, reason. -->
 
+- 2026-11-10: `ScopedCapabilityProviderTest` / `WorkflowServerTest` resource tests (added in d1a9888) expect `doc://{subjectId}/rubric` (provider) and `doc://d1/rubric` (server): the rubric fixture now uses the new `{subjectId}` URI placeholder. Same checks, new URI.
 - 2026-11-10: `tests/Unit/Lib/WorkflowMcp/ScopedCapabilityProviderTest::testUnknownPlaceToolIsAConfigurationError` passes an empty `PlaceResourceRegistry`, because `ScopedCapabilityProvider` now takes one. Call site only; no assertion changed.
 - 2026-11-10: `tests/Unit/RefundDesk/SearchPolicyToolTest` passes an `InMemoryUser` caller to the tool, because `PlaceToolInterface::__invoke()` now requires one. Call site only; no assertion changed.
 - 2026-11-07: `.claude/tests/bin.t.sh` "plan-section 3.2: has YAML" now expects `doc_review:` instead of `refund_case:`, because PLAN v3 §3.2 uses the Doc Review workflow as the metadata example (decisions/022). Same check, new content.

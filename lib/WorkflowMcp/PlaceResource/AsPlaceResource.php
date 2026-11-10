@@ -6,8 +6,8 @@ namespace Leash\WorkflowMcp\PlaceResource;
 
 /**
  * Marks a PlaceResourceInterface service as the resource `$name` of workflow `$workflow`, served at `$uri`.
- * A place exposes it through its `mcp_resources` metadata (name => roles). The URI is relative to the
- * subject's endpoint, so it does not need to carry the subject id.
+ * A place exposes it through its `mcp_resources` metadata (name => roles). `{subjectId}` in `$uri` is replaced
+ * by the endpoint's subject id, so URIs stay unique across subjects (`game://{subjectId}/log`).
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final readonly class AsPlaceResource

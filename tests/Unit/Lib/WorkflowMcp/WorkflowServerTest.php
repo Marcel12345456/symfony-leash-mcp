@@ -107,7 +107,7 @@ final class WorkflowServerTest extends TestCase
         $author = $this->client(new Document('review'), 'ROLE_AUTHOR')->request('resources/list');
         $draft = $this->client(new Document('draft'), 'ROLE_EDITOR')->request('resources/list');
 
-        self::assertSame(['doc://guidelines', 'doc://rubric'], array_column(self::list($editor, 'resources'), 'uri'));
+        self::assertSame(['doc://guidelines', 'doc://d1/rubric'], array_column(self::list($editor, 'resources'), 'uri'));
         self::assertSame(['doc_guidelines', 'doc_rubric'], array_column(self::list($editor, 'resources'), 'name'));
         self::assertSame(['doc://guidelines'], array_column(self::list($author, 'resources'), 'uri'));
         self::assertSame([], self::list($draft, 'resources'));
@@ -115,7 +115,7 @@ final class WorkflowServerTest extends TestCase
 
     public function testReadsVisibleResourceForTheCaller(): void
     {
-        $json = $this->client(new Document('review'), 'ROLE_EDITOR')->request('resources/read', ['uri' => 'doc://rubric']);
+        $json = $this->client(new Document('review'), 'ROLE_EDITOR')->request('resources/read', ['uri' => 'doc://d1/rubric']);
         $text = $this->client(new Document('review'), 'ROLE_AUTHOR')->request('resources/read', ['uri' => 'doc://guidelines']);
 
         self::assertSame('application/json', StatelessClient::at($json, 'result', 'contents', 0, 'mimeType'));
@@ -131,15 +131,23 @@ final class WorkflowServerTest extends TestCase
 
     public function testHiddenResourceIsInvalidParamsWithReadableUrisAndCapabilityDenied(): void
     {
-        $response = $this->client(new Document('review'), 'ROLE_AUTHOR')->request('resources/read', ['uri' => 'doc://rubric']);
+        $response = $this->client(new Document('review'), 'ROLE_AUTHOR')->request('resources/read', ['uri' => 'doc://d1/rubric']);
 
         self::assertNull($response['result'] ?? null);
         self::assertSame(-32602, StatelessClient::at($response, 'error', 'code'));
-        self::assertSame('Resource "doc://rubric" is not available to your role in state "review". Readable now: doc://guidelines.', StatelessClient::at($response, 'error', 'message'));
-        self::assertSame(['uri' => 'doc://rubric', 'visible' => ['doc://guidelines']], StatelessClient::at($response, 'error', 'data'));
+        self::assertSame('Resource "doc://d1/rubric" is not available to your role in state "review". Readable now: doc://guidelines.', StatelessClient::at($response, 'error', 'message'));
+        self::assertSame(['uri' => 'doc://d1/rubric', 'visible' => ['doc://guidelines']], StatelessClient::at($response, 'error', 'data'));
         $denied = $this->harness->eventsOf(CapabilityDenied::class);
         self::assertCount(1, $denied);
-        self::assertSame('doc://rubric', $denied[0]->tool);
+        self::assertSame('doc://d1/rubric', $denied[0]->tool);
+    }
+
+    public function testSubjectIdPlaceholderIsPerEndpoint(): void
+    {
+        $other = $this->harness->client(DocumentWorkflow::create(), new Document('review'), new InMemoryUser('bob', null, ['ROLE_EDITOR']), 'd2');
+
+        self::assertSame(['doc://guidelines', 'doc://d2/rubric'], array_column(self::list($other->request('resources/list'), 'resources'), 'uri'));
+        self::assertSame(-32602, StatelessClient::at($other->request('resources/read', ['uri' => 'doc://d1/rubric']), 'error', 'code'));
     }
 
     public function testUnknownResourceInAPlaceWithoutResources(): void

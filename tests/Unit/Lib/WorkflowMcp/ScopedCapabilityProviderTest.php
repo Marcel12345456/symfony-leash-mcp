@@ -111,7 +111,7 @@ final class ScopedCapabilityProviderTest extends TestCase
             yield $place . ' × editor' => [$place, 'ROLE_EDITOR', []];
         }
         yield 'review × author' => ['review', 'ROLE_AUTHOR', ['doc://guidelines']];
-        yield 'review × editor' => ['review', 'ROLE_EDITOR', ['doc://guidelines', 'doc://rubric']];
+        yield 'review × editor' => ['review', 'ROLE_EDITOR', ['doc://guidelines', 'doc://{subjectId}/rubric']];
         yield 'review × stranger' => ['review', 'ROLE_USER', []];
     }
 
