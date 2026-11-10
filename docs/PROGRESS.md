@@ -18,7 +18,7 @@
 - M4 done-signal and design intent: see "M4 notes" below.
 - M2 (PR #7) and M3 (PR #6) in main. M2 Inspector check complete (`decisions/018` part 2, 2026-11-10: approval round trip works; likely legacy elicitation, not MRTR wire format).
 - Follow-up for M4 Makefile: `php -S` needs `PHP_CLI_SERVER_WORKERS` > 1, otherwise a streamed `tools/call` deadlocks the server (`decisions/018`).
-- M4 done so far (50070a1): `actorsAmong()`, caller for place tools, `tools`/`resources` always advertised. Next: place resources in lib, then `src/Werewolf`.
+- M4 done so far: `actorsAmong()`, caller for place tools, `tools`/`resources` always advertised, place resources in lib. Next: `src/Werewolf`.
 - Blocked: none.
 
 ## Next prompt
@@ -91,12 +91,15 @@
 - 2026-11-10: Place resources: register only visible ones per request; hidden `resources/read` → own responder, `CapabilityDenied` + -32602 with the visible URIs; cache policy covers resources (`decisions/025`).
 - 2026-11-10: `WorkflowServerFactory` always advertises `tools` + `resources` (explicit `ServerCapabilities`, logging/completions kept, listChanged false), fixes the 018 Inspector follow-up (`decisions/026`).
 
+- 2026-11-10: Place resources built ([R], `lib/`): `#[AsPlaceResource(workflow, name, uri, description, mimeType='application/json')]` + `PlaceResourceInterface::__invoke(subject, caller): array|string`; place metadata `mcp_resources` is name => roles (like `mcp_tools`); URIs are per endpoint, so they carry no subject id. Hidden/unknown URI → `UnavailableResourceResponder` (-32602, data `{uri, visible}`) and `CapabilityDenied` with the URI in `tool` (no new event field).
+
 - 2026-11-10: `PlaceToolInterface::__invoke()` gets the caller (`UserInterface $caller`, required) so a place tool can act for the calling seat; Refund Desk tools and test fixtures updated, the parameter is unused there ([R], `lib/`).
 
 ## Test changes
 
 <!-- Every weakened, deleted, skipped or changed assertion: date, test, reason. -->
 
+- 2026-11-10: `tests/Unit/Lib/WorkflowMcp/ScopedCapabilityProviderTest::testUnknownPlaceToolIsAConfigurationError` passes an empty `PlaceResourceRegistry`, because `ScopedCapabilityProvider` now takes one. Call site only; no assertion changed.
 - 2026-11-10: `tests/Unit/RefundDesk/SearchPolicyToolTest` passes an `InMemoryUser` caller to the tool, because `PlaceToolInterface::__invoke()` now requires one. Call site only; no assertion changed.
 - 2026-11-07: `.claude/tests/bin.t.sh` "plan-section 3.2: has YAML" now expects `doc_review:` instead of `refund_case:`, because PLAN v3 §3.2 uses the Doc Review workflow as the metadata example (decisions/022). Same check, new content.
 

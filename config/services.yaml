@@ -26,11 +26,14 @@ services:
     Leash\WorkflowMcp\:
         resource: '../lib/WorkflowMcp/'
         exclude:
+            - '../lib/WorkflowMcp/Capability/VisibleResource.php'
             - '../lib/WorkflowMcp/Capability/VisibleTool.php'
             - '../lib/WorkflowMcp/Event/'
             - '../lib/WorkflowMcp/Metadata/'
+            - '../lib/WorkflowMcp/PlaceResource/AsPlaceResource.php'
             - '../lib/WorkflowMcp/PlaceTool/AsPlaceTool.php'
             - '../lib/WorkflowMcp/Server/UnavailableCapabilityResponder.php'
+            - '../lib/WorkflowMcp/Server/UnavailableResourceResponder.php'
             - '../lib/WorkflowMcp/Tool/InvalidInputException.php'
             - '../lib/WorkflowMcp/Tool/ToolResults.php'
 

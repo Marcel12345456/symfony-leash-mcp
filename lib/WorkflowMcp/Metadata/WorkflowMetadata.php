@@ -11,7 +11,7 @@ use Symfony\Component\Workflow\WorkflowInterface;
  * Typed reader for the MCP metadata contract (PLAN §3.2, decisions/012).
  *
  * Workflow: `mcp_prefix` (default: workflow name), `mcp_subject` (entity class), `mcp_role_resolver` (resolver class).
- * Place: `mcp_tools` (tool name => list of roles).
+ * Place: `mcp_tools` (tool name => list of roles), `mcp_resources` (resource name => list of roles).
  * Transition: `mcp_roles`, `mcp_description`, `mcp_input` (DTO class).
  */
 final readonly class WorkflowMetadata
@@ -69,20 +69,13 @@ final readonly class WorkflowMetadata
     /** @return array<string, list<string>> tool name => roles */
     public static function placeTools(WorkflowInterface $workflow, string $place): array
     {
-        $tools = $workflow->getMetadataStore()->getPlaceMetadata($place)['mcp_tools'] ?? [];
-        if (!\is_array($tools)) {
-            throw new \LogicException(\sprintf('Workflow "%s": mcp_tools of place "%s" must be a map of tool name => roles.', $workflow->getName(), $place));
-        }
+        return self::placeRoleMap($workflow, $place, 'mcp_tools');
+    }
 
-        $map = [];
-        foreach ($tools as $name => $roles) {
-            if (!\is_string($name)) {
-                throw new \LogicException(\sprintf('Workflow "%s": mcp_tools of place "%s" must be keyed by tool name.', $workflow->getName(), $place));
-            }
-            $map[$name] = self::roleList($workflow, $roles, \sprintf('mcp_tools.%s of place %s', $name, $place));
-        }
-
-        return $map;
+    /** @return array<string, list<string>> resource name => roles */
+    public static function placeResources(WorkflowInterface $workflow, string $place): array
+    {
+        return self::placeRoleMap($workflow, $place, 'mcp_resources');
     }
 
     /** @return list<string> every role named anywhere in the workflow's MCP metadata */
@@ -93,12 +86,31 @@ final readonly class WorkflowMetadata
             $roles = [...$roles, ...self::transitionRoles($workflow, $transition)];
         }
         foreach ($workflow->getDefinition()->getPlaces() as $place) {
-            foreach (self::placeTools($workflow, $place) as $placeRoles) {
+            foreach ([...array_values(self::placeTools($workflow, $place)), ...array_values(self::placeResources($workflow, $place))] as $placeRoles) {
                 $roles = [...$roles, ...$placeRoles];
             }
         }
 
         return array_values(array_unique($roles));
+    }
+
+    /** @return array<string, list<string>> name => roles */
+    private static function placeRoleMap(WorkflowInterface $workflow, string $place, string $key): array
+    {
+        $entries = $workflow->getMetadataStore()->getPlaceMetadata($place)[$key] ?? [];
+        if (!\is_array($entries)) {
+            throw new \LogicException(\sprintf('Workflow "%s": %s of place "%s" must be a map of name => roles.', $workflow->getName(), $key, $place));
+        }
+
+        $map = [];
+        foreach ($entries as $name => $roles) {
+            if (!\is_string($name)) {
+                throw new \LogicException(\sprintf('Workflow "%s": %s of place "%s" must be keyed by name.', $workflow->getName(), $key, $place));
+            }
+            $map[$name] = self::roleList($workflow, $roles, \sprintf('%s.%s of place %s', $key, $name, $place));
+        }
+
+        return $map;
     }
 
     private static function optionalString(WorkflowInterface $workflow, mixed $value, string $key): ?string

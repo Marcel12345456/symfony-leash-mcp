@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Leash\WorkflowMcp\Capability;
 
 use Leash\WorkflowMcp\Metadata\WorkflowMetadata;
+use Leash\WorkflowMcp\PlaceResource\PlaceResourceRegistry;
 use Leash\WorkflowMcp\PlaceTool\PlaceToolRegistry;
 use Leash\WorkflowMcp\Role\RoleResolverInterface;
 use Leash\WorkflowMcp\Role\SecurityRoleResolver;
@@ -14,13 +15,14 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
- * Subject + caller → visible tools (PLAN §3.2 visibility rule, decisions/012):
- * enabled transitions (guards run) and tools of the current places, filtered by the caller's roles.
+ * Subject + caller → visible tools and resources (PLAN §3.2 visibility rule, decisions/012, 025):
+ * enabled transitions (guards run) and tools/resources of the current places, filtered by the caller's roles.
  */
 final readonly class ScopedCapabilityProvider
 {
     public function __construct(
         private PlaceToolRegistry $placeTools,
+        private PlaceResourceRegistry $placeResources,
         #[AutowireLocator(RoleResolverInterface::TAG)]
         private ContainerInterface $roleResolvers,
         private SecurityRoleResolver $defaultRoleResolver = new SecurityRoleResolver(),
@@ -81,5 +83,24 @@ final readonly class ScopedCapabilityProvider
         }
 
         return array_values($tools);
+    }
+
+    /** @return list<VisibleResource> */
+    public function visibleResources(WorkflowInterface $workflow, object $subject, UserInterface $caller): array
+    {
+        $roles = $this->rolesFor($workflow, $subject, $caller);
+        $resources = [];
+
+        foreach (array_keys($workflow->getMarking($subject)->getPlaces()) as $place) {
+            foreach (WorkflowMetadata::placeResources($workflow, (string) $place) as $name => $resourceRoles) {
+                if (isset($resources[$name]) || [] === array_intersect($resourceRoles, $roles)) {
+                    continue;
+                }
+                [$meta, $resource] = $this->placeResources->get($workflow->getName(), $name);
+                $resources[$name] = new VisibleResource($name, $meta->uri, $meta->description, $meta->mimeType, $resource);
+            }
+        }
+
+        return array_values($resources);
     }
 }

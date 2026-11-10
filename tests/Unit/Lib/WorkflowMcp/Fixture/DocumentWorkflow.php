@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Lib\WorkflowMcp\Fixture;
 
 use Leash\WorkflowMcp\Capability\ScopedCapabilityProvider;
+use Leash\WorkflowMcp\PlaceResource\PlaceResourceRegistry;
 use Leash\WorkflowMcp\PlaceTool\PlaceToolRegistry;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -47,10 +48,16 @@ final class DocumentWorkflow
             'draft',
             new InMemoryMetadataStore(
                 $workflowMetadata,
-                ['review' => ['mcp_tools' => [
-                    'doc_read_comments' => ['ROLE_AUTHOR', 'ROLE_EDITOR'],
-                    'doc_add_comment' => ['ROLE_EDITOR'],
-                ]]],
+                ['review' => [
+                    'mcp_tools' => [
+                        'doc_read_comments' => ['ROLE_AUTHOR', 'ROLE_EDITOR'],
+                        'doc_add_comment' => ['ROLE_EDITOR'],
+                    ],
+                    'mcp_resources' => [
+                        'doc_guidelines' => ['ROLE_AUTHOR', 'ROLE_EDITOR'],
+                        'doc_rubric' => ['ROLE_EDITOR'],
+                    ],
+                ]],
                 $transitionMetadata,
             ),
         );
@@ -70,6 +77,7 @@ final class DocumentWorkflow
     {
         return new ScopedCapabilityProvider(
             new PlaceToolRegistry([new ReadCommentsTool(), new AddCommentTool()]),
+            new PlaceResourceRegistry([new GuidelinesResource(), new RubricResource()]),
             new ServiceLocator([OwnerRoleResolver::class => static fn(): OwnerRoleResolver => new OwnerRoleResolver()]),
         );
     }
