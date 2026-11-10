@@ -15,13 +15,15 @@
 
 - Plan v3 (`decisions/022`): Werewolf main, Doc Review second, Refund Desk retired in M6.
 - Phase: **M5 Agents play — in progress**, branch `m/phase-5-agents-play`, stacked on `m/phase-4-werewolf-mcp` (M4 not merged yet; rebase onto main after the M4 merge).
+- M5 done so far: VERIFY → decisions 027–029; `symfony/lock`; turn deadline (`Game::skipSpeaker()`, `GameModerator::expire()`, no own test yet).
+- M5 left, in order: `McpClientToolbox` (lib, + unit test), `TurnBudgetToolbox`, prompts `config/prompts/werewolf/*.md`, seat turn runner (resources → prompt, one Agent per turn, transcript), next-actor runner (lock, paused skip, `actorsAmong`, deadline via `expire()`) + `RunNextActor` handler, `leash:werewolf:play --seed --record`, `ReplayPlatform` + signature pin test (028), agent tests, live qwen3 game + cassette, `make werewolf`.
 - M5 done-signal and design: see "M5 notes".
 - M2 (PR #7) and M3 (PR #6) in main. M4 branch pushed, needs review ([R] `lib/`), then merge (human).
 - Blocked: none.
 
 ## Next prompt
 
-/phase M5
+/phase M5 — continue with McpClientToolbox (decisions/027), then the seat turn runner
 
 ## M5 notes
 
@@ -122,6 +124,8 @@
 ## Log
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
+
+- 2026-11-10 — M5 start (with human). Branch stacked on M4. VERIFY → decisions 027 (own `McpClientToolbox`, revises 006), 028 (record with `RecordingProvider`, replay per seat; default signature content-blind, proposed), 029 (Agent per turn, `TurnBudgetToolbox`, `think` on, own Ollama platform for the timeout). `symfony/lock` (flock). Turn deadline in rules + moderator. BUGS.md: two candidates (McpToolbox prefix, content-blind cassette signature). Test changes: none (one new rules test). Blocked: none. Needs review: M4 + M5 branches ([R]); `expire()` still untested. Spend: $0.
 
 - 2026-11-10 — M4 done (with human). lib: place resources (`#[AsPlaceResource]`, `PlaceResourceInterface`, registry, `mcp_resources`, `UnavailableResourceResponder`, `{subjectId}` URI placeholder) with synthetic-workflow tests. src/Werewolf: `WerewolfGame` entity + migration, `werewolf_game` workflow, `WerewolfSeatRoleResolver`, `PhaseGuard`, `GameModerator`, 4 place tools, 4 resources, denial log, HMAC seat/moderator tokens (`LEASH_WEREWOLF_SECRET`, `make install`). Tests: `WerewolfVisibilityTest` (7), `WerewolfMcpGameTest` (full game, same seed → same game). Test changes: two call-site/URI updates (see Test changes). Blocked: none. Needs review: `lib/` changes ([R]); `StaticTokenHandler` now knows Werewolf callers; moderator advances in-process on `ToolCalled`. Spend: $0.
 
