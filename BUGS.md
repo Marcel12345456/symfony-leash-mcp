@@ -33,6 +33,8 @@
 
 ## Candidates (from code reading, not yet reproduced)
 
+- **symfony/ai-ollama-platform 0.15.0 — HTTP errors lose the Ollama error body.** `OllamaResultConverter` ignores the status code; a 4xx/5xx `{"error": "…"}` body becomes `RuntimeException('Response does not contain message.')` (`OllamaResultConverter.php:70-72`). Repro idea: `MockHttpClient` with status 500 and `{"error":"boom"}`. Workaround: the seat turn runner treats it as a failed turn (`decisions/032`).
+
 - **symfony/ai-mcp-tool 0.15.0 — `McpToolbox` tool-name prefix cannot be disabled.** `McpToolbox.php:84` falls back to `<toolset name>_` when the prefix is empty; the model never sees the server's own names. JSON-RPC errors from `callTool` become a generic "An error occurred while executing tool" under `FaultTolerantToolbox`, losing the server's actionable message. Workaround: `Leash\WorkflowMcp\Client\McpClientToolbox` (`decisions/027`).
 - **symfony/ai-platform 0.15.0 — `RecordingProvider` default signature ignores message content.** `json_encode([$model, $input, $options])` encodes `MessageBag`/`Tool` (private props, no `JsonSerializable`) as `{}`, so replay is FIFO per model and a changed prompt is served the old answer. To pin with a test (`decisions/028`). Workaround: own replay platform.
 

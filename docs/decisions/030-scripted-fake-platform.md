@@ -1,7 +1,7 @@
 # 030 — Scripted fake platform for agent tests
 
 - Date: 2026-11-10
-- Status: proposed (pinned once the first agent test uses it)
+- Status: accepted (pinned by `SeatTurnRunnerTest`)
 - PLAN reference: §3.4 Platform, §7 agent tests; follow-up to 029
 
 ## Question

@@ -19,6 +19,11 @@ services:
     App\:
         resource: '../src/'
 
+    # Agents reach the MCP endpoints through this app's kernel, no web server needed.
+    App\Agent\McpConnector:
+        arguments:
+            $http: '@App\Agent\InProcessPsr18Client'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
