@@ -111,6 +111,8 @@
 - 2026-11-10: Replay: record with `RecordingProvider`, replay with own per-seat FIFO `ReplayPlatform`; the default cassette signature is content-blind (`decisions/028`, proposed until pinned by a test).
 - 2026-11-10: One `Agent` per seat turn built in PHP; `TurnBudgetToolbox` caps 3 calls (built-in `maxToolCalls` counts rounds and throws); transcript from the mutated `MessageBag`; `think` on by default (`LEASH_THINK=0` off); per-turn timeout via own Ollama platform with an explicit HTTP client (`decisions/029`).
 - 2026-11-10: Turn deadline: `GameModerator::expire()` skips the current speaker in day_discussion (`Game::skipSpeaker()`, public `turn_skipped` event) and otherwise resolves the phase with missing actions abstaining (transient `deadlinePassed` flag read by `PhaseGuard`, for one transition).
+- 2026-11-10: Agent tests script the model with `MockPlatformFactory::createPlatform(closure)` (closure sees the normalized payload + call options incl. `tools`); helper `ScriptedSeatPlatform` in tests; `Agent::call()` returns `Execution` (`decisions/030`, proposed until a test uses it).
+- 2026-11-10: `McpClientToolbox`/`TurnBudgetToolbox` API cheat sheet; server errors stay model-visible text (027); lib test runs the Builder behind `HttpTransport` via a PSR-18 fixture with one shared `InMemorySessionStore` (`decisions/031`).
 
 ## Test changes
 
