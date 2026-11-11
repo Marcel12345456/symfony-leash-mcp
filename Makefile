@@ -43,8 +43,8 @@ test:
 	$(RUN) vendor/bin/phpunit --no-progress
 
 # Replays the committed cassette data/werewolf/seed-$(SEED).json (no model, no network); LEASH_MODEL=ollama plays live.
-SEED ?= 7
-werewolf: ## make werewolf [SEED=7] [LEASH_MODEL=ollama]; transcript in var/werewolf/seed-<seed>.md
+SEED ?= 8
+werewolf: ## make werewolf [SEED=8] [LEASH_MODEL=ollama]; transcript in var/werewolf/seed-<seed>.md
 	$(RUN) bin/console leash:werewolf:play --seed=$(SEED) $(if $(LEASH_MODEL),--model=$(LEASH_MODEL))
 
 cs-fix:

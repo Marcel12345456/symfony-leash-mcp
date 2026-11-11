@@ -7,6 +7,7 @@ namespace App\Agent;
 use App\Agent\Replay\RecordingSeatProvider;
 use App\Agent\Replay\ReplayPlatform;
 use App\Agent\Replay\SeatCassette;
+use App\Agent\Werewolf\ScriptedVillager;
 use Symfony\AI\Platform\Bridge\Ollama\Factory as OllamaFactory;
 use Symfony\AI\Platform\Platform;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -37,14 +38,15 @@ final readonly class ModelChoiceFactory
     ) {}
 
     /**
-     * @param ?string $cassette replay: the cassette to play; ollama: the cassette to record into (null = no recording)
+     * @param ?string $cassette     replay: the cassette to play; ollama: the cassette to record into (null = no recording)
+     * @param ?int    $scriptedSeat ollama: the villager seat that plays the fixed script; replay takes it from the cassette
      */
-    public function create(?string $model = null, ?string $cassette = null): ModelChoice
+    public function create(?string $model = null, ?string $cassette = null, ?int $scriptedSeat = null): ModelChoice
     {
         $model ??= $this->model;
 
         return match ($model) {
-            'ollama' => $this->ollama($cassette),
+            'ollama' => $this->ollama($cassette, $scriptedSeat),
             'replay' => $this->replay($cassette ?? throw new \InvalidArgumentException('LEASH_MODEL=replay needs a cassette (leash:werewolf:play --cassette).')),
             default => throw new \InvalidArgumentException(\sprintf('LEASH_MODEL "%s" is unknown; use replay or ollama.', $model)),
         };
@@ -62,7 +64,7 @@ final readonly class ModelChoiceFactory
         return hash('xxh128', false === $prompt ? throw new \RuntimeException('Missing prompt ' . $this->promptFile) : $prompt);
     }
 
-    private function ollama(?string $record): ModelChoice
+    private function ollama(?string $record, ?int $scriptedSeat): ModelChoice
     {
         if ('' === $this->ollamaModel) {
             throw new \InvalidArgumentException('LEASH_OLLAMA_MODEL is empty.');
@@ -70,10 +72,10 @@ final readonly class ModelChoiceFactory
         $http = HttpClient::create(['timeout' => $this->timeoutSeconds, 'max_duration' => $this->timeoutSeconds]);
         $provider = OllamaFactory::createProvider($this->ollamaEndpoint, null, $http);
         if (null !== $record) {
-            $provider = new RecordingSeatProvider($provider, SeatCassette::start($record, $this->ollamaModel, $this->promptHash()));
+            $provider = new RecordingSeatProvider($provider, SeatCassette::start($record, $this->ollamaModel, $this->promptHash(), $scriptedSeat));
         }
 
-        return new ModelChoice(new Platform([$provider]), $this->ollamaModel, $this->think);
+        return new ModelChoice(new Platform([$provider]), $this->ollamaModel, $this->think, scripted: self::scripted($scriptedSeat));
     }
 
     private function replay(string $cassette): ModelChoice
@@ -81,6 +83,11 @@ final readonly class ModelChoiceFactory
         $loaded = SeatCassette::load($cassette, $this->promptHash());
         $replay = new ReplayPlatform($loaded);
 
-        return new ModelChoice($replay->platform(), $loaded->model, replay: $replay);
+        return new ModelChoice($replay->platform(), $loaded->model, replay: $replay, scripted: self::scripted($loaded->scriptedSeat));
+    }
+
+    private static function scripted(?int $seat): ?ScriptedVillager
+    {
+        return null === $seat ? null : new ScriptedVillager($seat);
     }
 }

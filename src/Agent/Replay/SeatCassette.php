@@ -11,10 +11,10 @@ use Symfony\AI\Platform\Test\Recording\ResultSerializer;
 
 /**
  * One recorded Werewolf game (decisions/033): every model request in call order, keyed by seat, plus the hash of
- * the player prompt it was recorded with. A request that failed is stored as `timeout` or `error`, so the replayed
+ * the player prompt it was recorded with and the scripted villager seat, if any (replay runs the same script). A request that failed is stored as `timeout` or `error`, so the replayed
  * turn fails the same way and the queues stay aligned.
  *
- * File: `{"model", "prompt", "interactions": [{"seat", "result"} | {"seat", "timeout"} | {"seat", "error"}]}`.
+ * File: `{"model", "prompt", "scriptedSeat"?, "interactions": [{"seat", "result"} | {"seat", "timeout"} | {"seat", "error"}]}`.
  */
 final class SeatCassette
 {
@@ -26,12 +26,13 @@ final class SeatCassette
         public readonly string $path,
         public readonly string $model,
         public readonly string $promptHash,
+        public readonly ?int $scriptedSeat = null,
     ) {}
 
     /** @param non-empty-string $model */
-    public static function start(string $path, string $model, string $promptHash): self
+    public static function start(string $path, string $model, string $promptHash, ?int $scriptedSeat = null): self
     {
-        $cassette = new self($path, $model, $promptHash);
+        $cassette = new self($path, $model, $promptHash, $scriptedSeat);
         $cassette->save();
 
         return $cassette;
@@ -43,12 +44,12 @@ final class SeatCassette
         if (false === $json) {
             throw new \RuntimeException(\sprintf('No Werewolf cassette at %s. Record one with --record and LEASH_MODEL=ollama.', $path));
         }
-        /** @var array{model: non-empty-string, prompt: string, interactions: list<array{seat: int, result?: array<string, mixed>, timeout?: string, error?: string}>} $data */
+        /** @var array{model: non-empty-string, prompt: string, scriptedSeat?: int, interactions: list<array{seat: int, result?: array<string, mixed>, timeout?: string, error?: string}>} $data */
         $data = json_decode($json, true, flags: \JSON_THROW_ON_ERROR);
         if ($data['prompt'] !== $promptHash) {
             throw new \RuntimeException(\sprintf('The cassette %s was recorded with another player prompt; re-record it (decisions/033).', $path));
         }
-        $cassette = new self($path, $data['model'], $data['prompt']);
+        $cassette = new self($path, $data['model'], $data['prompt'], $data['scriptedSeat'] ?? null);
         $cassette->interactions = $data['interactions'];
 
         return $cassette;
@@ -109,7 +110,8 @@ final class SeatCassette
         if (!is_dir($directory) && !mkdir($directory, 0o775, true) && !is_dir($directory)) {
             throw new \RuntimeException('Cannot create ' . $directory);
         }
-        $json = json_encode(['model' => $this->model, 'prompt' => $this->promptHash, 'interactions' => $this->interactions], \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
+        $data = ['model' => $this->model, 'prompt' => $this->promptHash, ...(null === $this->scriptedSeat ? [] : ['scriptedSeat' => $this->scriptedSeat]), 'interactions' => $this->interactions];
+        $json = json_encode($data, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
         file_put_contents($this->path, $json . "\n", \LOCK_EX);
     }
 }

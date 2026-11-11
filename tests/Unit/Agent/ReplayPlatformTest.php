@@ -90,6 +90,15 @@ final class ReplayPlatformTest extends TestCase
         SeatCassette::load($this->path, 'hash-2');
     }
 
+    public function testCassetteRemembersTheScriptedSeat(): void
+    {
+        SeatCassette::start($this->path, 'qwen3:8b', 'hash-1', 6);
+        self::assertSame(6, SeatCassette::load($this->path, 'hash-1')->scriptedSeat);
+
+        SeatCassette::start($this->path, 'qwen3:8b', 'hash-1');
+        self::assertNull(SeatCassette::load($this->path, 'hash-1')->scriptedSeat);
+    }
+
     /** Pins BUGS.md: symfony/ai's RecordingProvider gives two different MessageBags the same default signature. */
     public function testUpstreamDefaultSignatureIsContentBlind(): void
     {

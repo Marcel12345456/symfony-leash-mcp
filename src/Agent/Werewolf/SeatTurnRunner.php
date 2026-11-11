@@ -43,6 +43,7 @@ final readonly class SeatTurnRunner
 
     public function play(string $gameId, int $seat, ModelChoice $model, int $day, Phase $phase): SeatTurn
     {
+        $model = $model->forSeat($seat, $phase);
         $caller = WerewolfCallers::seat($seat);
         $client = $this->connector->connect('/mcp/werewolf_game/' . $gameId, WerewolfCallers::token($this->secret, $caller), 'leash-' . $caller);
 

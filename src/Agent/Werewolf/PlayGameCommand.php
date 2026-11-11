@@ -7,6 +7,7 @@ namespace App\Agent\Werewolf;
 use App\Agent\ModelChoiceFactory;
 use App\Werewolf\Entity\WerewolfGame;
 use App\Werewolf\Rules\Game;
+use App\Werewolf\Rules\Role;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\Option;
@@ -48,6 +49,8 @@ final readonly class PlayGameCommand
         bool $record = false,
         #[Option(description: 'Cassette path (default: data/werewolf/seed-<seed>.json)')]
         ?string $cassette = null,
+        #[Option(description: 'Live only: this villager seat plays the scripted demo moves (PLAN §3.5); replay takes it from the cassette', name: 'scripted-seat')]
+        ?int $scriptedSeat = null,
     ): int {
         $gameId = $game ?? 'seed-' . $seed;
         $cassette ??= \sprintf('%s/seed-%d.json', $this->cassettes, $seed);
@@ -57,9 +60,20 @@ final readonly class PlayGameCommand
 
             return Command::INVALID;
         }
-        $choice = $this->models->create($model, $live && !$record ? null : $cassette);
-        $this->reset($gameId, Game::start($seed, self::NAMES));
-        $io->writeln(\sprintf('Game <info>%s</info> (seed %d, model %s), transcript %s', $gameId, $seed, $choice->model, $this->transcript->path($gameId)));
+        $start = Game::start($seed, self::NAMES);
+        if (null !== $scriptedSeat && !$live) {
+            $io->error('--scripted-seat is for live games; a replay takes the scripted seat from its cassette.');
+
+            return Command::INVALID;
+        }
+        if (null !== $scriptedSeat && Role::Villager !== ($start->seats()[$scriptedSeat] ?? null)?->role) {
+            $io->error(\sprintf('--scripted-seat=%d is not a villager with seed %d.', $scriptedSeat, $seed));
+
+            return Command::INVALID;
+        }
+        $choice = $this->models->create($model, $live && !$record ? null : $cassette, $scriptedSeat);
+        $this->reset($gameId, $start);
+        $io->writeln(\sprintf('Game <info>%s</info> (seed %d, model %s%s), transcript %s', $gameId, $seed, $choice->model, null === $choice->scripted ? '' : ', scripted seat ' . $choice->scripted->seat, $this->transcript->path($gameId)));
 
         for ($n = 1; $n <= $maxSteps; ++$n) {
             $step = $this->runner->step($gameId, $choice);

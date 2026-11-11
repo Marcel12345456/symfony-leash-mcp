@@ -1,0 +1,1167 @@
+{
+    "model": "qwen3:latest",
+    "prompt": "894930af59d454cfef709d23c81169bf",
+    "scriptedSeat": 3,
+    "interactions": [
+        {
+            "seat": 1,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_choose_victim",
+                        "arguments": {
+                            "target": 2
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1226,
+                        "completion_tokens": 474,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 1,
+            "result": {
+                "type": "text",
+                "content": "I don't know who the wolves are, but we should focus on the most suspicious seat. Let's discuss calmly.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1293,
+                        "completion_tokens": 1334,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 2,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_inspect",
+                        "arguments": {
+                            "target": 3
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1134,
+                        "completion_tokens": 258,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 2,
+            "result": {
+                "type": "text",
+                "content": "Inspected Cara (seat 3) during the night.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1200,
+                        "completion_tokens": 967,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 5,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_choose_victim",
+                        "arguments": {
+                            "target": 2
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1301,
+                        "completion_tokens": 315,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 5,
+            "result": {
+                "type": "text",
+                "content": "I accuse Cara (seat 3) of being a werewolf. Her actions tonight were suspicious, and she should be eliminated to protect the village.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1368,
+                        "completion_tokens": 1160,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 1,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "I think Cara (seat 3) is a wolf."
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1495,
+                        "completion_tokens": 2893,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 1,
+            "result": {
+                "type": "text",
+                "content": "I made the statement accusing Cara (seat 3) of being a wolf during the day discussion.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1574,
+                        "completion_tokens": 759,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 4,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "I am a villager."
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1345,
+                        "completion_tokens": 479,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 4,
+            "result": {
+                "type": "text",
+                "content": "I voted to eliminate Cara (seat 3) based on Anna's accusation.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1418,
+                        "completion_tokens": 786,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 5,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "I am a wolf, and Anna is a wolf."
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1647,
+                        "completion_tokens": 2328,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 5,
+            "result": {
+                "type": "text",
+                "content": "I will vote to eliminate Cara (seat 3) for lying about her role. \n\n",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1725,
+                        "completion_tokens": 1232,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 6,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "I am a villager."
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1426,
+                        "completion_tokens": 2053,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 6,
+            "result": {
+                "type": "text",
+                "content": "The discussion phase ends after all seats have spoken. Your next step is to vote. Use the `vote` tool to eliminate the most suspicious seat.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1499,
+                        "completion_tokens": 1022,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 1,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "Eve is a wolf."
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1727,
+                        "completion_tokens": 3516,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 1,
+            "result": {
+                "type": "text",
+                "content": "I confirmed Eve's role as a wolf. Now, I will vote for Cara, as she is the only remaining suspect. \n\n",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1800,
+                        "completion_tokens": 2308,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 4,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "I'm a villager. Let's focus on finding the wolves together."
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1550,
+                        "completion_tokens": 1701,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 4,
+            "result": {
+                "type": "text",
+                "content": "I've made my statement as a villager. Now I'll vote based on the statements and the dead seat 2. Since Eve claimed to be a wolf and accused Anna, but Anna later accused Eve, and Cara's forced audit revealed inconsistencies, I'll vote for Eve.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1632,
+                        "completion_tokens": 1547,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 5,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "I think Anna is a wolf."
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1861,
+                        "completion_tokens": 1328,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 5,
+            "result": {
+                "type": "text",
+                "content": "I made my statement during the day discussion. Now, the phase will transition to voting, where I'll strategize my vote to eliminate a suspect while avoiding detection as a wolf.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1935,
+                        "completion_tokens": 1314,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 6,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "Eve's accusations are inconsistent; she's likely a wolf. Let's vote her out."
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1636,
+                        "completion_tokens": 1208,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 6,
+            "result": {
+                "type": "text",
+                "content": "",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1722,
+                        "completion_tokens": 2078,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 1,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_vote",
+                        "arguments": {
+                            "reason": "Dan's statements are inconsistent.",
+                            "target": 4
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 2014,
+                        "completion_tokens": 3482,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 1,
+            "result": {
+                "type": "text",
+                "content": "I voted to eliminate Dan (seat 4) for his inconsistent statements.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 2088,
+                        "completion_tokens": 1752,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 4,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_vote",
+                        "arguments": {
+                            "reason": "Eve's accusations are inconsistent and contradictory; she likely hides her wolf identity.",
+                            "target": 5
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1794,
+                        "completion_tokens": 1337,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 4,
+            "result": {
+                "type": "text",
+                "content": "Voted to eliminate Eve (seat 5) for inconsistent accusations.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1878,
+                        "completion_tokens": 1255,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 5,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_vote",
+                        "arguments": {
+                            "reason": "Dan's statements are inconsistent.",
+                            "target": 4
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 2112,
+                        "completion_tokens": 2511,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 5,
+            "result": {
+                "type": "text",
+                "content": "I voted for Dan (seat 4) because his statements about consistency contradict his role as a villager.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 2186,
+                        "completion_tokens": 1608,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 6,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_vote",
+                        "arguments": {
+                            "reason": "Eve's accusations are inconsistent and contradictory; she likely hides her wolf identity.",
+                            "target": 5
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1893,
+                        "completion_tokens": 835,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 6,
+            "result": {
+                "type": "text",
+                "content": "I voted for Eve (seat 5) due to her inconsistent accusations. The vote will eliminate her if she has the most votes.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1977,
+                        "completion_tokens": 584,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 1,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_choose_victim",
+                        "arguments": {
+                            "target": 3
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 2225,
+                        "completion_tokens": 1091,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 1,
+            "result": {
+                "type": "text",
+                "content": "I have chosen seat 3 as the victim.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 2292,
+                        "completion_tokens": 1005,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 5,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_choose_victim",
+                        "arguments": {
+                            "target": 3
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 2300,
+                        "completion_tokens": 2269,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 5,
+            "result": {
+                "type": "text",
+                "content": "Killed Cara (seat 3) as planned. The wolves' strategy is working—eliminating the village's strongest defender. Now the villagers will panic over the loss of seat 3.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 2367,
+                        "completion_tokens": 848,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        }
+    ]
+}

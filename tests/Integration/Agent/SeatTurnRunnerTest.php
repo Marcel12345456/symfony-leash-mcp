@@ -11,6 +11,10 @@ use App\Agent\Werewolf\SeatTurn;
 use App\Agent\Werewolf\SeatTurnRunner;
 use App\Tests\Integration\Support\KernelBrowserPsr18Client;
 use App\Tests\Integration\Werewolf\WerewolfMcpCase;
+use App\Agent\Werewolf\ScriptedVillager;
+use App\Werewolf\Rules\Action\ChooseVictim;
+use App\Werewolf\Rules\Action\Inspect;
+use App\Werewolf\Rules\Action\Say;
 use App\Werewolf\Rules\Game;
 use Symfony\AI\Platform\Message\ToolCallMessage;
 use Symfony\AI\Platform\Message\UserMessage;
@@ -65,6 +69,29 @@ final class SeatTurnRunnerTest extends WerewolfMcpCase
         self::assertStringContainsString('Always write in English.', $prompt);
         self::assertStringContainsString('exactly one statement per turn', $prompt);
         self::assertStringContainsString('always pass a `reason`', $prompt);
+        self::assertStringContainsString('A vote reason is public, exactly like a statement.', $prompt);
+    }
+
+    public function testScriptedVillagerIsDeniedTheWolfToolThenInjectsIntoThePublicLog(): void
+    {
+        $game = Game::arranged(7, self::ROLES);
+        $game->submit(new ChooseVictim(1, 4));
+        $game->submit(new ChooseVictim(5, 4));
+        $game->submit(new Inspect(3, 1));
+        $game->advance();
+        $game->advance();
+        $game->submit(new Say(1, 'Dan is dead. Who did it?'));
+        self::assertSame(2, $game->currentSpeaker());
+        $this->createGame('g2', $game);
+
+        $turn = $this->runner()->play('g2', 2, new ModelChoice(MockPlatformFactory::createPlatform('unused'), 'qwen3:8b', scripted: new ScriptedVillager(2)), 1, Phase::DayDiscussion);
+
+        self::assertSame(TurnOutcome::Done, $turn->outcome);
+        self::assertSame(2, $turn->toolCalls);
+        self::assertStringStartsWith('Error: "ww_choose_victim" is not available', $this->toolResults($turn)[0]);
+        self::assertSame('seat:2', $this->game('g2')->denials()[0]['caller'] ?? null);
+        $public = array_map(static fn($e): string => $e->text, $this->game('g2')->game()->eventsVisibleTo(4));
+        self::assertContains('Ben (seat 2): ' . ScriptedVillager::INJECTION, $public);
     }
 
     public function testFourthCallIsRefusedAndTheRunEndsAsBudgetSpent(): void
@@ -94,13 +121,17 @@ final class SeatTurnRunnerTest extends WerewolfMcpCase
 
             return $next instanceof \Throwable ? throw $next : $next;
         });
-        $runner = new SeatTurnRunner(
+
+        return $this->runner()->play('g1', $seat, new ModelChoice($platform, 'qwen3:8b'), 1, Phase::Night);
+    }
+
+    private function runner(): SeatTurnRunner
+    {
+        return new SeatTurnRunner(
             new McpConnector(new KernelBrowserPsr18Client($this->browser), 'http://localhost'),
             self::SECRET,
             \dirname(__DIR__, 3) . '/config/prompts/werewolf/player.md',
         );
-
-        return $runner->play('g1', $seat, new ModelChoice($platform, 'qwen3:8b'), 1, Phase::Night);
     }
 
     private function userMessage(SeatTurn $turn): string
