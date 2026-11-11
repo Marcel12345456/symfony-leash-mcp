@@ -23,7 +23,7 @@
 
 ## Next prompt
 
-G1 gate: read docs/PROGRESS.md "Current" and the M5 evidence, then decide headline or fallback and record it under "Decisions"; after that, /phase M6
+/phase G1 — human watches the recorded game (make werewolf, var/werewolf/seed-7.md), decides headline or fallback, record under Decisions; then /phase M6
 
 ## M5 notes
 
