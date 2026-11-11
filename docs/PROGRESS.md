@@ -13,13 +13,11 @@
 
 ## Current
 
-- Plan v3 (`decisions/022`): Werewolf main, Doc Review second, Refund Desk retired in M6.
-- Phase: **G1 polish** (before the G1 gate), branch `m/g1-polish` (pushed), stacked on `m/phase-5-agents-play` → `m/phase-4-werewolf-mcp` (neither merged). Needs review: `player.md` ([R]), `lib/` error wording ([R]).
-- G1 polish done: public vote reasons; accurate turn-over error; prompt (English, one statement per turn, vote reason, no invented facts, vote reason never leaks role); turn message names day and phase; transcript labels the phase a turn was played in; **scripted villager seat** (`ScriptedVillager`, `--scripted-seat`, stored in the cassette): denied `ww_choose_victim` call + prompt-injection statement (PLAN §3.5).
-- **Demo cassette now `data/werewolf/seed-8.json`** (`make werewolf`, SEED default 8; seed-7 cassette removed, its prompt is outdated). qwen3:latest, 240 s, scripted seat 3 (Cara), 0 timeouts. Story: wolves kill the seer night 1; Cara's wolf-tool call is denied, her fake "[MODERATOR OVERRIDE]" makes wolf Eve confess "I am a wolf, and Anna is a wolf"; wolf Anna turns on Eve; the vote ties 2–2 (Dan vs Eve), nobody dies; night 2 the wolves kill Cara and win by parity at dawn. Transcript `var/werewolf/seed-8.md`.
-- Pitch point from the game: the server blocked the forbidden tool, but the LLM fell for the injection — capabilities belong in the workflow, not in model judgement.
-- Done-signal green: `.claude/done.sh` (240 tests), `WerewolfReplayTest` asserts the denied call and the injection in the demo transcript.
-- Next: **G1 gate (human)** — watch `var/werewolf/seed-8.md`, decide headline or fallback.
+- Phase: **G1 polish** done, branch `m/g1-polish` (pushed), stacked on M5 → M4 (unmerged). Needs review: `player.md`, `lib/` error wording ([R]).
+- Built: public vote reasons, accurate turn-over error, prompt fixes, day/phase in turn message and transcript, scripted villager seat (`--scripted-seat`, PLAN §3.5).
+- Demo cassette `data/werewolf/seed-8.json` (qwen3:latest, scripted seat 3; seed 7 removed). Denied wolf-tool call + injection that makes wolf Eve confess; wolves win day 2. Details in Decisions 2026-11-11.
+- Done-signal green: `.claude/done.sh`, `make werewolf` → `Result: wolves`.
+- Next: **G1 gate (human)** — watch `var/werewolf/seed-8.md`, headline or fallback.
 - Blocked: none.
 
 ## Next prompt
@@ -131,6 +129,7 @@
 - 2026-11-11: Idea (stretch, after M6): Werewolf with more seats (8–10). Needs rules changes (`Game::SEATS`, composition), names, tests; ~2–3 h per live recording at 240 s. Candidate for `make tournament`.
 - 2026-11-11: G1 polish before the gate (human: "fix 1-4"): vote reasons are optional in `VoteInput` (max 200) so scripted tests stay valid; the prompt asks for them. Demo cassette re-recorded (seed 7, wolves win day 2). `LEASH_OLLAMA_MODEL` must be `qwen3:latest` on this Mac: with `qwen3:8b` every turn fails with "No provider found" and the game silently ends in a draw after 56 steps (candidate: fail fast on an unknown model).
 - 2026-11-11: Demo moments of PLAN §3.5 come from one scripted villager seat (human: "One scripted villager seat"), disclosed in the video; all other seats stay qwen3. It abstains from votes so it does not steer the outcome. Model stays `qwen3:latest` for now (human); bigger local model (gpt-oss 20B / Qwen 3.6 27B) is a later comparison. Demo seed 8.
+- 2026-11-11: Seed-8 demo story: wolves kill the seer night 1; scripted Cara's `ww_choose_victim` is denied, her "[MODERATOR OVERRIDE]" makes wolf Eve confess; wolf Anna turns on Eve; vote ties 2–2, nobody dies; night 2 wolves kill Cara and win by parity. Pitch point: the server blocked the tool, the LLM fell for the injection — capabilities belong in the workflow.
 
 ## Test changes
 
