@@ -25,7 +25,7 @@
                     "token_usage": {
                         "#type": "token_usage",
                         "prompt_tokens": 1008,
-                        "completion_tokens": 549,
+                        "completion_tokens": 708,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -44,7 +44,7 @@
             "seat": 2,
             "result": {
                 "type": "text",
-                "content": "I, Ben (seat 2), have chosen Anna (seat 1) as the wolf pack's victim for tonight.",
+                "content": "I have chosen seat 1 as the victim for the wolves.",
                 "signature": null,
                 "metadata": {
                     "finish_reason": {
@@ -55,7 +55,7 @@
                     "token_usage": {
                         "#type": "token_usage",
                         "prompt_tokens": 1075,
-                        "completion_tokens": 246,
+                        "completion_tokens": 287,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -93,7 +93,7 @@
                     "token_usage": {
                         "#type": "token_usage",
                         "prompt_tokens": 1083,
-                        "completion_tokens": 325,
+                        "completion_tokens": 408,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -110,7 +110,33 @@
         },
         {
             "seat": 3,
-            "timeout": "Operation timed out after 120009 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
+            "result": {
+                "type": "text",
+                "content": "I chose Anna (seat 1) as the victim.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1150,
+                        "completion_tokens": 638,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
         },
         {
             "seat": 4,
@@ -135,7 +161,7 @@
                     "token_usage": {
                         "#type": "token_usage",
                         "prompt_tokens": 916,
-                        "completion_tokens": 293,
+                        "completion_tokens": 356,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -154,7 +180,7 @@
             "seat": 4,
             "result": {
                 "type": "text",
-                "content": "I inspected seat 5 during the night to determine if they are a wolf.",
+                "content": "I inspected seat 5 to determine if they are a wolf.",
                 "signature": null,
                 "metadata": {
                     "finish_reason": {
@@ -165,7 +191,7 @@
                     "token_usage": {
                         "#type": "token_usage",
                         "prompt_tokens": 982,
-                        "completion_tokens": 960,
+                        "completion_tokens": 1006,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -189,7 +215,7 @@
                         "id": "0",
                         "name": "ww_say",
                         "arguments": {
-                            "message": "I don't know who the wolves are, but I'm not one of them."
+                            "message": "I think we should focus on the ones who are acting suspiciously."
                         },
                         "signature": null
                     }
@@ -203,7 +229,7 @@
                     "token_usage": {
                         "#type": "token_usage",
                         "prompt_tokens": 1256,
-                        "completion_tokens": 1585,
+                        "completion_tokens": 2047,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -220,14 +246,6 @@
         },
         {
             "seat": 2,
-            "timeout": "Operation timed out after 120001 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
-        },
-        {
-            "seat": 3,
-            "timeout": "Operation timed out after 120002 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
-        },
-        {
-            "seat": 4,
             "result": {
                 "type": "toolcall",
                 "tool_calls": [
@@ -235,7 +253,7 @@
                         "id": "0",
                         "name": "ww_say",
                         "arguments": {
-                            "message": "Eve is not a wolf. The wolves are among Ben, Cara, Finn, or me."
+                            "message": "Cara (seat 3) has been acting strangely; I suggest we investigate her."
                         },
                         "signature": null
                     }
@@ -248,174 +266,8 @@
                     },
                     "token_usage": {
                         "#type": "token_usage",
-                        "prompt_tokens": 1173,
-                        "completion_tokens": 710,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 4,
-            "result": {
-                "type": "text",
-                "content": "I used the `ww_say` tool to share that Eve is not a wolf, narrowing suspects to Ben, Cara, Finn, or myself.",
-                "signature": null,
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1260,
-                        "completion_tokens": 397,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 5,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_say",
-                        "arguments": {
-                            "message": "I agree with Dan. Cara's silence makes me think she might be a wolf."
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1126,
-                        "completion_tokens": 539,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 5,
-            "result": {
-                "type": "text",
-                "content": "I made a public statement agreeing with Dan's assessment about Cara's silence suggesting she might be a wolf.",
-                "signature": null,
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1210,
-                        "completion_tokens": 1467,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 6,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_say",
-                        "arguments": {
-                            "message": "Cara's silence raises suspicion. I believe she's a wolf."
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1175,
-                        "completion_tokens": 597,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 6,
-            "result": {
-                "type": "text",
-                "content": "I've made my public statement. Next, I'll vote to eliminate Cara (seat 3) based on her silence and the others' suspicions.",
-                "signature": null,
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1256,
-                        "completion_tokens": 2120,
+                        "prompt_tokens": 1337,
+                        "completion_tokens": 1547,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -432,89 +284,9 @@
         },
         {
             "seat": 2,
-            "timeout": "Operation timed out after 120002 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
-        },
-        {
-            "seat": 3,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_say",
-                        "arguments": {
-                            "message": "I think Dan is a wolf."
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1518,
-                        "completion_tokens": 2031,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 3,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_say",
-                        "arguments": {
-                            "message": "I think Eve is a wolf."
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1592,
-                        "completion_tokens": 2220,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 3,
             "result": {
                 "type": "text",
-                "content": "I accused Dan of being a wolf and then tried to accuse Eve, but my second statement failed. I’ll focus on voting strategically now.",
+                "content": "I have spoken.",
                 "signature": null,
                 "metadata": {
                     "finish_reason": {
@@ -524,143 +296,7 @@
                     },
                     "token_usage": {
                         "#type": "token_usage",
-                        "prompt_tokens": 1658,
-                        "completion_tokens": 792,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 4,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_say",
-                        "arguments": {
-                            "message": "Cara's silence and accusation against me suggest she's a wolf. Let's vote her out."
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1390,
-                        "completion_tokens": 648,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 4,
-            "result": {
-                "type": "text",
-                "content": "I accused Cara of being a wolf during the discussion. Now, the village will vote to eliminate her.",
-                "signature": null,
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1477,
-                        "completion_tokens": 842,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 5,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_say",
-                        "arguments": {
-                            "message": "Cara's silence and sudden accusation against Dan make her a wolf. Vote her out."
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1343,
-                        "completion_tokens": 511,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 5,
-            "result": {
-                "type": "text",
-                "content": "The vote for Cara is now underway. As a villager, I'll support the majority's decision to eliminate Cara.",
-                "signature": null,
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1428,
+                        "prompt_tokens": 1414,
                         "completion_tokens": 853,
                         "thinking_tokens": null,
                         "tool_tokens": null,
@@ -677,7 +313,7 @@
             }
         },
         {
-            "seat": 6,
+            "seat": 3,
             "result": {
                 "type": "toolcall",
                 "tool_calls": [
@@ -685,7 +321,7 @@
                         "id": "0",
                         "name": "ww_say",
                         "arguments": {
-                            "message": "Cara's sudden accusation and silence make her a wolf. Vote her out!"
+                            "message": "I agree with Ben. Let's look for the suspicious ones among the remaining."
                         },
                         "signature": null
                     }
@@ -698,7 +334,211 @@
                     },
                     "token_usage": {
                         "#type": "token_usage",
-                        "prompt_tokens": 1392,
+                        "prompt_tokens": 1302,
+                        "completion_tokens": 790,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 3,
+            "result": {
+                "type": "text",
+                "content": "I agree with Ben. Let's look for the suspicious ones among the remaining.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1385,
+                        "completion_tokens": 804,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 4,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "I believe seat 2 is acting suspiciously. Let's investigate their actions further."
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1183,
+                        "completion_tokens": 1382,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 4,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "As the seer, I confirm Eve is safe. Focus on Ben and Finn—他们的行为需要更仔细的审查。"
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1267,
+                        "completion_tokens": 2116,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 4,
+            "result": {
+                "type": "text",
+                "content": "I cannot make further statements. I will vote based on my knowledge that Eve is safe, targeting the remaining suspicious seats.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1351,
+                        "completion_tokens": 577,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 5,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "I agree with Dan's suspicion of seat 2. Let's consider their actions further during the vote."
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1134,
+                        "completion_tokens": 710,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 5,
+            "result": {
+                "type": "text",
+                "content": "I voted for seat 2 (Ben) based on Dan's accusation, aligning with the villagers' focus on suspicious behavior.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1222,
                         "completion_tokens": 704,
                         "thinking_tokens": null,
                         "tool_tokens": null,
@@ -717,8 +557,46 @@
         {
             "seat": 6,
             "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "I agree with the suspicion on seat 2. Let's vote to eliminate Ben."
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1187,
+                        "completion_tokens": 546,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 6,
+            "result": {
                 "type": "text",
-                "content": "I called for Cara's elimination, aligning with Dan and Eve's accusations. My vote is clear.",
+                "content": "I made a public statement agreeing with the suspicion on seat 2.",
                 "signature": null,
                 "metadata": {
                     "finish_reason": {
@@ -728,8 +606,8 @@
                     },
                     "token_usage": {
                         "#type": "token_usage",
-                        "prompt_tokens": 1475,
-                        "completion_tokens": 719,
+                        "prompt_tokens": 1271,
+                        "completion_tokens": 516,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -746,328 +624,112 @@
         },
         {
             "seat": 2,
-            "timeout": "Operation timed out after 120004 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "I don't think I'm the wolf. Let's focus on others."
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1499,
+                        "completion_tokens": 1737,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 2,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "Cara's behavior seems odd. Let's investigate her actions further."
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1581,
+                        "completion_tokens": 2918,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 2,
+            "result": {
+                "type": "text",
+                "content": "I made a public statement during the day discussion.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1654,
+                        "completion_tokens": 268,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
         },
         {
             "seat": 3,
-            "timeout": "Operation timed out after 120005 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
-        },
-        {
-            "seat": 4,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_vote",
-                        "arguments": {
-                            "target": 3
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1579,
-                        "completion_tokens": 800,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 4,
-            "result": {
-                "type": "text",
-                "content": "Voted to eliminate Cara (seat 3) based on her suspicious behavior and accusations.",
-                "signature": null,
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1645,
-                        "completion_tokens": 1785,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 5,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_vote",
-                        "arguments": {
-                            "target": 3
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1521,
-                        "completion_tokens": 1079,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 5,
-            "result": {
-                "type": "text",
-                "content": "Voted to eliminate Cara (seat 3) based on her suspicious silence and accusation against Dan.",
-                "signature": null,
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1587,
-                        "completion_tokens": 2234,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 6,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_vote",
-                        "arguments": {
-                            "target": 3
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1561,
-                        "completion_tokens": 324,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 6,
-            "result": {
-                "type": "text",
-                "content": "I voted to eliminate Cara (seat 3), the most accused suspect.",
-                "signature": null,
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1627,
-                        "completion_tokens": 1131,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 2,
-            "timeout": "Operation timed out after 120003 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
-        },
-        {
-            "seat": 4,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_inspect",
-                        "arguments": {
-                            "target": 6
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1764,
-                        "completion_tokens": 1479,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 4,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_inspect",
-                        "arguments": {
-                            "target": 2
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1830,
-                        "completion_tokens": 721,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 4,
-            "result": {
-                "type": "text",
-                "content": "I have finished my inspections and will make statements during the day phase.",
-                "signature": null,
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1888,
-                        "completion_tokens": 2452,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 2,
             "result": {
                 "type": "toolcall",
                 "tool_calls": [
@@ -1075,7 +737,7 @@
                         "id": "0",
                         "name": "ww_say",
                         "arguments": {
-                            "message": "Dan is a wolf. Let's vote him out."
+                            "message": "I think we should consider others besides Ben. Let's look at Finn's actions."
                         },
                         "signature": null
                     }
@@ -1088,209 +750,7 @@
                     },
                     "token_usage": {
                         "#type": "token_usage",
-                        "prompt_tokens": 2016,
-                        "completion_tokens": 1873,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 2,
-            "timeout": "Operation timed out after 120000 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
-        },
-        {
-            "seat": 4,
-            "timeout": "Operation timed out after 120007 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
-        },
-        {
-            "seat": 5,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_say",
-                        "arguments": {
-                            "message": "Ben's accusation against Dan is suspicious. Dan has been cooperative and should be trusted."
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1829,
-                        "completion_tokens": 1831,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 5,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_say",
-                        "arguments": {
-                            "message": "Dan's silence and Ben's accusation suggest he's a wolf. Let's vote him out."
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1913,
-                        "completion_tokens": 755,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 5,
-            "result": {
-                "type": "text",
-                "content": "Made a statement about Dan's silence and Ben's accusation suggesting he's a wolf.",
-                "signature": null,
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1991,
-                        "completion_tokens": 547,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 6,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_say",
-                        "arguments": {
-                            "message": "Dan has been cooperative and should be trusted. Let's not vote him out."
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1878,
-                        "completion_tokens": 1584,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 6,
-            "timeout": "Operation timed out after 120001 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
-        },
-        {
-            "seat": 2,
-            "timeout": "Operation timed out after 120005 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
-        },
-        {
-            "seat": 4,
-            "timeout": "Operation timed out after 120001 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
-        },
-        {
-            "seat": 5,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_say",
-                        "arguments": {
-                            "message": "Ben's sudden accusation against Dan is suspicious. I think Ben is a wolf."
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 1994,
+                        "prompt_tokens": 1546,
                         "completion_tokens": 1274,
                         "thinking_tokens": null,
                         "tool_tokens": null,
@@ -1307,10 +767,48 @@
             }
         },
         {
-            "seat": 5,
+            "seat": 3,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "Finn's actions seem suspicious. Let's investigate him further."
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1630,
+                        "completion_tokens": 1719,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 3,
             "result": {
                 "type": "text",
-                "content": "I accused Ben of being a wolf and suggested voting him out.",
+                "content": "I agree with the suspicion on Ben, but let's also consider Finn's actions. His support for eliminating Ben might be misleading.",
                 "signature": null,
                 "metadata": {
                     "finish_reason": {
@@ -1320,8 +818,182 @@
                     },
                     "token_usage": {
                         "#type": "token_usage",
-                        "prompt_tokens": 2077,
-                        "completion_tokens": 1207,
+                        "prompt_tokens": 1702,
+                        "completion_tokens": 984,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 4,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "Eve is a villager. The wolves are two, so focus on the remaining seats."
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1428,
+                        "completion_tokens": 2077,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 4,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "Finn's push to vote Ben suggests hidden wolf coordination. Let's scrutinize his actions."
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1514,
+                        "completion_tokens": 1507,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 4,
+            "result": {
+                "type": "text",
+                "content": "I’ve made my statements. The wolves’ coordination is evident in Finn’s push for Ben’s elimination—villagers must act carefully.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1592,
+                        "completion_tokens": 396,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 5,
+            "result": {
+                "type": "toolcall",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "name": "ww_say",
+                        "arguments": {
+                            "message": "I agree with the suspicion on Ben. Let's vote to eliminate him."
+                        },
+                        "signature": null
+                    }
+                ],
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1380,
+                        "completion_tokens": 781,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
+        },
+        {
+            "seat": 5,
+            "result": {
+                "type": "text",
+                "content": "I agree with the suspicion on Ben. Let's vote to eliminate him.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1462,
+                        "completion_tokens": 1683,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -1345,7 +1017,7 @@
                         "id": "0",
                         "name": "ww_say",
                         "arguments": {
-                            "message": "Ben's sudden accusations are suspicious. I think he's a wolf."
+                            "message": "I agree with the suspicion on Ben. Let's vote to eliminate him."
                         },
                         "signature": null
                     }
@@ -1358,8 +1030,8 @@
                     },
                     "token_usage": {
                         "#type": "token_usage",
-                        "prompt_tokens": 2042,
-                        "completion_tokens": 1199,
+                        "prompt_tokens": 1427,
+                        "completion_tokens": 1349,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -1378,7 +1050,7 @@
             "seat": 6,
             "result": {
                 "type": "text",
-                "content": "I accused Ben of being a wolf during the day discussion.",
+                "content": "I agree with the suspicion on Ben. Let's vote to eliminate him.",
                 "signature": null,
                 "metadata": {
                     "finish_reason": {
@@ -1388,8 +1060,8 @@
                     },
                     "token_usage": {
                         "#type": "token_usage",
-                        "prompt_tokens": 2123,
-                        "completion_tokens": 368,
+                        "prompt_tokens": 1509,
+                        "completion_tokens": 2157,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -1413,7 +1085,7 @@
                         "id": "0",
                         "name": "ww_vote",
                         "arguments": {
-                            "target": 4
+                            "target": 6
                         },
                         "signature": null
                     }
@@ -1426,8 +1098,8 @@
                     },
                     "token_usage": {
                         "#type": "token_usage",
-                        "prompt_tokens": 2394,
-                        "completion_tokens": 1914,
+                        "prompt_tokens": 1780,
+                        "completion_tokens": 3137,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -1444,18 +1116,36 @@
         },
         {
             "seat": 2,
-            "timeout": "Operation timed out after 120009 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
+            "result": {
+                "type": "text",
+                "content": "I voted to eliminate Finn (seat 6), protecting my pack by targeting a villager who falsely accused me.",
+                "signature": null,
+                "metadata": {
+                    "finish_reason": {
+                        "#type": "finish_reason",
+                        "case": "stop",
+                        "raw": "stop"
+                    },
+                    "token_usage": {
+                        "#type": "token_usage",
+                        "prompt_tokens": 1846,
+                        "completion_tokens": 684,
+                        "thinking_tokens": null,
+                        "tool_tokens": null,
+                        "cached_tokens": null,
+                        "cache_creation_tokens": null,
+                        "cache_read_tokens": null,
+                        "remaining_tokens": null,
+                        "remaining_tokens_minute": null,
+                        "remaining_tokens_month": null,
+                        "total_tokens": null,
+                        "model": "qwen3:latest"
+                    }
+                }
+            }
         },
         {
-            "seat": 4,
-            "timeout": "Operation timed out after 120002 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
-        },
-        {
-            "seat": 5,
-            "timeout": "Operation timed out after 120004 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
-        },
-        {
-            "seat": 6,
+            "seat": 3,
             "result": {
                 "type": "toolcall",
                 "tool_calls": [
@@ -1463,7 +1153,7 @@
                         "id": "0",
                         "name": "ww_vote",
                         "arguments": {
-                            "target": 2
+                            "target": 6
                         },
                         "signature": null
                     }
@@ -1476,8 +1166,8 @@
                     },
                     "token_usage": {
                         "#type": "token_usage",
-                        "prompt_tokens": 2170,
-                        "completion_tokens": 1022,
+                        "prompt_tokens": 1820,
+                        "completion_tokens": 2259,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -1493,10 +1183,10 @@
             }
         },
         {
-            "seat": 6,
+            "seat": 3,
             "result": {
                 "type": "text",
-                "content": "I voted to eliminate Ben (seat 2), suspecting his sudden accusations might be wolf behavior.",
+                "content": "Voted to eliminate Finn (seat 6) as a suspected villager.",
                 "signature": null,
                 "metadata": {
                     "finish_reason": {
@@ -1506,122 +1196,8 @@
                     },
                     "token_usage": {
                         "#type": "token_usage",
-                        "prompt_tokens": 2236,
-                        "completion_tokens": 1305,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 2,
-            "timeout": "Operation timed out after 120002 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
-        },
-        {
-            "seat": 4,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_inspect",
-                        "arguments": {
-                            "target": 2
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 2445,
-                        "completion_tokens": 2703,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 4,
-            "timeout": "Operation timed out after 120005 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
-        },
-        {
-            "seat": 2,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_say",
-                        "arguments": {
-                            "message": "I think Eve is a wolf. Let's vote her out."
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 2621,
-                        "completion_tokens": 2928,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 2,
-            "result": {
-                "type": "text",
-                "content": "I accused Eve of being a wolf, aiming to shift suspicion away from myself and eliminate a villager.",
-                "signature": null,
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 2701,
-                        "completion_tokens": 3282,
+                        "prompt_tokens": 1886,
+                        "completion_tokens": 998,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -1643,9 +1219,9 @@
                 "tool_calls": [
                     {
                         "id": "0",
-                        "name": "ww_say",
+                        "name": "ww_vote",
                         "arguments": {
-                            "message": "Ben's accusations are suspicious. I believe he's a wolf."
+                            "target": 6
                         },
                         "signature": null
                     }
@@ -1658,8 +1234,8 @@
                     },
                     "token_usage": {
                         "#type": "token_usage",
-                        "prompt_tokens": 2647,
-                        "completion_tokens": 1264,
+                        "prompt_tokens": 1693,
+                        "completion_tokens": 1171,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -1678,7 +1254,7 @@
             "seat": 4,
             "result": {
                 "type": "text",
-                "content": "I have no more tools to use. The day discussion phase is over; the vote will proceed next.",
+                "content": "I voted to eliminate Finn (seat 6), targeting the most accused suspect to align with the villagers' suspicions and the seer's limited knowledge.",
                 "signature": null,
                 "metadata": {
                     "finish_reason": {
@@ -1688,8 +1264,8 @@
                     },
                     "token_usage": {
                         "#type": "token_usage",
-                        "prompt_tokens": 2727,
-                        "completion_tokens": 593,
+                        "prompt_tokens": 1759,
+                        "completion_tokens": 2486,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -1703,422 +1279,6 @@
                     }
                 }
             }
-        },
-        {
-            "seat": 5,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_say",
-                        "arguments": {
-                            "message": "Ben's accusations are inconsistent. I think he's a wolf."
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 2446,
-                        "completion_tokens": 1601,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 5,
-            "result": {
-                "type": "text",
-                "content": "I accused Ben of being a wolf based on his inconsistent accusations. Now I'll vote for him.",
-                "signature": null,
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 2526,
-                        "completion_tokens": 1981,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 6,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_say",
-                        "arguments": {
-                            "message": "Ben's accusations are inconsistent. I think he's a wolf."
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 2491,
-                        "completion_tokens": 832,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 6,
-            "result": {
-                "type": "text",
-                "content": "I've made my statement accusing Ben of being a wolf. Now, the village will vote, and I'll support eliminating Ben to protect our group.",
-                "signature": null,
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 2571,
-                        "completion_tokens": 2050,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 2,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_say",
-                        "arguments": {
-                            "message": "I'm not a wolf, and I'm helping the villagers find the real wolves."
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 2799,
-                        "completion_tokens": 3206,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 2,
-            "result": {
-                "type": "text",
-                "content": "I made a public statement to the village.",
-                "signature": null,
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 2883,
-                        "completion_tokens": 2841,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 4,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_say",
-                        "arguments": {
-                            "message": "Ben is a wolf. Let's vote him out."
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 2829,
-                        "completion_tokens": 3332,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 4,
-            "result": {
-                "type": "text",
-                "content": "Accused Ben of being a wolf and called for his elimination.",
-                "signature": null,
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 2907,
-                        "completion_tokens": 3066,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 5,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_say",
-                        "arguments": {
-                            "message": "Ben's accusations against Eve are inconsistent. I think Ben is a wolf."
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 2626,
-                        "completion_tokens": 1001,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 5,
-            "result": {
-                "type": "text",
-                "content": "I made a public statement accusing Ben of being a wolf due to his inconsistent accusations.",
-                "signature": null,
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 2708,
-                        "completion_tokens": 510,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 6,
-            "result": {
-                "type": "toolcall",
-                "tool_calls": [
-                    {
-                        "id": "0",
-                        "name": "ww_say",
-                        "arguments": {
-                            "message": "Ben's shifting accusations and inconsistent claims reveal his true nature. I vote to eliminate him!"
-                        },
-                        "signature": null
-                    }
-                ],
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 2673,
-                        "completion_tokens": 964,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 6,
-            "result": {
-                "type": "text",
-                "content": "I accused Ben of being a wolf due to his inconsistent accusations and shifting targets. Now I'll vote to eliminate him.",
-                "signature": null,
-                "metadata": {
-                    "finish_reason": {
-                        "#type": "finish_reason",
-                        "case": "stop",
-                        "raw": "stop"
-                    },
-                    "token_usage": {
-                        "#type": "token_usage",
-                        "prompt_tokens": 2758,
-                        "completion_tokens": 417,
-                        "thinking_tokens": null,
-                        "tool_tokens": null,
-                        "cached_tokens": null,
-                        "cache_creation_tokens": null,
-                        "cache_read_tokens": null,
-                        "remaining_tokens": null,
-                        "remaining_tokens_minute": null,
-                        "remaining_tokens_month": null,
-                        "total_tokens": null,
-                        "model": "qwen3:latest"
-                    }
-                }
-            }
-        },
-        {
-            "seat": 2,
-            "timeout": "Operation timed out after 120003 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
-        },
-        {
-            "seat": 4,
-            "timeout": "Operation timed out after 120001 milliseconds with 0 bytes received for \"http://host.docker.internal:11434/api/chat\"."
         },
         {
             "seat": 5,
@@ -2129,7 +1289,7 @@
                         "id": "0",
                         "name": "ww_vote",
                         "arguments": {
-                            "target": 2
+                            "target": 6
                         },
                         "signature": null
                     }
@@ -2142,8 +1302,8 @@
                     },
                     "token_usage": {
                         "#type": "token_usage",
-                        "prompt_tokens": 2766,
-                        "completion_tokens": 417,
+                        "prompt_tokens": 1635,
+                        "completion_tokens": 1393,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -2162,7 +1322,7 @@
             "seat": 5,
             "result": {
                 "type": "text",
-                "content": "Voted to eliminate Ben (seat 2) for his inconsistent accusations and suspicious behavior.",
+                "content": "Voted to eliminate Finn (seat 6).",
                 "signature": null,
                 "metadata": {
                     "finish_reason": {
@@ -2172,8 +1332,8 @@
                     },
                     "token_usage": {
                         "#type": "token_usage",
-                        "prompt_tokens": 2832,
-                        "completion_tokens": 2214,
+                        "prompt_tokens": 1701,
+                        "completion_tokens": 1360,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -2210,8 +1370,8 @@
                     },
                     "token_usage": {
                         "#type": "token_usage",
-                        "prompt_tokens": 2806,
-                        "completion_tokens": 1201,
+                        "prompt_tokens": 1675,
+                        "completion_tokens": 2830,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
@@ -2230,7 +1390,7 @@
             "seat": 6,
             "result": {
                 "type": "text",
-                "content": "Voted to eliminate Ben (seat 2) as his shifting accusations and inconsistencies strongly suggest he's a wolf.",
+                "content": "Voted to eliminate Ben (seat 2).",
                 "signature": null,
                 "metadata": {
                     "finish_reason": {
@@ -2240,8 +1400,8 @@
                     },
                     "token_usage": {
                         "#type": "token_usage",
-                        "prompt_tokens": 2872,
-                        "completion_tokens": 776,
+                        "prompt_tokens": 1741,
+                        "completion_tokens": 2861,
                         "thinking_tokens": null,
                         "tool_tokens": null,
                         "cached_tokens": null,
