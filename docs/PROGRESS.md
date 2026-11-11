@@ -14,17 +14,16 @@
 ## Current
 
 - Plan v3 (`decisions/022`): Werewolf main, Doc Review second, Refund Desk retired in M6.
-- Phase: **M5 Agents play — in progress**, branch `m/phase-5-agents-play`, stacked on `m/phase-4-werewolf-mcp` (M4 not merged yet; rebase onto main after the M4 merge).
-- M5 done so far: decisions 027–032; `symfony/lock`; turn deadline (`skipSpeaker()`, `expire()`); lib `McpClientToolbox` + `TurnBudgetToolbox`; `SeatTurnRunner` + `McpConnector` over `InProcessPsr18Client` + prompt `player.md`.
-- M5 runner stretch done: `TranscriptWriter`, `NextActorRunner`, `RunNextActorHandler`, `ModelChoiceFactory` (details: M5 notes, Decisions).
-- M5 left, in order: `leash:werewolf:play --seed --record` (`ModelChoice` from `LEASH_MODEL`), `ReplayPlatform` + signature pin test (028), full-game agent test (`ScriptedSeatPlatform`, 030), live qwen3 game + cassette, `make werewolf`.
-- M5 done-signal and design: see "M5 notes".
+- Phase: **M5 Agents play — done**, branch `m/phase-5-agents-play` (pushed), stacked on `m/phase-4-werewolf-mcp` (M4 not merged yet; rebase onto main after the M4 merge). Needs review: prompt `player.md` ([R]), M4/M5 `lib/` ([R]).
+- M5 built: decisions 027–033; `McpClientToolbox`/`TurnBudgetToolbox`; `SeatTurnRunner`, `NextActorRunner`, `RunNextActorHandler`, `TranscriptWriter`; `leash:werewolf:play` (`--seed --game --model --record --cassette --max-steps`); per-seat replay (`App\Agent\Replay`, decisions/033); demo cassette `data/werewolf/seed-7.json` (live qwen3, wolves win day 1); `make werewolf`.
+- M5 done-signal green: `.claude/done.sh`; `WerewolfAgentsTest`, `NextActorRunnerTest`, `WerewolfReplayTest`, `PlayGameCommandTest`, `ReplayPlatformTest`; `make werewolf` → `Result: wolves`; live game ended with a winner, transcript `var/werewolf/rec-7.md`.
+- Next: **G1 gate (human, Fri 11-13)** — headline or fallback; M6 starts only after a G1 entry in "Decisions". Open for the demo: stage the §3.5 forbidden `ww_choose_victim` call and prompt injection in a cassette, or show them via the scripted test.
 - M2 (PR #7) and M3 (PR #6) in main. M4 branch pushed, needs review ([R] `lib/`), then merge (human).
 - Blocked: none.
 
 ## Next prompt
 
-/phase M5 — continue with the leash:werewolf:play command, then ReplayPlatform and the full-game agent test
+G1 gate: read docs/PROGRESS.md "Current" and the M5 evidence, then decide headline or fallback and record it under "Decisions"; after that, /phase M6
 
 ## M5 notes
 
@@ -144,6 +143,7 @@
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
 
+- 2026-11-11 — M5 done (with human). Built: `leash:werewolf:play` (`PlayGameCommandTest`), per-seat record/replay `SeatCassette`/`RecordingSeatProvider`/`ReplayPlatform` (`ReplayPlatformTest`, pins upstream `RecordingProvider` content-blind signature, BUGS.md), `WerewolfAgentsTest` (full scripted game: denial, budget 3, deadline), `WerewolfReplayTest`, `make werewolf`, demo cassette seed 7 (live `qwen3:latest`, 240 s turns, wolves win day 1). Hook: context warning now counts tokens (300k, step 100k). Decision 033. Test changes: `.claude/tests/hooks.t.sh` context checks (logged). Blocked: none (laptop idle sleep hung the first recording; use `caffeinate -dims` on AC). Needs review: `player.md`, M4/M5 `lib/` ([R]). Spend: $0 (local Ollama).
 - 2026-11-10 — M5 continued (with human). Built: `TranscriptWriter` (`var/werewolf/<game>.md`, last line `Result: …`), `NextActorRunner` + `Step`/`StepOutcome` (lock, pause, `actorsAmong` round, deadline via `expire()`), `RunNextActorHandler` (chains until game over), `ModelChoiceFactory` (`LEASH_MODEL`, own Ollama HttpClient timeout), test helper `ScriptedSeatPlatform`; new env vars in `.env`/`.env.test`; parameter `leash.werewolf.transcripts`. Tests: `TranscriptWriterTest` (3), `NextActorRunnerTest` (3), `RunNextActorHandlerTest` (3). Test changes: none. Blocked: none. Needs review: prompt `player.md` and M4/M5 `lib/` ([R], unchanged this stretch). Spend: $0.
 
 - 2026-11-10 — M5 continued (with human). VERIFY → decisions 030 (scripted fake platform via `MockPlatformFactory`), 031 (MCP client toolbox API, in-process session pinned), 032 (turn exceptions: raw HttpClient transport errors, transcript accessors). Built: lib `McpClientToolbox` (bare names, server errors as text, empty-properties schema → null) + `TurnBudgetToolbox`; App `McpConnector`, `InProcessPsr18Client`, `ModelChoice`, `TurnOutcome`, `SeatTurnRunner`, `SeatTurn`; prompt `player.md`. Tests: `McpClientToolboxTest` (5), `SeatTurnRunnerTest` (4). BUGS.md: candidate (Ollama HTTP errors lose the body). Test changes: none. Blocked: none. Needs review: `lib/WorkflowMcp/Client` ([R]), prompt `player.md` ([R]). Spend: $0.
