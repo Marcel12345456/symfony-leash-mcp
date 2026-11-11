@@ -70,7 +70,7 @@ final readonly class NextActorRunner
                 if ($day !== $game->game()->day() || $phase !== $game->game()->phase() || !\in_array($seat, $this->actorSeats($game), true)) {
                     continue;
                 }
-                $turn = $this->turns->play($gameId, $seat, $model);
+                $turn = $this->turns->play($gameId, $seat, $model, $day, $phase);
                 $game = $this->load($gameId) ?? throw new \LogicException(\sprintf('Werewolf game "%s" vanished during a turn.', $gameId));
                 $this->transcript->turn($gameId, $day, $phase, $turn);
                 $turns[] = $turn;

@@ -7,6 +7,7 @@ namespace App\Agent\Werewolf;
 use App\Agent\McpConnector;
 use App\Agent\ModelChoice;
 use App\Agent\TurnOutcome;
+use App\Werewolf\Rules\Phase;
 use App\Werewolf\Security\WerewolfCallers;
 use Leash\WorkflowMcp\Client\McpClientToolbox;
 use Leash\WorkflowMcp\Client\TurnBudgetToolbox;
@@ -40,13 +41,13 @@ final readonly class SeatTurnRunner
         private ?float $toolTimeoutSeconds = 30.0,
     ) {}
 
-    public function play(string $gameId, int $seat, ModelChoice $model): SeatTurn
+    public function play(string $gameId, int $seat, ModelChoice $model, int $day, Phase $phase): SeatTurn
     {
         $caller = WerewolfCallers::seat($seat);
         $client = $this->connector->connect('/mcp/werewolf_game/' . $gameId, WerewolfCallers::token($this->secret, $caller), 'leash-' . $caller);
 
         try {
-            $messages = new MessageBag(Message::forSystem($this->prompt()), Message::ofUser(self::turnMessage($seat, self::resources($client))));
+            $messages = new MessageBag(Message::forSystem($this->prompt()), Message::ofUser(self::turnMessage($seat, $day, $phase, self::resources($client))));
             $toolbox = new TurnBudgetToolbox(new McpClientToolbox($client, $this->toolTimeoutSeconds), self::TOOL_BUDGET);
             $agent = new Agent($model->platform, $model->model, name: 'seat-' . $seat, toolbox: $toolbox, maxToolCalls: self::TOOL_BUDGET + 1);
 
@@ -83,15 +84,27 @@ final readonly class SeatTurnRunner
     }
 
     /** @param array<string, string> $resources */
-    private static function turnMessage(int $seat, array $resources): string
+    private static function turnMessage(int $seat, int $day, Phase $phase, array $resources): string
     {
-        $parts = [\sprintf('You are seat %d. It is your turn. Here is everything you can see right now.', $seat)];
+        $parts = [\sprintf('You are seat %d. %s It is your turn. Here is everything you can see right now.', $seat, self::situation($day, $phase))];
         foreach ($resources as $name => $text) {
             $parts[] = \sprintf("## %s\n```json\n%s\n```", $name, $text);
         }
         $parts[] = \sprintf('Act now with the tools you have (at most %d calls), then answer with one short sentence about what you did.', self::TOOL_BUDGET);
 
         return implode("\n\n", $parts);
+    }
+
+    /** Says where the game stands, so the model does not invent votes or deaths that have not happened yet. */
+    private static function situation(int $day, Phase $phase): string
+    {
+        return match ($phase) {
+            Phase::Night => \sprintf('It is night %d.', $day),
+            Phase::Dawn => \sprintf('It is dawn of day %d.', $day),
+            Phase::DayDiscussion => \sprintf('It is day %d, discussion. Nobody has voted yet today; the vote comes after the discussion. Make your one statement now.', $day),
+            Phase::DayVote => \sprintf('It is day %d, the vote. Cast your vote with a short public reason.', $day),
+            Phase::Over => 'The game is over.',
+        };
     }
 
     private function prompt(): string

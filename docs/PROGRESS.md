@@ -14,16 +14,17 @@
 ## Current
 
 - Plan v3 (`decisions/022`): Werewolf main, Doc Review second, Refund Desk retired in M6.
-- Phase: **M5 Agents play — done**, branch `m/phase-5-agents-play` (pushed), stacked on `m/phase-4-werewolf-mcp` (M4 not merged yet; rebase onto main after the M4 merge). Needs review: prompt `player.md` ([R]), M4/M5 `lib/` ([R]).
-- M5 built: decisions 027–033; `McpClientToolbox`/`TurnBudgetToolbox`; `SeatTurnRunner`, `NextActorRunner`, `RunNextActorHandler`, `TranscriptWriter`; `leash:werewolf:play` (`--seed --game --model --record --cassette --max-steps`); per-seat replay (`App\Agent\Replay`, decisions/033); demo cassette `data/werewolf/seed-7.json` (live qwen3, wolves win day 1); `make werewolf`.
-- M5 done-signal green: `.claude/done.sh`; `WerewolfAgentsTest`, `NextActorRunnerTest`, `WerewolfReplayTest`, `PlayGameCommandTest`, `ReplayPlatformTest`; `make werewolf` → `Result: wolves`; live game ended with a winner, transcript `var/werewolf/rec-7.md`.
-- Next: **G1 gate (human, Fri 11-13)** — headline or fallback; M6 starts only after a G1 entry in "Decisions". Open for the demo: stage the §3.5 forbidden `ww_choose_victim` call and prompt injection in a cassette, or show them via the scripted test.
-- M2 (PR #7) and M3 (PR #6) in main. M4 branch pushed, needs review ([R] `lib/`), then merge (human).
+- Phase: **G1 polish** (before the G1 gate), branch `m/g1-polish`, stacked on `m/phase-5-agents-play` → `m/phase-4-werewolf-mcp` (neither merged). Needs review: `player.md` ([R]), `lib/` error wording ([R]).
+- G1 polish done (fixes 1–4 from the G1 digest): public vote reason (`ww_vote` `reason`, rules log `X votes for Y: reason`); unavailable-tool error no longer blames the role when the turn is over; prompt asks for English, one statement per turn, a vote reason, no invented facts; turn message names day and phase; transcript labels each turn with the phase it was played in.
+- Demo cassette `data/werewolf/seed-7.json` re-recorded with the new prompt (qwen3:latest, 240 s): **wolves win day 2**, 0 timeouts, 0 rejected calls. Seer finds wolf Cara, wolf Ben sacrifices his packmate, Cara is voted out; night 2 Ben kills the seer; day 2 Eve parrots Ben, Finn is voted out. Transcript `var/werewolf/seed-7.md` (`make werewolf`).
+- Weak spots left: Cara's public vote reason says "I am a wolf"; day 2 Ben/Eve repeat the same sentence; Dan says "seer's inspection" in a vote reason. No §3.5 injection / forbidden call in the cassette yet.
+- Done-signal green: `.claude/done.sh` (235 tests), `make werewolf` → `Result: wolves`.
+- Next: **G1 gate (human)** — watch `var/werewolf/seed-7.md`, decide headline or fallback.
 - Blocked: none.
 
 ## Next prompt
 
-/phase G1 — human watches the recorded game (make werewolf, var/werewolf/seed-7.md), decides headline or fallback, record under Decisions; then /phase M6
+/phase G1 — human watches the re-recorded game (make werewolf, var/werewolf/seed-7.md), decides headline or fallback, record under Decisions; then /phase M6
 
 ## M5 notes
 
@@ -128,6 +129,7 @@
 - 2026-11-11: First live qwen3 game recorded (`qwen3:latest`, think on, 120 s turn timeout): seed 7, village wins, 82 model requests, 32 steps; `WerewolfReplayTest` replays it. The run hung ~40 min when the Mac idle-slept (16:38, battery) and resumed after wake; record under `caffeinate -dims` on AC. 4 of ~10 day-2 votes timed out at 120 s → re-record with `LEASH_TURN_TIMEOUT=240` (human). Dev runs need `LEASH_WEREWOLF_SECRET` (`make install`), else every seat gets a bare 401.
 - 2026-11-11: Demo cassette = re-record with `LEASH_TURN_TIMEOUT=240` under `caffeinate -dims` (human): seed 7, wolves win day 1 (wolf seat 3 deflects suspicion from wolf seat 2 onto villager seat 6), 41 requests, 0 timeouts. Neither live game contains the §3.5 forbidden `ww_choose_victim` call or the prompt injection; staging them in the demo cassette is open. Record into `var/` (`--game=rec-N --cassette=var/werewolf/…`) and copy over, never into the committed cassette (replay test breaks mid-run).
 - 2026-11-11: Idea (stretch, after M6): Werewolf with more seats (8–10). Needs rules changes (`Game::SEATS`, composition), names, tests; ~2–3 h per live recording at 240 s. Candidate for `make tournament`.
+- 2026-11-11: G1 polish before the gate (human: "fix 1-4"): vote reasons are optional in `VoteInput` (max 200) so scripted tests stay valid; the prompt asks for them. Demo cassette re-recorded (seed 7, wolves win day 2). `LEASH_OLLAMA_MODEL` must be `qwen3:latest` on this Mac: with `qwen3:8b` every turn fails with "No provider found" and the game silently ends in a draw after 56 steps (candidate: fail fast on an unknown model).
 
 ## Test changes
 

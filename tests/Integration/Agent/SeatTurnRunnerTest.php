@@ -19,6 +19,8 @@ use Symfony\AI\Platform\Result\ToolCall;
 use Symfony\AI\Platform\Result\ToolCallResult;
 use Symfony\AI\Platform\Test\MockPlatformFactory;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use App\Werewolf\Rules\Phase;
+use Symfony\AI\Platform\Message\SystemMessage;
 
 /** One seat turn over real HTTP MCP with a scripted model (decisions/030): night 1, wolves 1 and 5, seer 3. */
 final class SeatTurnRunnerTest extends WerewolfMcpCase
@@ -37,6 +39,7 @@ final class SeatTurnRunnerTest extends WerewolfMcpCase
         self::assertSame('I chose seat 2.', $turn->finalText);
         self::assertSame(1, $turn->toolCalls);
         self::assertStringContainsString('## wolf-den', $this->userMessage($turn));
+        self::assertStringStartsWith('You are seat 1. It is night 1. It is your turn.', $this->userMessage($turn));
         self::assertNotContains(1, $this->game('g1')->game()->pendingSeats());
         self::assertSame([], $this->game('g1')->denials());
     }
@@ -49,6 +52,19 @@ final class SeatTurnRunnerTest extends WerewolfMcpCase
         self::assertStringNotContainsString('wolf-den', $this->userMessage($turn));
         self::assertStringStartsWith('Error: "ww_choose_victim" is not available', $this->toolResults($turn)[0]);
         self::assertCount(1, $this->game('g1')->denials());
+    }
+
+    public function testPromptAsksForEnglishOneStatementPerTurnAndVoteReasons(): void
+    {
+        $turn = $this->play(1, 'done');
+        $system = $turn->messages->getMessages()[0] ?? null;
+        self::assertInstanceOf(SystemMessage::class, $system);
+        $prompt = $system->getContent();
+        self::assertIsString($prompt);
+
+        self::assertStringContainsString('Always write in English.', $prompt);
+        self::assertStringContainsString('exactly one statement per turn', $prompt);
+        self::assertStringContainsString('always pass a `reason`', $prompt);
     }
 
     public function testFourthCallIsRefusedAndTheRunEndsAsBudgetSpent(): void
@@ -84,7 +100,7 @@ final class SeatTurnRunnerTest extends WerewolfMcpCase
             \dirname(__DIR__, 3) . '/config/prompts/werewolf/player.md',
         );
 
-        return $runner->play('g1', $seat, new ModelChoice($platform, 'qwen3:8b'));
+        return $runner->play('g1', $seat, new ModelChoice($platform, 'qwen3:8b'), 1, Phase::Night);
     }
 
     private function userMessage(SeatTurn $turn): string
