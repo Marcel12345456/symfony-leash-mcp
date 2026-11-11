@@ -82,7 +82,7 @@ final class RefundMcpEndpointTest extends WebTestCase
         $resolver->disconnect();
 
         self::assertTrue($result->isError);
-        self::assertSame('"refund_propose_resolution" is not available to your role in state "investigating". Available now: refund_search_policy.', self::text($result));
+        self::assertSame('"refund_propose_resolution" is not available to you in state "investigating": your role cannot use it here, or your turn is over. Available now: refund_search_policy.', self::text($result));
         self::assertSame('investigating', $this->case('C1')->getStatus());
 
         $denied = $this->events('C1', CaseEventType::CapabilityDenied);

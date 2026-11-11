@@ -72,7 +72,7 @@ final readonly class NextActorRunner
                 }
                 $turn = $this->turns->play($gameId, $seat, $model);
                 $game = $this->load($gameId) ?? throw new \LogicException(\sprintf('Werewolf game "%s" vanished during a turn.', $gameId));
-                $this->transcript->turn($gameId, $game->game(), $turn);
+                $this->transcript->turn($gameId, $day, $phase, $turn);
                 $turns[] = $turn;
             }
 

@@ -7,6 +7,7 @@ namespace App\Agent\Werewolf;
 use App\Werewolf\Rules\Audience;
 use App\Werewolf\Rules\Event;
 use App\Werewolf\Rules\Game;
+use App\Werewolf\Rules\Phase;
 use Symfony\AI\Platform\Message\AssistantMessage;
 use Symfony\AI\Platform\Message\ToolCallMessage;
 use Symfony\AI\Platform\Message\UserMessage;
@@ -29,12 +30,13 @@ final readonly class TranscriptWriter
         return $this->directory . '/' . $gameId . '.md';
     }
 
-    public function turn(string $gameId, Game $game, SeatTurn $turn): void
+    /** Day and phase are the ones the turn was played in; its own call may already have moved the game on. */
+    public function turn(string $gameId, int $day, Phase $phase, SeatTurn $turn): void
     {
         $lines = [\sprintf(
             '## Day %d, %s: seat %d (%s, %d tool %s)',
-            $game->day(),
-            $game->phase()->value,
+            $day,
+            $phase->value,
             $turn->seat,
             $turn->outcome->value,
             $turn->toolCalls,

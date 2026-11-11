@@ -131,6 +131,8 @@
 
 ## Test changes
 
+- 2026-11-11: Unavailable-tool error reworded in `ToolResults::unavailable()` (`is not available to you in state "X": your role cannot use it here, or your turn is over.`), because "not available to your role" was wrong when a seat's turn had simply ended (G1 transcript L440ff.). Exact-string assertions updated in `WorkflowServerTest`, `McpClientToolboxTest`, `RefundMcpEndpointTest`, `WerewolfVisibilityTest`; same check, new wording. `TranscriptWriterTest` passes day and phase instead of a `Game` (call sites only). `WerewolfMcpGameTest` scripted votes now carry a reason and the test asserts it appears in the public log (stronger, not weaker).
+
 <!-- Every weakened, deleted, skipped or changed assertion: date, test, reason. -->
 
 - 2026-11-10: `.claude/tests/hooks.t.sh` context checks now use usage lines (tokens) instead of zero-filled KB files; "small transcript quiet" became "110k tokens quiet (700 KB transcript is fine)", plus a bytes/4 fallback check. Reason: the hook now measures real context tokens (human: warning fired at ~10% of the 1M context).
