@@ -13,14 +13,15 @@
 
 ## Current
 
-- Phase: **M7 Spectator, replay demo, exhibition — in progress**, branch `m/phase-7-spectator-demo`, stacked on `m/phase-6-human-seat-doc-review` (M6 unmerged, [R]).
-- Done-signal (human-approved 2026-11-12): (1) `DashboardWerewolfTest`: `/` renders the Werewolf tab; JSON after a replayed seed-8 game has public log, winner, denied `ww_choose_victim`, roles only with reveal. (2) `SeatPanelMatchesServerTest`: every seat × every phase of the replayed game, panel tools/resources == MCP `tools/list`/`resources/list` with that seat's token. (3) `DashboardDocReviewTest`: Mermaid with current place, timeline colours (denied/requested/transition). (4) `DemoPrepareTest`: `leash:demo:prepare` with replay and Ollama on a closed port ends with a seed-8 winner and Doc Review documents moved forward. (5) `.claude/done.sh` green. Look at 1080p = human review [R].
-- Left from M6: live Telegram smoke test (human, needs a bot token).
+- Phase: **M7 Spectator, replay demo — done** (done-signal green; [R], unmerged, needs review), branch `m/phase-7-spectator-demo` (pushed), stacked on `m/phase-6-human-seat-doc-review` (M6 unmerged, [R]).
+- Done in M7: dashboard `/` (Werewolf spectator: public log, denials, per-seat panel from `ScopedCapabilityProvider`, reveal toggle; Doc Review: Mermaid with current place (decisions/037), timeline red/amber/green), JSON `/dashboard/werewolf/{id}`, `/dashboard/doc-review`, assets `public/static/`, mermaid 11.17.2 in `public/vendor/`; replay for Doc Review + `LEASH_REPLAY_PACE` (decisions/038), cassette `data/docreview/demo.json` (qwen3:latest, 45 answers); `leash:demo:seed --reset`, `leash:demo:prepare`, `make demo` (php -S + worker + poller if telegram DSN, paced replay; smoke-run OK).
+- Done-signal: `.claude/done.sh` green (247 tests) incl. `DashboardWerewolfTest`, `SeatPanelMatchesServerTest`, `DashboardDocReviewTest`, `DemoPrepareTest`.
+- Left / needs a human: look at 1080p in light and dark ([R]; `make demo`, open http://127.0.0.1:8000/); live Telegram smoke test (from M6). Optional, not done: `make tournament` (stretch), step scrubber.
 - Blocked: none.
 
 ## Next prompt
 
-/phase M7
+/phase M8
 
 ## M5 notes
 
@@ -141,6 +142,10 @@
 
 - 2026-11-12: Replay generalised: cassette key `int|string` (Doc Review `author:d1`), prompt hash per agent set, `LEASH_REPLAY_PACE` waits before each answer, `leash:work --record/--cassette` (default `data/docreview/demo.json`); worker plays no model turns under `LEASH_MODEL=replay` (`decisions/038`).
 
+- 2026-11-12: Dashboard is public (local demo screen); without reveal it hides roles, private events and resource contents, but resource names (`wolf-den`, `seer-notes`) and night tools still show who is a wolf/seer — on purpose, that is the information hiding the demo shows ([R]). Dawn never rests between runner steps, so the panel-vs-server test covers night, day_discussion, day_vote, over.
+- 2026-11-12: Dashboard JSON routes have no `.json` suffix and assets live in `public/static/`: `php -S` 404s on file-like paths and stops at a real `public/dashboard/` directory.
+- 2026-11-12: Doc Review demo cassette recorded live (qwen3:latest, 240 s turn timeout): d1 and d3 approved after one change request, d2 after three; every editor sign-off waits for a human. Re-record after any change to `config/prompts/docreview/*.md`: `leash:demo:seed --reset && leash:work --model=ollama --record`.
+
 ## Test changes
 
 - 2026-11-12: Refund Desk retired (decisions/022; code at tag `refund-desk-v1`). Removed `tests/Integration/RefundDesk/SeedDemoCommandTest.php` (refund seed C1–C8 + H5 idempotent, reset to `received`, C3 injection). Replacement: `tests/Integration/DocReview/SeedDemoCommandTest.php` (new `leash:demo:seed` run twice, d1–d3 in `drafting`, d2 brief mentions Node 18 but not upgrade notes).
@@ -169,6 +174,8 @@
 ## Log
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
+
+- 2026-11-12 — M7 (with human). Done: dashboard (Werewolf spectator + Doc Review), decisions 037 (Mermaid) and 038 (paced replay, Doc Review cassette, worker idle under replay), `leash:demo:prepare`, `make demo`, `leash:demo:seed --reset`, README sections; 4 done-signal tests + replay/handler/seed tests. Blocked: none. Needs review ([R]): dashboard look at 1080p (light/dark), public dashboard, role hints in resource names, worker skipping model turns in replay mode, 3.5 MB vendored mermaid. Spend: $0 (local Ollama only).
 
 - 2026-11-12 — M6 Telegram (with human). Done: symfony/notifier + telegram-notifier 8.1 installed (decisions/034 re-checked), `src/Telegram` (notifier decorator, `TelegramQuestion`, `TelegramCallbacks`, `TelegramPoller`, `leash:telegram:poll`), README section, `TelegramHumanSeatTest`, `TelegramBotTest`. M6 acceptance complete. Blocked: none. Needs review ([R]): `src/Telegram`, test-only `test.telegram_http` mock in `services.yaml`, `TELEGRAM_DSN=null://null` default in `.env`; live smoke test with a real bot still open (human). Spend: $0.
 
