@@ -67,12 +67,13 @@ demo: ## make demo [PACE=2] [LEASH_MODEL=ollama]; dashboard on http://127.0.0.1:
 cs-fix:
 	$(RUN) vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php
 
-# MCP Inspector (host Node) against a Doc Review document; php -S runs in the toolchain container meanwhile.
-INSPECTOR_DOC ?= d1
-inspector: ## make inspector TOKEN=<agent bearer token> [INSPECTOR_DOC=d1]
-	@test -n "$(TOKEN)" || { echo "usage: make inspector TOKEN=<Doc Review agent token (DocReviewCallers::token)> [INSPECTOR_DOC=d1]" >&2; exit 2; }
+# MCP Inspector (host Node) as one demo caller against one subject; php -S runs in the toolchain container meanwhile.
+MCP ?= doc_review/d1
+inspector: ## make inspector CALLER=seat:1 MCP=werewolf_game/seed-8 (callers: bin/console leash:tokens), or TOKEN=<bearer token>
+	@test -n "$(TOKEN)$(CALLER)" || { echo "usage: make inspector CALLER=<seat:1|agent:reviewer|…> [MCP=werewolf_game/seed-8|doc_review/d1], or TOKEN=<bearer token>" >&2; exit 2; }
 	@node -e 'const [a,b,c]=process.versions.node.split(".").map(Number), v=b*1e4+c; process.exit((a===22&&v>=230004)||(a===24&&v>=220001)||(a===26&&v>=120001)||a>26?0:1)' \
 	  || { echo "MCP Inspector needs Node ^22.23.4, ^24.22.1 or >=26.12.1 (found $$(node --version)); e.g. nvm install 24" >&2; exit 2; }
-	@docker compose --progress quiet run -d --rm --service-ports --no-deps --name leash-inspector-php php php -S 0.0.0.0:8000 -t public >/dev/null
-	@sh -c 'trap "docker stop leash-inspector-php >/dev/null" EXIT INT TERM; \
-	  npx -y @modelcontextprotocol/inspector@2.14.0 --server-url "http://127.0.0.1:$${LEASH_PORT:-8000}/mcp/doc_review/$(INSPECTOR_DOC)" --transport http --header "Authorization: Bearer $(TOKEN)"'
+	@token="$(TOKEN)"; [ -n "$$token" ] || token="$$($(RUN) bin/console leash:tokens '$(CALLER)')" || exit 2; \
+	  docker compose --progress quiet run -d --rm --service-ports --no-deps --name leash-inspector-php php php -S 0.0.0.0:8000 -t public >/dev/null; \
+	  trap "docker stop leash-inspector-php >/dev/null" EXIT INT TERM; \
+	  npx -y @modelcontextprotocol/inspector@2.14.0 --server-url "http://127.0.0.1:$${LEASH_PORT:-8000}/mcp/$(MCP)" --transport http --header "Authorization: Bearer $$token"
