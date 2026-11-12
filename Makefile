@@ -12,12 +12,10 @@ endif
 BASE := $(shell git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main 2>/dev/null)
 CHANGED_PHP := $(sort $(filter %.php,$(shell git diff --name-only --diff-filter=ACMR $(BASE) 2>/dev/null; git ls-files --others --exclude-standard 2>/dev/null)))
 
-.PHONY: install qa qa-verbose test cs-fix inspector werewolf
+.PHONY: install qa qa-verbose test cs-fix inspector werewolf work
 
-install: ## Generates APP_SECRET, agent tokens and the inbox approver password into .env.local on first run; never overwrites them
+install: ## Generates APP_SECRET, the Werewolf token secret and the inbox approver password into .env.local on first run; never overwrites them
 	@grep -qs '^APP_SECRET=.' .env.local || echo "APP_SECRET=$$(openssl rand -hex 16)" >> .env.local
-	@grep -qs '^LEASH_INVESTIGATOR_TOKEN=.' .env.local || echo "LEASH_INVESTIGATOR_TOKEN=$$(openssl rand -hex 24)" >> .env.local
-	@grep -qs '^LEASH_RESOLVER_TOKEN=.' .env.local || echo "LEASH_RESOLVER_TOKEN=$$(openssl rand -hex 24)" >> .env.local
 	@grep -qs '^LEASH_WEREWOLF_SECRET=.' .env.local || echo "LEASH_WEREWOLF_SECRET=$$(openssl rand -hex 24)" >> .env.local
 	@grep -qs '^APPROVER_PASSWORD=.' .env.local || echo "APPROVER_PASSWORD=$$(openssl rand -hex 12)" >> .env.local
 	$(RUN) composer install --no-interaction --no-progress -q
@@ -47,15 +45,19 @@ SEED ?= 8
 werewolf: ## make werewolf [SEED=8] [LEASH_MODEL=ollama]; transcript in var/werewolf/seed-<seed>.md
 	$(RUN) bin/console leash:werewolf:play --seed=$(SEED) $(if $(LEASH_MODEL),--model=$(LEASH_MODEL))
 
+# The Doc Review agents work every open document once (Ollama; replay is not available for Doc Review yet).
+work: ## make work [LEASH_MODEL=ollama]
+	$(RUN) bin/console leash:work $(if $(LEASH_MODEL),--model=$(LEASH_MODEL))
+
 cs-fix:
 	$(RUN) vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php
 
-# MCP Inspector (host Node) against the refund endpoint; php -S runs in the toolchain container meanwhile.
-INSPECTOR_CASE ?= C1
-inspector: ## make inspector TOKEN=<agent token from .env.local> [INSPECTOR_CASE=C1]
-	@test -n "$(TOKEN)" || { echo "usage: make inspector TOKEN=<LEASH_INVESTIGATOR_TOKEN or LEASH_RESOLVER_TOKEN from .env.local> [INSPECTOR_CASE=C1]" >&2; exit 2; }
+# MCP Inspector (host Node) against a Doc Review document; php -S runs in the toolchain container meanwhile.
+INSPECTOR_DOC ?= d1
+inspector: ## make inspector TOKEN=<agent bearer token> [INSPECTOR_DOC=d1]
+	@test -n "$(TOKEN)" || { echo "usage: make inspector TOKEN=<Doc Review agent token (DocReviewCallers::token)> [INSPECTOR_DOC=d1]" >&2; exit 2; }
 	@node -e 'const [a,b,c]=process.versions.node.split(".").map(Number), v=b*1e4+c; process.exit((a===22&&v>=230004)||(a===24&&v>=220001)||(a===26&&v>=120001)||a>26?0:1)' \
 	  || { echo "MCP Inspector needs Node ^22.23.4, ^24.22.1 or >=26.12.1 (found $$(node --version)); e.g. nvm install 24" >&2; exit 2; }
 	@docker compose --progress quiet run -d --rm --service-ports --no-deps --name leash-inspector-php php php -S 0.0.0.0:8000 -t public >/dev/null
 	@sh -c 'trap "docker stop leash-inspector-php >/dev/null" EXIT INT TERM; \
-	  npx -y @modelcontextprotocol/inspector@2.14.0 --server-url "http://127.0.0.1:$${LEASH_PORT:-8000}/mcp/refund_case/$(INSPECTOR_CASE)" --transport http --header "Authorization: Bearer $(TOKEN)"'
+	  npx -y @modelcontextprotocol/inspector@2.14.0 --server-url "http://127.0.0.1:$${LEASH_PORT:-8000}/mcp/doc_review/$(INSPECTOR_DOC)" --transport http --header "Authorization: Bearer $(TOKEN)"'
