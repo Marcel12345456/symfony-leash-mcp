@@ -62,6 +62,15 @@ final class ReadmeTest extends TestCase
         self::assertSame([], $broken, $document . ' has broken relative links');
     }
 
+    /** GitHub's Mermaid ends a sequence-diagram statement at `;`, so a semicolon in a message breaks the render. */
+    public function testSequenceDiagramMessagesHaveNoSemicolon(): void
+    {
+        preg_match_all('/```mermaid\nsequenceDiagram\n(.*?)```/s', self::read('README.md'), $diagrams);
+        self::assertNotSame([], $diagrams[1]);
+
+        self::assertSame([], array_values(array_filter(explode("\n", implode("\n", $diagrams[1])), static fn(string $l): bool => str_contains($l, ';'))));
+    }
+
     private static function read(string $file): string
     {
         $content = file_get_contents(self::ROOT . '/' . $file);
