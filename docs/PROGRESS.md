@@ -16,7 +16,7 @@
 - Phase: **M7 Spectator, replay demo — done** (done-signal green; [R], unmerged, needs review), branch `m/phase-7-spectator-demo` (pushed), stacked on `m/phase-6-human-seat-doc-review` (M6 unmerged, [R]).
 - Done in M7: dashboard `/` (Werewolf spectator: public log, denials, per-seat panel from `ScopedCapabilityProvider`, reveal toggle; Doc Review: Mermaid with current place (decisions/037), timeline red/amber/green), JSON `/dashboard/werewolf/{id}`, `/dashboard/doc-review`, assets `public/static/`, mermaid 11.17.2 in `public/vendor/`; replay for Doc Review + `LEASH_REPLAY_PACE` (decisions/038), cassette `data/docreview/demo.json` (qwen3:latest, 45 answers); `leash:demo:seed --reset`, `leash:demo:prepare`, `make demo` (php -S + worker + poller if telegram DSN, paced replay; smoke-run OK).
 - Done-signal: `.claude/done.sh` green (247 tests) incl. `DashboardWerewolfTest`, `SeatPanelMatchesServerTest`, `DashboardDocReviewTest`, `DemoPrepareTest`.
-- Left / needs a human: look at 1080p in light and dark ([R]; `make demo`, open http://127.0.0.1:8000/); live Telegram smoke test (from M6). Optional, not done: `make tournament` (stretch), step scrubber.
+- Dashboard look reviewed by the human via `make demo` (2026-11-12: "looks good"). Left / needs a human: live Telegram smoke test (from M6). Optional, not done: `make tournament` (stretch), step scrubber.
 - Blocked: none.
 
 ## Next prompt
@@ -145,6 +145,8 @@
 - 2026-11-12: Dashboard is public (local demo screen); without reveal it hides roles, private events and resource contents, but resource names (`wolf-den`, `seer-notes`) and night tools still show who is a wolf/seer — on purpose, that is the information hiding the demo shows ([R]). Dawn never rests between runner steps, so the panel-vs-server test covers night, day_discussion, day_vote, over.
 - 2026-11-12: Dashboard JSON routes have no `.json` suffix and assets live in `public/static/`: `php -S` 404s on file-like paths and stops at a real `public/dashboard/` directory.
 - 2026-11-12: Doc Review demo cassette recorded live (qwen3:latest, 240 s turn timeout): d1 and d3 approved after one change request, d2 after three; every editor sign-off waits for a human. Re-record after any change to `config/prompts/docreview/*.md`: `leash:demo:seed --reset && leash:work --model=ollama --record`.
+
+- 2026-11-12: Dashboard look accepted by the human after `make demo` ("looks good").
 
 ## Test changes
 
