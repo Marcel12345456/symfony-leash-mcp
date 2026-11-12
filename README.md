@@ -25,6 +25,14 @@ make inspector TOKEN=...  # MCP Inspector against /mcp/doc_review/d1 (INSPECTOR_
 
 Inside the container, or with a local PHP 8.4, pass `NATIVE=1` to skip Docker.
 
+## Telegram (optional)
+
+Pending human input is also sent to Telegram when `.env.local` sets
+`TELEGRAM_DSN=telegram://BOTID:TOKEN@default?channel=CHAT_ID` (your private chat with the bot).
+A pick list or yes/no comes with one button per option; anything else links to the inbox.
+`bin/console leash:telegram:poll` receives the button presses (only from that chat) and answers the input;
+the messenger worker resumes the call. Without the DSN nothing is sent.
+
 ## Stack
 
 Symfony 8.1, PHP 8.4, Doctrine ORM on SQLite (WAL, `busy_timeout` 5000 ms).

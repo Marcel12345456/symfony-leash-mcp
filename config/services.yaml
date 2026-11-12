@@ -81,3 +81,13 @@ services:
 when@test:
     parameters:
         leash.werewolf.transcripts: '%kernel.cache_dir%/werewolf'
+    services:
+        # Telegram Bot API calls (getUpdates, answer, edit) go to a mock; TelegramHumanSeatTest scripts its responses.
+        test.telegram_http:
+            class: Symfony\Component\HttpClient\MockHttpClient
+            public: true
+
+        App\Telegram\TelegramBot:
+            autowire: true
+            arguments:
+                $http: '@test.telegram_http'
