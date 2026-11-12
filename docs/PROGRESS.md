@@ -14,8 +14,8 @@
 ## Current
 
 - Phase: **M8 Hardening, README, video, submit — starting**, branch `m/phase-8-hardening-submit` from `main` (M6 and M7 merged by the human, 2026-11-12).
-- Done-signal: not yet agreed (proposal pending with the human).
-- Open from earlier phases: live Telegram smoke test (only needed if Telegram is in the video).
+- Done-signal (human-approved 2026-11-12): (1) `docs/test-matrix.md` maps every PLAN §7 item to test methods; `TestMatrixTest` fails if a listed test is missing or an item has none; gaps get written. (2) `ReadmeTest`: README has the §9 sections, every `make X` it names exists, relative links resolve; `lib/WorkflowMcp/README.md` and `lib/HumanInput/README.md` exist. (3) `.claude/bin/clean-clone.sh`: fresh clone → `make install` → `leash:demo:prepare` → winner; prints the time, fails above 5 min. (4) `.claude/done.sh` green. Human review [R]: README texts, BUGS.md issue text, `docs/video-script.md`; recording, upload, submission are the human's.
+- Telegram is not in the video (human); the live smoke test is optional.
 - Blocked: none.
 
 ## Next prompt
@@ -152,6 +152,8 @@
 - 2026-11-12: M6 and M7 merged into `main` (human). M8 branches from `main`.
 
 - 2026-11-12: Related work for the README: Tool Guard, mcparcade, Xu et al. 2023, Werewolf Arena 2024, all opened; describe what Leash does, never what others cannot do; no "first/only" claims (`decisions/039`).
+
+- 2026-11-12: Video shows the human step in the web inbox, not Telegram (human); Telegram stays optional and documented, live smoke test optional.
 
 ## Test changes
 
