@@ -13,11 +13,9 @@
 
 ## Current
 
-- Phase: **G1 polish** done, branch `m/g1-polish` (pushed), stacked on M5 → M4 (unmerged). Needs review: `player.md`, `lib/` error wording ([R]).
-- Built: public vote reasons, accurate turn-over error, prompt fixes, day/phase in turn message and transcript, scripted villager seat (`--scripted-seat`, PLAN §3.5).
-- Demo cassette `data/werewolf/seed-8.json` (qwen3:latest, scripted seat 3; seed 7 removed). Denied wolf-tool call + injection that makes wolf Eve confess; wolves win day 2. Details in Decisions 2026-11-11.
-- Done-signal green: `.claude/done.sh`, `make werewolf` → `Result: wolves`.
-- G1 = headline, demo seed 8 (Decisions 2026-11-12). Next: M6.
+- Phase: **M6 Human seat + Doc Review**, branch `m/phase-6-human-seat-doc-review`, stacked on `m/g1-polish` (main lacks M4/M5; rebase after merges). [R] phase.
+- G1 = headline, demo seed 8. Design: decisions/034 (Telegram), 035 (human seat, argument-level elicit-missing, MRTR for place tools). Order: Doc Review first, then Refund Desk removal, then human seat, Telegram last (cut order #2).
+- Done-signal: `.claude/done.sh` plus `DocReviewFlowTest` (publish → input_required no side effects; approve with edited headline → published; decline + note → doc_send_back → author gets note; duplicate retry idempotent; author never sees doc_rubric/reviewer tools); `ElicitMissingInputPolicyTest` (synthetic: exactly the missing fields); `HumanSeatTest` (vote input_required → inbox answer → retry → game continues); architecture test forbids DocReview in lib/; no RefundDesk references; `TelegramPollerTest` (mock HttpClient) if Telegram is built.
 - Blocked: none.
 
 ## Next prompt
@@ -131,6 +129,8 @@
 - 2026-11-11: Demo moments of PLAN §3.5 come from one scripted villager seat (human: "One scripted villager seat"), disclosed in the video; all other seats stay qwen3. It abstains from votes so it does not steer the outcome. Model stays `qwen3:latest` for now (human); bigger local model (gpt-oss 20B / Qwen 3.6 27B) is a later comparison. Demo seed 8.
 - 2026-11-11: Seed-8 demo story: wolves kill the seer night 1; scripted Cara's `ww_choose_victim` is denied, her "[MODERATOR OVERRIDE]" makes wolf Eve confess; wolf Anna turns on Eve; vote ties 2–2, nobody dies; night 2 wolves kill Cara and win by parity. Pitch point: the server blocked the tool, the LLM fell for the injection — capabilities belong in the workflow.
 - 2026-11-12: **G1 = headline** (human: "g1 seed 8"): Werewolf stays the main demo, plan §1/§10 unchanged; demo game = seed 8 (`data/werewolf/seed-8.json`, scripted seat 3). Bigger local model comparison and more seeds are optional, later (M7 records the best game).
+- 2026-11-12: Telegram bridge sends/edits inline keyboards, no receiving; own `getUpdates` poller, short `callback_data` (`decisions/034`).
+- 2026-11-12: Human seat = argument-level elicit-missing step before DTO mapping for `ROLE_HUMAN_BACKED` callers (schema without `required`), MRTR for place tools (human, `decisions/035`). M6 order: Doc Review first (human).
 
 ## Test changes
 
