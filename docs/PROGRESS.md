@@ -13,15 +13,16 @@
 
 ## Current
 
-- Phase: **M6 Human seat + Doc Review — in progress**, branch `m/phase-6-human-seat-doc-review` (pushed), based on main (M4, M5, g1-polish merged). [R] phase.
-- Done in M6: decline with a reason (lib), Doc Review over MCP + agents (`leash:work`, `HumanInputToolbox`), Refund Desk retired (tag `refund-desk-v1`), seed d1–d3, `make work`.
-- Left: human seat (decisions/035: elicit-missing step, MRTR for place tools, `HumanSeatTest`); Telegram (decisions/034, cut order #2); Doc Review replay for `make demo` is M7.
-- Done-signal: `.claude/done.sh` (220 tests) + `DocReviewFlowTest`, `DocReviewAgentsTest`, `RetiredDemoTest` green; open: `ElicitMissingInputPolicyTest`, `HumanSeatTest`.
+- Phase: **M6 Human seat + Doc Review — done** (all four acceptance criteria green; [R], unmerged, needs review), branch `m/phase-6-human-seat-doc-review` (pushed), based on main (M4, M5, g1-polish merged).
+- Done in M6: decline with a reason (lib), Doc Review over MCP + agents (`leash:work`, `HumanInputToolbox`), Refund Desk retired (tag `refund-desk-v1`), seed d1–d3, `make work`; **human seat** (decisions/035): `ElicitMissingInputPolicy` + MRTR for place tools (lib), `InputChoicesInterface`, Werewolf `--human-seat` / `HUMAN_SEAT=n`, paused step skips the deadline.
+- Left: live Telegram smoke test (human, needs a bot token); Doc Review replay for `make demo` and the poller in `make demo` are M7.
+- Done-signal: `.claude/done.sh` green (237 tests) incl. `DocReviewFlowTest`, `DocReviewAgentsTest`, `RetiredDemoTest`, `ElicitMissingInputPolicyTest`, `HumanSeatTest`.
+- Telegram done (decisions/034 + re-check): `TelegramHumanInputNotifier` (decorates email; HTML parse mode, one button per option, inbox link otherwise), `leash:telegram:poll`, `TelegramCallbacks` (chat = DSN channel, unknown/foreign ignored, idempotent). Green: `TelegramHumanSeatTest` (button press resumes the human-seat vote, foreign/unknown/repeat presses, poller offset, link fallback), `TelegramBotTest` (env gate). Open: one live smoke test with a real bot (empty-keyboard edit, HTML message).
 - Blocked: none.
 
 ## Next prompt
 
-/phase M6 — human seat (decisions/035): ElicitMissingInputPolicy + MRTR for place tools, HumanSeatTest
+/phase M7
 
 ## M5 notes
 
@@ -133,6 +134,8 @@
 - 2026-11-12: Telegram bridge sends/edits inline keyboards, no receiving; own `getUpdates` poller, short `callback_data` (`decisions/034`).
 - 2026-11-12: Human seat = argument-level elicit-missing step before DTO mapping for `ROLE_HUMAN_BACKED` callers (schema without `required`), MRTR for place tools (human, `decisions/035`). M6 order: Doc Review first (human).
 - 2026-11-12: Doc Review workflow and "decline with a note" = editor accepts the form with `approve: false` + note; generic `DecliningApprovalPolicyInterface` + `ApprovalDeclined` event; app stores the note, `doc_send_back` carries it to the author (human, `decisions/036`).
+- 2026-11-12: Telegram implemented per decisions/034 with deviations recorded there: HTML parse mode (bridge's MarkdownV2 auto-escape misses `_*()[]~`), allowed chat = DSN `channel` (no separate `TELEGRAM_CHAT_ID`), non-choice inputs get the link in the text (Telegram rejects `localhost` URL buttons).
+- 2026-11-12: Human seat implemented per decisions/035 (implementation notes there): human-backed = workflow role via the role resolver (per game for Werewolf), place tools only, `InputChoicesInterface` for pick lists, `werewolf_game.human_seat` + `--human-seat`/`HUMAN_SEAT=n`; a paused step skips the deadline.
 
 ## Test changes
 
@@ -161,6 +164,9 @@
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
 
+- 2026-11-12 — M6 Telegram (with human). Done: symfony/notifier + telegram-notifier 8.1 installed (decisions/034 re-checked), `src/Telegram` (notifier decorator, `TelegramQuestion`, `TelegramCallbacks`, `TelegramPoller`, `leash:telegram:poll`), README section, `TelegramHumanSeatTest`, `TelegramBotTest`. M6 acceptance complete. Blocked: none. Needs review ([R]): `src/Telegram`, test-only `test.telegram_http` mock in `services.yaml`, `TELEGRAM_DSN=null://null` default in `.env`; live smoke test with a real bot still open (human). Spend: $0.
+
+- 2026-11-12 — M6 human seat (with human). Done: `ElicitMissingInputPolicy` + MRTR for place tools (lib, synthetic `doc_rate`, `ElicitMissingInputPolicyTest`), `InputChoicesInterface`, Werewolf human seat (`werewolf_game.human_seat` migration, `HumanSeatTurnRunner`, `ww_vote` pick list, paused step, `--human-seat`, `HumanSeatTest`). Blocked: none. Needs review ([R]): lib `PlaceToolHandler` MRTR path, `HumanInputGate::ask/answer`, `ElicitMissingInputPolicy`, `InputChoicesInterface`; `PlayGameCommand --human-seat` untested by its own test (covered via runner). Spend: $0.
 - 2026-11-12 — M6 part 1 (with human). Done: decline with a reason (lib), Doc Review workflow/resources/editor sign-off, agents + `leash:work`, Refund Desk retired, seed d1–d3. Blocked: none. Needs review: lib `DecliningApprovalPolicyInterface`, `ApprovalDeclined`, `HumanInputToolbox`; prompts `config/prompts/docreview/*` ([R]). Open notes: `make inspector` needs a Doc Review token (no command prints one yet); `src/Spike` still mentions refunds in text only. Spend: $0.
 - 2026-11-12 — G1 polish + G1 + M6 start (with human). Done: vote reasons, accurate turn-over error, prompt fixes, day/phase labels, scripted villager seat; demo cassette seed 8; G1 = headline; M6 decisions 034 (Telegram), 035 (human seat), 036 (Doc Review, decline with a note). Blocked: none. Needs review: `player.md`, `lib/` error wording, branches M4/M5/g1-polish unmerged. Spend: $0 (Ollama local).
 - 2026-11-11 — M5 done (with human). Built: `leash:werewolf:play` (`PlayGameCommandTest`), per-seat record/replay `SeatCassette`/`RecordingSeatProvider`/`ReplayPlatform` (`ReplayPlatformTest`, pins upstream `RecordingProvider` content-blind signature, BUGS.md), `WerewolfAgentsTest` (full scripted game: denial, budget 3, deadline), `WerewolfReplayTest`, `make werewolf`, demo cassette seed 7 (live `qwen3:latest`, 240 s turns, wolves win day 1). Hook: context warning now counts tokens (300k, step 100k). Decision 033. Test changes: `.claude/tests/hooks.t.sh` context checks (logged). Blocked: none (laptop idle sleep hung the first recording; use `caffeinate -dims` on AC). Needs review: `player.md`, M4/M5 `lib/` ([R]). Spend: $0 (local Ollama).

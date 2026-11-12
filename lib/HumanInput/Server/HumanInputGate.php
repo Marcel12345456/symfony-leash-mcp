@@ -10,6 +10,8 @@ use Leash\HumanInput\Policy\DecliningApprovalPolicyInterface;
 use Leash\HumanInput\RequestState\BoundRequest;
 use Leash\HumanInput\RequestState\RequestBinder;
 use Leash\HumanInput\RequestState\RequestStateRejected;
+use Mcp\Schema\Request\ElicitRequest;
+use Mcp\Schema\Result\ElicitResult;
 use Mcp\Schema\Result\InputRequiredResult;
 use Mcp\Server\RequestContext;
 use Mcp\Server\Stateless\InputContext;
@@ -56,12 +58,11 @@ final readonly class HumanInputGate
             if (null === $context) {
                 return Decision::unanswered();
             }
-            $issued = $this->binder->issue($subjectRef, $capability, $arguments, $callerId);
 
-            return Decision::inputRequired(new InputRequiredResult([self::KEY => $request], $context->mintRequestState($issued->toArray())));
+            return Decision::inputRequired($this->ask($context, self::KEY, $request, $subjectRef, $capability, $arguments, $callerId));
         }
 
-        $answer = $context?->getInputContext()?->elicitResult(self::KEY);
+        $answer = $this->answer($context, self::KEY);
         $reason = null !== $answer && $answer->isAccepted() && $policy instanceof DecliningApprovalPolicyInterface ? $policy->declineReason($answer->content ?? []) : null;
 
         return match (true) {
@@ -70,6 +71,24 @@ final readonly class HumanInputGate
             null !== $reason => Decision::declined($reason, $bound->nonce),
             default => Decision::proceed($policy->applyAnswer($input, $answer->content ?? []), $bound->nonce),
         };
+    }
+
+    /**
+     * Asks one question under `$key`; the request state binds the retry to subject, capability, arguments and caller.
+     *
+     * @param array<mixed> $arguments
+     */
+    public function ask(RequestContext $context, string $key, ElicitRequest $request, string $subjectRef, string $capability, array $arguments, string $callerId): InputRequiredResult
+    {
+        $issued = $this->binder->issue($subjectRef, $capability, $arguments, $callerId);
+
+        return new InputRequiredResult([$key => $request], $context->mintRequestState($issued->toArray()));
+    }
+
+    /** The human's answer under `$key` on a retry, or null. */
+    public function answer(?RequestContext $context, string $key): ?ElicitResult
+    {
+        return $context?->getInputContext()?->elicitResult($key);
     }
 
     /**

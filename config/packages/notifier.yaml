@@ -1,0 +1,12 @@
+framework:
+    notifier:
+        # Telegram channel for human input (decisions/034). `null://null` (the .env default) sends nothing.
+        chatter_transports:
+            telegram: '%env(TELEGRAM_DSN)%'
+
+when@test:
+    framework:
+        notifier:
+            # Tests read TELEGRAM_DSN for the bot (mock HttpClient) but never send through the bridge.
+            chatter_transports:
+                telegram: 'null://null'

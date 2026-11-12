@@ -9,6 +9,7 @@ use Leash\WorkflowMcp\Capability\ScopedCapabilityProvider;
 use Leash\WorkflowMcp\Capability\VisibleResource;
 use Leash\WorkflowMcp\Capability\VisibleTool;
 use Leash\WorkflowMcp\Schema\SchemaFactory;
+use Leash\WorkflowMcp\Tool\ElicitMissingInputPolicy;
 use Leash\WorkflowMcp\Tool\PlaceToolHandler;
 use Leash\WorkflowMcp\Tool\ToolResults;
 use Leash\WorkflowMcp\Tool\TransitionToolHandler;
@@ -39,6 +40,7 @@ final readonly class WorkflowServerFactory
         private PlaceToolHandler $placeTools,
         private EventDispatcherInterface $dispatcher,
         private HumanInputGate $humanInput,
+        private ElicitMissingInputPolicy $missingInput,
     ) {}
 
     /** @param string $subjectId binds MRTR request states to this subject (with the workflow name) */
@@ -49,6 +51,7 @@ final readonly class WorkflowServerFactory
         $resources = $this->capabilities->visibleResources($workflow, $subject, $caller);
         $uri = static fn(VisibleResource $r): string => str_replace('{subjectId}', $subjectId, $r->uri);
         $places = array_map(strval(...), array_keys($workflow->getMarking($subject)->getPlaces()));
+        $humanBacked = $this->missingInput->isHumanBacked($this->capabilities->rolesFor($workflow, $subject, $caller));
 
         $builder = Server::builder()
             ->setServerInfo('leash-' . $workflow->getName(), '0.1')
@@ -99,6 +102,7 @@ final readonly class WorkflowServerFactory
             $transitionTools = $this->transitionTools;
             $placeTools = $this->placeTools;
             $isTransition = null !== $tool->transition;
+            $inputSchema = $this->schemas->inputSchema($tool->inputClass);
             $builder->addTool(
                 handler: static function (RequestContext $context) use ($transitionTools, $placeTools, $isTransition, $workflow, $subject, $caller, $subjectRef): CallToolResult|InputRequiredResult {
                     $request = $context->getRequest();
@@ -108,12 +112,13 @@ final readonly class WorkflowServerFactory
 
                     return $isTransition
                         ? $transitionTools->handle($workflow, $subject, $caller, $request->name, $request->arguments, $context, $subjectRef)
-                        : $placeTools->handle($workflow, $subject, $caller, $request->name, $request->arguments);
+                        : $placeTools->handle($workflow, $subject, $caller, $request->name, $request->arguments, $context, $subjectRef);
                 },
                 name: $tool->name,
                 description: $tool->description,
                 annotations: new ToolAnnotations(readOnlyHint: $tool->readOnly),
-                inputSchema: $this->schemas->inputSchema($tool->inputClass),
+                // A human-backed caller may leave required fields out of a place tool call; it is asked for them (decisions/035).
+                inputSchema: $humanBacked && !$isTransition ? $this->missingInput->relax($inputSchema) : $inputSchema,
                 outputSchema: null !== $tool->transition ? $this->schemas->transitionOutputSchema() : null,
             );
         }

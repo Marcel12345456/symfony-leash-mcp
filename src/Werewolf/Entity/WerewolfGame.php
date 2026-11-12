@@ -36,6 +36,10 @@ class WerewolfGame
     #[ORM\Column(type: 'json')]
     private array $denials = [];
 
+    /** The seat a human plays through the inbox (decisions/035), or null when all seats are agents. */
+    #[ORM\Column(nullable: true)]
+    private ?int $humanSeat = null;
+
     /** Decoded from $state on first use; written back before every flush. */
     private ?Game $game = null;
 
@@ -87,6 +91,16 @@ class WerewolfGame
     public function denials(): array
     {
         return $this->denials;
+    }
+
+    public function humanSeat(): ?int
+    {
+        return $this->humanSeat;
+    }
+
+    public function setHumanSeat(?int $seat): void
+    {
+        $this->humanSeat = $seat;
     }
 
     public function deadlinePassed(): bool

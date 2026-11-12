@@ -18,3 +18,12 @@ How does a human-backed caller get "exactly the missing fields" asked via `input
 
 - Library change ([R]), tested with the synthetic non-domain workflow: missing fields → `input_required` naming exactly those fields; full arguments → no question; answer → applied once; duplicate retry → stored result; non-human caller with missing fields → unchanged -32602/validation path.
 - Werewolf human seat uses it for `ww_vote` (enum of living seats).
+
+## Implementation (2026-11-12)
+
+- "Human-backed" is a **workflow role** from the workflow's role resolver (`ElicitMissingInputPolicy::HUMAN_BACKED`), not a Symfony security role, so it can vary per subject: `WerewolfSeatRoleResolver` adds it for the game's `humanSeat`. With the default `SecurityRoleResolver` it is simply a security role.
+- Scope: **place tools only**. Transition tools keep their `required` list and their single MRTR round (approval); combining a missing-input round with an approval round in one call was not needed.
+- The form asks for the missing *required* fields only (types from the tool schema; non-primitive types become strings). `InputChoicesInterface` (optional, on the place tool) turns a field into a `oneOf` pick list; the string answer is converted back to the schema's integer/number type before DTO mapping. Elicitation answers live under key `input` (`approval` stays for policies).
+- Decline/cancel of the question → non-error result "No answer: … nothing changed." An answer that breaks the DTO constraints → the usual validation error (not stored, so the same state can be retried with a corrected answer).
+- Place tool outputs are stored per nonce as `{output}` and replayed to duplicate retries.
+- Werewolf: the human seat plays without a model (`HumanSeatTurnRunner`): it calls its one acting tool with `{}` through `HumanInputToolCaller`; the step returns `Paused` right after that turn (no deadline, other seats wait), and `PendingInputResolved` → `RunNextActor` continues the game. Only `ww_vote` offers choices; night tools and `ww_say` ask for plain fields.

@@ -14,7 +14,7 @@ nothing else is installed on the host.
 
 ```
 make install      # composer install, warm the cache, migrate, seed the Doc Review demo documents; generate APP_SECRET + Werewolf secret into .env.local
-make werewolf     # play one Werewolf game: replays data/werewolf/seed-8.json (SEED=…, LEASH_MODEL=ollama for live)
+make werewolf     # play one Werewolf game: replays data/werewolf/seed-8.json (SEED=…, LEASH_MODEL=ollama for live, HUMAN_SEAT=n: you play seat n via the inbox)
 make work         # run the Doc Review agents once over all open documents (bin/console leash:work; LEASH_MODEL=ollama)
 make test         # phpunit
 make qa           # php-cs-fixer (changed files) + phpstan + phpunit, quiet
@@ -24,6 +24,14 @@ make inspector TOKEN=...  # MCP Inspector against /mcp/doc_review/d1 (INSPECTOR_
 ```
 
 Inside the container, or with a local PHP 8.4, pass `NATIVE=1` to skip Docker.
+
+## Telegram (optional)
+
+Pending human input is also sent to Telegram when `.env.local` sets
+`TELEGRAM_DSN=telegram://BOTID:TOKEN@default?channel=CHAT_ID` (your private chat with the bot).
+A pick list or yes/no comes with one button per option; anything else links to the inbox.
+`bin/console leash:telegram:poll` receives the button presses (only from that chat) and answers the input;
+the messenger worker resumes the call. Without the DSN nothing is sent.
 
 ## Stack
 

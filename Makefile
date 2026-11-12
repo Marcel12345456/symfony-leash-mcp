@@ -42,8 +42,8 @@ test:
 
 # Replays the committed cassette data/werewolf/seed-$(SEED).json (no model, no network); LEASH_MODEL=ollama plays live.
 SEED ?= 8
-werewolf: ## make werewolf [SEED=8] [LEASH_MODEL=ollama]; transcript in var/werewolf/seed-<seed>.md
-	$(RUN) bin/console leash:werewolf:play --seed=$(SEED) $(if $(LEASH_MODEL),--model=$(LEASH_MODEL))
+werewolf: ## make werewolf [SEED=8] [LEASH_MODEL=ollama] [HUMAN_SEAT=n]; transcript in var/werewolf/seed-<seed>.md
+	$(RUN) bin/console leash:werewolf:play --seed=$(SEED) $(if $(LEASH_MODEL),--model=$(LEASH_MODEL)) $(if $(HUMAN_SEAT),--human-seat=$(HUMAN_SEAT))
 
 # The Doc Review agents work every open document once (Ollama; replay is not available for Doc Review yet).
 work: ## make work [LEASH_MODEL=ollama]

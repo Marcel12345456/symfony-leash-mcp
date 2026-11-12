@@ -9,12 +9,14 @@ use App\Werewolf\Rules\Phase;
 use App\Werewolf\Rules\Role;
 use App\Werewolf\Security\WerewolfCallers;
 use Leash\WorkflowMcp\Role\RoleResolverInterface;
+use Leash\WorkflowMcp\Tool\ElicitMissingInputPolicy;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Seat → workflow roles for one game (PLAN §3.5). Roles stay any-of, so turn-bound tools use dedicated roles:
  * a dead seat gets only ROLE_DEAD; a living seat gets ROLE_ALIVE, its identity role and, while the phase waits for it,
  * ROLE_ON_TURN (plus ROLE_WOLF_ON_TURN / ROLE_SEER_ON_TURN at night). A seat that acted loses its tool.
+ * The game's human seat is also human-backed: it is asked for missing tool input (decisions/035).
  */
 final readonly class WerewolfSeatRoleResolver implements RoleResolverInterface
 {
@@ -45,6 +47,9 @@ final readonly class WerewolfSeatRoleResolver implements RoleResolverInterface
         }
 
         $roles = [self::ALIVE, 'ROLE_' . strtoupper($seat->role->value)];
+        if ($seat->number === $subject->humanSeat()) {
+            $roles[] = ElicitMissingInputPolicy::HUMAN_BACKED;
+        }
         if (\in_array($seat->number, $game->pendingSeats(), true)) {
             $roles[] = self::ON_TURN;
             if (Phase::Night === $game->phase()) {

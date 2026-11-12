@@ -15,6 +15,7 @@ use Leash\WorkflowMcp\Event\CapabilityDenied;
 use Leash\WorkflowMcp\Event\ToolCalled;
 use Leash\WorkflowMcp\Schema\SchemaFactory;
 use Leash\WorkflowMcp\Server\WorkflowServerFactory;
+use Leash\WorkflowMcp\Tool\ElicitMissingInputPolicy;
 use Leash\WorkflowMcp\Tool\PlaceToolHandler;
 use Leash\WorkflowMcp\Tool\TransitionToolHandler;
 use Mcp\Server\Builder;
@@ -34,6 +35,7 @@ final class Harness
     public readonly MockClock $clock;
     public readonly TransitionToolHandler $transitionTools;
     public readonly WorkflowServerFactory $servers;
+    public readonly RateTool $rate;
 
     /** @param ApprovalPolicyInterface|null $approval the `doc_approval` policy; defaults to {@see ApproveApproval} */
     public function __construct(?ApprovalPolicyInterface $approval = null)
@@ -45,7 +47,7 @@ final class Harness
                 $this->events[] = $e;
             });
         }
-        $provider = DocumentWorkflow::provider();
+        $provider = DocumentWorkflow::provider($this->rate = new RateTool());
         $this->subjects = new InMemorySubjectProvider();
         $this->processed = new InMemoryProcessedInputRequests();
         $this->clock = new MockClock('2026-11-07 12:00:00');
@@ -61,9 +63,10 @@ final class Harness
             $provider,
             new SchemaFactory(),
             $this->transitionTools,
-            new PlaceToolHandler($provider, InputMapperTest::mapper(), $this->subjects, $dispatcher),
+            new PlaceToolHandler($provider, InputMapperTest::mapper(), $this->subjects, $dispatcher, $gate, $missingInput = new ElicitMissingInputPolicy(), new SchemaFactory()),
             $dispatcher,
             $gate,
+            $missingInput,
         );
     }
 
