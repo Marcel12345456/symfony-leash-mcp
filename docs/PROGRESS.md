@@ -134,6 +134,7 @@
 - 2026-11-12: Telegram bridge sends/edits inline keyboards, no receiving; own `getUpdates` poller, short `callback_data` (`decisions/034`).
 - 2026-11-12: Human seat = argument-level elicit-missing step before DTO mapping for `ROLE_HUMAN_BACKED` callers (schema without `required`), MRTR for place tools (human, `decisions/035`). M6 order: Doc Review first (human).
 - 2026-11-12: Doc Review workflow and "decline with a note" = editor accepts the form with `approve: false` + note; generic `DecliningApprovalPolicyInterface` + `ApprovalDeclined` event; app stores the note, `doc_send_back` carries it to the author (human, `decisions/036`).
+- 2026-11-12: Human seat implemented per decisions/035 (implementation notes there): human-backed = workflow role via the role resolver (per game for Werewolf), place tools only, `InputChoicesInterface` for pick lists, `werewolf_game.human_seat` + `--human-seat`/`HUMAN_SEAT=n`; a paused step skips the deadline.
 
 ## Test changes
 
