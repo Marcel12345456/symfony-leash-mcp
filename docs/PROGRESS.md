@@ -160,6 +160,10 @@
 - 2026-11-12: §7 audit (Explore agent): 35 of 39 items covered; gaps L5 (Choice/Email/Url), L6 (unsupported constructs fail loudly), D2 (ActorSelector hand-off on doc_review), D3 (rubric only for the reviewer in in_review). PLAN §7 "Range, Length, Choice, Email, Url → schema" is read through decisions/015: Choice is structural (enum), the others stay server-side Validator checks with actionable errors; both are pinned.
 - 2026-11-12: `SchemaFactory` refuses input classes with `mixed`, union, intersection or untyped constructor properties (`LogicException` naming class and property): the platform factory emitted wrong schemas silently (BUGS.md).
 
+- 2026-11-12: `leash:tokens [caller]` prints demo bearer tokens; `make inspector CALLER=… MCP=…` (TOKEN still works); `leash:werewolf:play --max-steps=0` sets a game up at night 1 and stops (README "Try it from an MCP client").
+- 2026-11-12: `docs/upstream-issues.md`: the 7 reproduced BUGS.md entries as issue text (human files them); candidates stay out until reproduced.
+- 2026-11-12: `docs/video-script.md` draft adapts PLAN §10: inbox instead of phone; MRTR on video = editor sign-off (works in replay), human-seat vote and decline→revise need a live model; the injection beat says "the server held, the model confessed its own role". Needs human review.
+
 ## Test changes
 
 - 2026-11-12: Refund Desk retired (decisions/022; code at tag `refund-desk-v1`). Removed `tests/Integration/RefundDesk/SeedDemoCommandTest.php` (refund seed C1–C8 + H5 idempotent, reset to `received`, C3 injection). Replacement: `tests/Integration/DocReview/SeedDemoCommandTest.php` (new `leash:demo:seed` run twice, d1–d3 in `drafting`, d2 brief mentions Node 18 but not upgrade notes).
