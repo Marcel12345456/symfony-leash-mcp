@@ -13,15 +13,14 @@
 
 ## Current
 
-- Phase: **M7 Spectator, replay demo — done** (done-signal green; [R], unmerged, needs review), branch `m/phase-7-spectator-demo` (pushed), stacked on `m/phase-6-human-seat-doc-review` (M6 unmerged, [R]).
-- Done in M7: dashboard `/` (Werewolf spectator: public log, denials, per-seat panel from `ScopedCapabilityProvider`, reveal toggle; Doc Review: Mermaid with current place (decisions/037), timeline red/amber/green), JSON `/dashboard/werewolf/{id}`, `/dashboard/doc-review`, assets `public/static/`, mermaid 11.17.2 in `public/vendor/`; replay for Doc Review + `LEASH_REPLAY_PACE` (decisions/038), cassette `data/docreview/demo.json` (qwen3:latest, 45 answers); `leash:demo:seed --reset`, `leash:demo:prepare`, `make demo` (php -S + worker + poller if telegram DSN, paced replay; smoke-run OK).
-- Done-signal: `.claude/done.sh` green (247 tests) incl. `DashboardWerewolfTest`, `SeatPanelMatchesServerTest`, `DashboardDocReviewTest`, `DemoPrepareTest`.
-- Dashboard look reviewed by the human via `make demo` (2026-11-12: "looks good"). Left / needs a human: live Telegram smoke test (from M6). Optional, not done: `make tournament` (stretch), step scrubber.
+- Phase: **M8 Hardening, README, video, submit — automatable part done**, branch `m/phase-8-hardening-submit` (pushed, from `main`; [R], unmerged).
+- Done-signal green: (1) `docs/test-matrix.md` + `TestMatrixTest` (all 39 PLAN §7 items; gaps L5, L6, D2, D3 filled); (2) `ReadmeTest` (README per §9, make targets, links; both library READMEs); (3) `.claude/bin/clean-clone.sh` 24 s (budget 300 s); (4) `.claude/done.sh` green (271 tests).
+- Left for the human: review README, `lib/*/README.md`, `docs/upstream-issues.md` (then file the 7 issues), `docs/video-script.md` (decide the MRTR moment: A editor sign-off in replay / B live human seat / C live decline→revise); record, edit, upload the 90 s video; add the video link (and optionally a spectator GIF) to the README; merge; submit by Sat 11-21 20:00 CET. Optional: live Telegram smoke test, `make tournament`.
 - Blocked: none.
 
 ## Next prompt
 
-/phase M8
+/phase M8 — the human reviewed the README and video script; continue with their feedback and the video link
 
 ## M5 notes
 
@@ -150,6 +149,21 @@
 
 - 2026-11-12: CI on the M7 PR ran out of memory (128M) in `DemoPrepareTest`: the replayed demo adds ~67 MB in one debug test kernel, ~34 MB of it debug traces (stopwatch, TraceableEventDispatcher, Doctrine backtraces for 429 queries). `phpunit.dist.xml` sets `memory_limit=512M` for tests only; `leash:demo:prepare` in dev peaks at 84.6 MB under the default 128M, so the app is unchanged.
 
+- 2026-11-12: M6 and M7 merged into `main` (human). M8 branches from `main`.
+
+- 2026-11-12: Related work for the README: Tool Guard, mcparcade, Xu et al. 2023, Werewolf Arena 2024, all opened; describe what Leash does, never what others cannot do; no "first/only" claims (`decisions/039`).
+
+- 2026-11-12: Video shows the human step in the web inbox, not Telegram (human); Telegram stays optional and documented, live smoke test optional.
+
+- 2026-11-12: `.claude/bin/clean-clone.sh [branch] [budget]`: clone from origin → `docker compose build` → `make install` → `leash:demo:prepare --model=replay`; own compose project and port 18765, cleaned up after. First run: 32 s (Docker image layers cached on this Mac, composer cache empty).
+
+- 2026-11-12: §7 audit (Explore agent): 35 of 39 items covered; gaps L5 (Choice/Email/Url), L6 (unsupported constructs fail loudly), D2 (ActorSelector hand-off on doc_review), D3 (rubric only for the reviewer in in_review). PLAN §7 "Range, Length, Choice, Email, Url → schema" is read through decisions/015: Choice is structural (enum), the others stay server-side Validator checks with actionable errors; both are pinned.
+- 2026-11-12: `SchemaFactory` refuses input classes with `mixed`, union, intersection or untyped constructor properties (`LogicException` naming class and property): the platform factory emitted wrong schemas silently (BUGS.md).
+
+- 2026-11-12: `leash:tokens [caller]` prints demo bearer tokens; `make inspector CALLER=… MCP=…` (TOKEN still works); `leash:werewolf:play --max-steps=0` sets a game up at night 1 and stops (README "Try it from an MCP client").
+- 2026-11-12: `docs/upstream-issues.md`: the 7 reproduced BUGS.md entries as issue text (human files them); candidates stay out until reproduced.
+- 2026-11-12: `docs/video-script.md` draft adapts PLAN §10: inbox instead of phone; MRTR on video = editor sign-off (works in replay), human-seat vote and decline→revise need a live model; the injection beat says "the server held, the model confessed its own role". Needs human review.
+
 ## Test changes
 
 - 2026-11-12: Refund Desk retired (decisions/022; code at tag `refund-desk-v1`). Removed `tests/Integration/RefundDesk/SeedDemoCommandTest.php` (refund seed C1–C8 + H5 idempotent, reset to `received`, C3 injection). Replacement: `tests/Integration/DocReview/SeedDemoCommandTest.php` (new `leash:demo:seed` run twice, d1–d3 in `drafting`, d2 brief mentions Node 18 but not upgrade notes).
@@ -178,6 +192,8 @@
 ## Log
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
+
+- 2026-11-12 — M8 automatable part (with human). Done: CI memory fix on M7 (phpunit 512M), M6/M7 merged by the human, decisions/039 (related work), §7 test matrix + `TestMatrixTest`, `SchemaFactory` refuses mixed/union types (BUGS.md), Choice/Email/Url pinned, Doc Review hand-off + rubric visibility test, library READMEs, `leash:tokens`, `make inspector CALLER/MCP`, `--max-steps=0`, README per §9 + `ReadmeTest`, clean-clone script (24 s), upstream issue texts, video script draft. Blocked: none. Needs review ([R]): README and library READMEs, `docs/upstream-issues.md`, `docs/video-script.md` (MRTR choice), `SchemaFactory::assertDescribable` (lib). Spend: $0.
 
 - 2026-11-12 — M7 (with human). Done: dashboard (Werewolf spectator + Doc Review), decisions 037 (Mermaid) and 038 (paced replay, Doc Review cassette, worker idle under replay), `leash:demo:prepare`, `make demo`, `leash:demo:seed --reset`, README sections; 4 done-signal tests + replay/handler/seed tests. Blocked: none. Needs review ([R]): dashboard look at 1080p (light/dark), public dashboard, role hints in resource names, worker skipping model turns in replay mode, 3.5 MB vendored mermaid. Spend: $0 (local Ollama only).
 

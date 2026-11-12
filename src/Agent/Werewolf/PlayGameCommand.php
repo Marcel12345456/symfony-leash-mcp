@@ -43,7 +43,7 @@ final readonly class PlayGameCommand
         ?string $game = null,
         #[Option(description: 'replay or ollama (default: LEASH_MODEL)')]
         ?string $model = null,
-        #[Option(description: 'Stop after this many steps', name: 'max-steps')]
+        #[Option(description: 'Stop after this many steps; 0 sets the game up at night 1 and stops (e.g. for the MCP Inspector)', name: 'max-steps')]
         int $maxSteps = 60,
         #[Option(description: 'Record the live game into the cassette (ollama only)')]
         bool $record = false,
@@ -81,6 +81,11 @@ final readonly class PlayGameCommand
         $choice = $this->models->create($model, $live && !$record ? null : $cassette, $scriptedSeat);
         $this->reset($gameId, $start, $humanSeat);
         $io->writeln(\sprintf('Game <info>%s</info> (seed %d, model %s%s), transcript %s', $gameId, $seed, $choice->model, null === $choice->scripted ? '' : ', scripted seat ' . $choice->scripted->seat, $this->transcript->path($gameId)));
+        if (0 === $maxSteps) {
+            $io->success(\sprintf('Game %s is set up at night 1; nobody has acted. MCP endpoint: /mcp/werewolf_game/%s', $gameId, $gameId));
+
+            return Command::SUCCESS;
+        }
 
         for ($n = 1; $n <= $maxSteps; ++$n) {
             $step = $this->runner->step($gameId, $choice);

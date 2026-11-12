@@ -33,6 +33,17 @@ final class PlayGameCommandTest extends WerewolfMcpCase
         self::assertSame(1, substr_count((string) file_get_contents($this->transcripts()->path('g9')), 'Result:'));
     }
 
+    public function testZeroStepsSetsTheGameUpAndStops(): void
+    {
+        $tester = $this->play(['--seed' => '8', '--game' => 'look', '--model' => 'replay', '--max-steps' => '0']);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString('/mcp/werewolf_game/look', $tester->getDisplay());
+        $game = $this->game('look')->game();
+        self::assertSame([1, 'night'], [$game->day(), $game->phase()->value]);
+        self::assertNotSame([], $game->pendingSeats(), 'the night actors are still to act');
+    }
+
     /** @param array<string, string> $options */
     private function play(array $options): CommandTester
     {
