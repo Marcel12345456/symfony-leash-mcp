@@ -151,6 +151,8 @@
 
 - 2026-11-12: M6 and M7 merged into `main` (human). M8 branches from `main`.
 
+- 2026-11-12: Related work for the README: Tool Guard, mcparcade, Xu et al. 2023, Werewolf Arena 2024, all opened; describe what Leash does, never what others cannot do; no "first/only" claims (`decisions/039`).
+
 ## Test changes
 
 - 2026-11-12: Refund Desk retired (decisions/022; code at tag `refund-desk-v1`). Removed `tests/Integration/RefundDesk/SeedDemoCommandTest.php` (refund seed C1–C8 + H5 idempotent, reset to `received`, C3 injection). Replacement: `tests/Integration/DocReview/SeedDemoCommandTest.php` (new `leash:demo:seed` run twice, d1–d3 in `drafting`, d2 brief mentions Node 18 but not upgrade notes).

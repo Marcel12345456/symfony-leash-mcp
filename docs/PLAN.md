@@ -470,7 +470,7 @@ Doc Review:
 5. How it works: architecture diagram, visibility rule (state ∩ role), MRTR sequence diagram.
 6. Same libraries, zero game code: Doc Review, with its YAML.
 7. Using the libraries in your own app (metadata contract, role resolvers, HumanInput channels).
-8. Related work: Tool Guard (`acencyril/tool-guard-bundle`) guards single calls; Leash shapes the tool surface and resumes the agent. Complementary. Existing Werewolf/Mafia MCP servers and LLM Werewolf benchmarks are game servers; in Leash the game is one workflow YAML plus `src/Werewolf` on a generic library. Name the projects with links (**VERIFY** each link and claim before M8; nothing unread goes into the README).
+8. Related work: Tool Guard (`acencyril/tool-guard-bundle`) guards single calls; Leash shapes the tool surface and resumes the agent. Complementary. Existing Werewolf/Mafia MCP servers and LLM Werewolf benchmarks are game servers; in Leash the game is one workflow YAML plus `src/Werewolf` on a generic library. Name the projects with links (verified: decisions/039; nothing unread goes into the README).
 9. Exhibition results (if kept). Bugs found & filed upstream (`BUGS.md`).
 10. Versions, limitations, license.
 
