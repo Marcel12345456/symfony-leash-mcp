@@ -14,15 +14,14 @@
 ## Current
 
 - Phase: **M6 Human seat + Doc Review — in progress**, branch `m/phase-6-human-seat-doc-review` (pushed), based on main (M4, M5, g1-polish merged). [R] phase.
-- Done in M6: decline with a reason (lib), Doc Review over MCP + agents (`leash:work`, `HumanInputToolbox`), Refund Desk retired (tag `refund-desk-v1`), seed d1–d3, `make work`.
-- Left: human seat (decisions/035: elicit-missing step, MRTR for place tools, `HumanSeatTest`); Telegram (decisions/034, cut order #2); Doc Review replay for `make demo` is M7.
-- Done-signal: `.claude/done.sh` (220 tests) + `DocReviewFlowTest`, `DocReviewAgentsTest`, `RetiredDemoTest` green; open: `ElicitMissingInputPolicyTest`, `HumanSeatTest`.
-- Human seat done-signal (decisions/035): `ElicitMissingInputPolicyTest` (synthetic `doc_rate` place tool): human-backed caller with missing fields → `input_required` naming exactly those fields, no side effect; full arguments → no question; answer → applied once; duplicate retry → stored result; agent caller with missing fields → JSON-RPC -32602 as before; `tools/list` for a human-backed caller has no `required`. `HumanSeatTest` (Werewolf): human seat's vote turn → pending input with an enum of living seats → answer → retry → vote recorded, game not expired and continues. Plus `.claude/done.sh`.
+- Done in M6: decline with a reason (lib), Doc Review over MCP + agents (`leash:work`, `HumanInputToolbox`), Refund Desk retired (tag `refund-desk-v1`), seed d1–d3, `make work`; **human seat** (decisions/035): `ElicitMissingInputPolicy` + MRTR for place tools (lib), `InputChoicesInterface`, Werewolf `--human-seat` / `HUMAN_SEAT=n`, paused step skips the deadline.
+- Left: Telegram (decisions/034, cut order #2; acceptance "Telegram button resumes a vote (when configured)"); Doc Review replay for `make demo` is M7.
+- Done-signal: `.claude/done.sh` green (230 tests) incl. `DocReviewFlowTest`, `DocReviewAgentsTest`, `RetiredDemoTest`, `ElicitMissingInputPolicyTest`, `HumanSeatTest`. Open: a Telegram test per decisions/034.
 - Blocked: none.
 
 ## Next prompt
 
-/phase M6 — human seat (decisions/035): ElicitMissingInputPolicy + MRTR for place tools, HumanSeatTest
+/phase M6 — Telegram (decisions/034): Telegram notifier + button resumes a human-seat vote
 
 ## M5 notes
 
@@ -163,6 +162,7 @@
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
 
+- 2026-11-12 — M6 human seat (with human). Done: `ElicitMissingInputPolicy` + MRTR for place tools (lib, synthetic `doc_rate`, `ElicitMissingInputPolicyTest`), `InputChoicesInterface`, Werewolf human seat (`werewolf_game.human_seat` migration, `HumanSeatTurnRunner`, `ww_vote` pick list, paused step, `--human-seat`, `HumanSeatTest`). Blocked: none. Needs review ([R]): lib `PlaceToolHandler` MRTR path, `HumanInputGate::ask/answer`, `ElicitMissingInputPolicy`, `InputChoicesInterface`; `PlayGameCommand --human-seat` untested by its own test (covered via runner). Spend: $0.
 - 2026-11-12 — M6 part 1 (with human). Done: decline with a reason (lib), Doc Review workflow/resources/editor sign-off, agents + `leash:work`, Refund Desk retired, seed d1–d3. Blocked: none. Needs review: lib `DecliningApprovalPolicyInterface`, `ApprovalDeclined`, `HumanInputToolbox`; prompts `config/prompts/docreview/*` ([R]). Open notes: `make inspector` needs a Doc Review token (no command prints one yet); `src/Spike` still mentions refunds in text only. Spend: $0.
 - 2026-11-12 — G1 polish + G1 + M6 start (with human). Done: vote reasons, accurate turn-over error, prompt fixes, day/phase labels, scripted villager seat; demo cassette seed 8; G1 = headline; M6 decisions 034 (Telegram), 035 (human seat), 036 (Doc Review, decline with a note). Blocked: none. Needs review: `player.md`, `lib/` error wording, branches M4/M5/g1-polish unmerged. Spend: $0 (Ollama local).
 - 2026-11-11 — M5 done (with human). Built: `leash:werewolf:play` (`PlayGameCommandTest`), per-seat record/replay `SeatCassette`/`RecordingSeatProvider`/`ReplayPlatform` (`ReplayPlatformTest`, pins upstream `RecordingProvider` content-blind signature, BUGS.md), `WerewolfAgentsTest` (full scripted game: denial, budget 3, deadline), `WerewolfReplayTest`, `make werewolf`, demo cassette seed 7 (live `qwen3:latest`, 240 s turns, wolves win day 1). Hook: context warning now counts tokens (300k, step 100k). Decision 033. Test changes: `.claude/tests/hooks.t.sh` context checks (logged). Blocked: none (laptop idle sleep hung the first recording; use `caffeinate -dims` on AC). Needs review: `player.md`, M4/M5 `lib/` ([R]). Spend: $0 (local Ollama).
