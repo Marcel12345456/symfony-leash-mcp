@@ -6,6 +6,7 @@ namespace Leash\HumanInput\Server;
 
 use Leash\HumanInput\Idempotency\ProcessedInputRequests;
 use Leash\HumanInput\Policy\ApprovalPolicyInterface;
+use Leash\HumanInput\Policy\DecliningApprovalPolicyInterface;
 use Leash\HumanInput\RequestState\BoundRequest;
 use Leash\HumanInput\RequestState\RequestBinder;
 use Leash\HumanInput\RequestState\RequestStateRejected;
@@ -61,10 +62,12 @@ final readonly class HumanInputGate
         }
 
         $answer = $context?->getInputContext()?->elicitResult(self::KEY);
+        $reason = null !== $answer && $answer->isAccepted() && $policy instanceof DecliningApprovalPolicyInterface ? $policy->declineReason($answer->content ?? []) : null;
 
         return match (true) {
             null === $answer, $answer->isCancelled() => Decision::unanswered(),
             $answer->isDeclined() => Decision::declined(),
+            null !== $reason => Decision::declined($reason, $bound->nonce),
             default => Decision::proceed($policy->applyAnswer($input, $answer->content ?? []), $bound->nonce),
         };
     }

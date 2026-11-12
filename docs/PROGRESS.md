@@ -13,7 +13,7 @@
 
 ## Current
 
-- Phase: **M6 Human seat + Doc Review — in progress** (design done, no code yet), branch `m/phase-6-human-seat-doc-review`, stacked on `m/g1-polish` (main lacks M4/M5; rebase after merges). [R] phase. Left: all M6 code.
+- Phase: **M6 Human seat + Doc Review — in progress** (design done, no code yet), branch `m/phase-6-human-seat-doc-review`, based on main (M4, M5, g1-polish merged 2026-11-12). [R] phase. Left: all M6 code.
 - G1 = headline, demo seed 8. Design: decisions/034 (Telegram), 035 (human seat), 036 (Doc Review, decline with a note). Order: Doc Review first, then Refund Desk removal, then human seat, Telegram last (cut order #2).
 - Done-signal: `.claude/done.sh` plus `DocReviewFlowTest` (publish → input_required no side effects; approve with edited headline → published; decline + note → doc_send_back → author gets note; duplicate retry idempotent; author never sees doc_rubric/reviewer tools); `ElicitMissingInputPolicyTest` (synthetic: exactly the missing fields); `HumanSeatTest` (vote input_required → inbox answer → retry → game continues); architecture test forbids DocReview in lib/; no RefundDesk references; `TelegramPollerTest` (mock HttpClient) if Telegram is built.
 - Blocked: none.

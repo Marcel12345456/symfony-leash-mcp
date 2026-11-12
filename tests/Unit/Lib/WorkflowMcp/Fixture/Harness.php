@@ -10,6 +10,7 @@ use Leash\HumanInput\Policy\ApprovalPolicyInterface;
 use Leash\HumanInput\RequestState\RequestBinder;
 use Leash\HumanInput\RequestState\RequestStateKey;
 use Leash\HumanInput\Server\HumanInputGate;
+use Leash\WorkflowMcp\Event\ApprovalDeclined;
 use Leash\WorkflowMcp\Event\CapabilityDenied;
 use Leash\WorkflowMcp\Event\ToolCalled;
 use Leash\WorkflowMcp\Schema\SchemaFactory;
@@ -39,7 +40,7 @@ final class Harness
     {
         $approval ??= new ApproveApproval();
         $dispatcher = new EventDispatcher();
-        foreach ([CapabilityDenied::class, ToolCalled::class] as $event) {
+        foreach ([CapabilityDenied::class, ToolCalled::class, ApprovalDeclined::class] as $event) {
             $dispatcher->addListener($event, function (object $e): void {
                 $this->events[] = $e;
             });
