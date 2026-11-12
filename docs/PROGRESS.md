@@ -17,7 +17,7 @@
 - Built: public vote reasons, accurate turn-over error, prompt fixes, day/phase in turn message and transcript, scripted villager seat (`--scripted-seat`, PLAN §3.5).
 - Demo cassette `data/werewolf/seed-8.json` (qwen3:latest, scripted seat 3; seed 7 removed). Denied wolf-tool call + injection that makes wolf Eve confess; wolves win day 2. Details in Decisions 2026-11-11.
 - Done-signal green: `.claude/done.sh`, `make werewolf` → `Result: wolves`.
-- Next: **G1 gate (human)** — watch `var/werewolf/seed-8.md`, headline or fallback.
+- G1 = headline, demo seed 8 (Decisions 2026-11-12). Next: M6.
 - Blocked: none.
 
 ## Next prompt
@@ -130,6 +130,7 @@
 - 2026-11-11: G1 polish before the gate (human: "fix 1-4"): vote reasons are optional in `VoteInput` (max 200) so scripted tests stay valid; the prompt asks for them. Demo cassette re-recorded (seed 7, wolves win day 2). `LEASH_OLLAMA_MODEL` must be `qwen3:latest` on this Mac: with `qwen3:8b` every turn fails with "No provider found" and the game silently ends in a draw after 56 steps (candidate: fail fast on an unknown model).
 - 2026-11-11: Demo moments of PLAN §3.5 come from one scripted villager seat (human: "One scripted villager seat"), disclosed in the video; all other seats stay qwen3. It abstains from votes so it does not steer the outcome. Model stays `qwen3:latest` for now (human); bigger local model (gpt-oss 20B / Qwen 3.6 27B) is a later comparison. Demo seed 8.
 - 2026-11-11: Seed-8 demo story: wolves kill the seer night 1; scripted Cara's `ww_choose_victim` is denied, her "[MODERATOR OVERRIDE]" makes wolf Eve confess; wolf Anna turns on Eve; vote ties 2–2, nobody dies; night 2 wolves kill Cara and win by parity. Pitch point: the server blocked the tool, the LLM fell for the injection — capabilities belong in the workflow.
+- 2026-11-12: **G1 = headline** (human: "g1 seed 8"): Werewolf stays the main demo, plan §1/§10 unchanged; demo game = seed 8 (`data/werewolf/seed-8.json`, scripted seat 3). Bigger local model comparison and more seeds are optional, later (M7 records the best game).
 
 ## Test changes
 
