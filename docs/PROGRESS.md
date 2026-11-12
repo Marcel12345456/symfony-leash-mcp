@@ -139,6 +139,8 @@
 
 - 2026-11-12: Dashboard diagram: `MermaidDumper(statemachine, LR)` + marking + own appended `style placeN fill:…` line; vendor mermaid 11.17.2 IIFE as `public/vendor/mermaid.min.js` (`decisions/037`).
 
+- 2026-11-12: Replay generalised: cassette key `int|string` (Doc Review `author:d1`), prompt hash per agent set, `LEASH_REPLAY_PACE` waits before each answer, `leash:work --record/--cassette` (default `data/docreview/demo.json`); worker plays no model turns under `LEASH_MODEL=replay` (`decisions/038`).
+
 ## Test changes
 
 - 2026-11-12: Refund Desk retired (decisions/022; code at tag `refund-desk-v1`). Removed `tests/Integration/RefundDesk/SeedDemoCommandTest.php` (refund seed C1–C8 + H5 idempotent, reset to `received`, C3 injection). Replacement: `tests/Integration/DocReview/SeedDemoCommandTest.php` (new `leash:demo:seed` run twice, d1–d3 in `drafting`, d2 brief mentions Node 18 but not upgrade notes).
@@ -155,6 +157,8 @@
 - 2026-11-11: Unavailable-tool error reworded in `ToolResults::unavailable()` (`is not available to you in state "X": your role cannot use it here, or your turn is over.`), because "not available to your role" was wrong when a seat's turn had simply ended (G1 transcript L440ff.). Exact-string assertions updated in `WorkflowServerTest`, `McpClientToolboxTest`, `RefundMcpEndpointTest`, `WerewolfVisibilityTest`; same check, new wording. `TranscriptWriterTest` passes day and phase instead of a `Game` (call sites only). `WerewolfMcpGameTest` scripted votes now carry a reason and the test asserts it appears in the public log (stronger, not weaker).
 
 <!-- Every weakened, deleted, skipped or changed assertion: date, test, reason. -->
+
+- 2026-11-12: `ReplayPlatformTest::testCassetteFromAnotherPromptIsRefused` expects "recorded with other prompts" instead of "recorded with another player prompt": cassettes now pin a prompt set (Werewolf or Doc Review, decisions/038). Same check, new wording.
 
 - 2026-11-10: `.claude/tests/hooks.t.sh` context checks now use usage lines (tokens) instead of zero-filled KB files; "small transcript quiet" became "110k tokens quiet (700 KB transcript is fine)", plus a bytes/4 fallback check. Reason: the hook now measures real context tokens (human: warning fired at ~10% of the 1M context).
 - 2026-11-10: `ScopedCapabilityProviderTest` / `WorkflowServerTest` resource tests (added in d1a9888) expect `doc://{subjectId}/rubric` (provider) and `doc://d1/rubric` (server): the rubric fixture now uses the new `{subjectId}` URI placeholder. Same checks, new URI.

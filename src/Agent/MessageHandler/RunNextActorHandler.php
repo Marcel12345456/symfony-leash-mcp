@@ -32,6 +32,13 @@ final readonly class RunNextActorHandler
 
     public function __invoke(RunNextActor $message): void
     {
+        // A replay lives in the process that plays it (leash:werewolf:play, leash:work); the worker has no cassette
+        // position to continue from. A human's answer was already applied by the resume (decisions/038).
+        if ('replay' === $this->models->defaultModel()) {
+            $this->logger->notice('RunNextActor {workflow}:{subject}: LEASH_MODEL=replay, the worker plays no model turns.', ['workflow' => $message->workflow, 'subject' => $message->subjectId]);
+
+            return;
+        }
         if (DocWorkRunner::WORKFLOW === $message->workflow) {
             $turns = $this->docReview->work($message->subjectId, $this->models->create());
             $this->logger->info('RunNextActor {subject}: {turns}.', ['subject' => $message->subjectId, 'turns' => [] === $turns ? 'nobody acts' : implode('; ', $turns)]);
