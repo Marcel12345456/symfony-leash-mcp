@@ -80,7 +80,7 @@ make inspector CALLER=seat:4 MCP=werewolf_game/seed-8    # Dan, a villager: no t
 flowchart LR
     A[Agent<br>Symfony AI] -- "tools/list, tools/call<br>Bearer token" --> E["/mcp/{workflow}/{id}<br>Leash\WorkflowMcp"]
     E -- "state ∩ role" --> W[(Symfony Workflow<br>+ subject)]
-    E -- "input_required" --> H[Leash\HumanInput]
+    E -- "input_required" --> H["Leash\HumanInput"]
     H -- "inbox, email, Telegram" --> P((Human))
     P -- answer --> H
     H -- "retry with the agent's token" --> E
@@ -101,9 +101,9 @@ sequenceDiagram
     participant I as Inbox / Telegram
     A->>S: tools/call doc_publish
     S-->>A: input_required + signed requestState (nothing changed)
-    A->>I: park PendingInput, notify; the turn ends
+    A->>I: park PendingInput, notify, end the turn
     I->>S: human answers → retry with answer + requestState, as the agent
-    S-->>A: result (applied once; a duplicate retry gets the same result)
+    S-->>A: result, applied once (a duplicate retry gets the same result)
     Note over A,S: PendingInputResolved → RunNextActor: the worker runs the next agent the workflow picks
 ```
 
