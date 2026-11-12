@@ -22,6 +22,7 @@ final class LibraryBoundariesTest extends TestCase
         yield 'lib → App\\' => [self::LIB, '/\bApp\\\\/'];
         yield 'lib → RefundDesk' => [self::LIB, '/RefundDesk/i'];
         yield 'lib → Werewolf' => [self::LIB, '/Werewolf/i'];
+        yield 'lib → DocReview' => [self::LIB, '/DocReview|doc_review/i'];
         yield 'HumanInput → WorkflowMcp' => [self::LIB . '/HumanInput', '/Leash\\\\WorkflowMcp\\\\/'];
     }
 
