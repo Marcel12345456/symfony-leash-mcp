@@ -17,6 +17,7 @@
 - Done in M6: decline with a reason (lib), Doc Review over MCP + agents (`leash:work`, `HumanInputToolbox`), Refund Desk retired (tag `refund-desk-v1`), seed d1–d3, `make work`.
 - Left: human seat (decisions/035: elicit-missing step, MRTR for place tools, `HumanSeatTest`); Telegram (decisions/034, cut order #2); Doc Review replay for `make demo` is M7.
 - Done-signal: `.claude/done.sh` (220 tests) + `DocReviewFlowTest`, `DocReviewAgentsTest`, `RetiredDemoTest` green; open: `ElicitMissingInputPolicyTest`, `HumanSeatTest`.
+- Human seat done-signal (decisions/035): `ElicitMissingInputPolicyTest` (synthetic `doc_rate` place tool): human-backed caller with missing fields → `input_required` naming exactly those fields, no side effect; full arguments → no question; answer → applied once; duplicate retry → stored result; agent caller with missing fields → JSON-RPC -32602 as before; `tools/list` for a human-backed caller has no `required`. `HumanSeatTest` (Werewolf): human seat's vote turn → pending input with an enum of living seats → answer → retry → vote recorded, game not expired and continues. Plus `.claude/done.sh`.
 - Blocked: none.
 
 ## Next prompt
