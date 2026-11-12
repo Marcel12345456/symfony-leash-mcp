@@ -9,6 +9,7 @@ final readonly class Vote implements Action
     public function __construct(
         public int $seat,
         public int $target,
+        public string $reason = '',
     ) {}
 
     public function actor(): int

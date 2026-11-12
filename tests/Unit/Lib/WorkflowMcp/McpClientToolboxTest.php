@@ -64,7 +64,7 @@ final class McpClientToolboxTest extends TestCase
 
         $result = $this->toolbox($document, 'ROLE_AUTHOR')->execute(new ToolCall('c1', 'doc_approve', ['note' => 'sneaky']));
 
-        self::assertSame('Error: "doc_approve" is not available to your role in state "review". Available now: doc_read_comments.', $result->getResult());
+        self::assertSame('Error: "doc_approve" is not available to you in state "review": your role cannot use it here, or your turn is over. Available now: doc_read_comments.', $result->getResult());
         self::assertCount(1, $this->harness->eventsOf(CapabilityDenied::class));
         self::assertSame('review', $document->getStatus());
     }

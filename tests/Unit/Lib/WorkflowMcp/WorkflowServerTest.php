@@ -55,7 +55,7 @@ final class WorkflowServerTest extends TestCase
         $result = $this->client($document, 'ROLE_AUTHOR')->call('doc_approve', ['note' => 'sneaky']);
 
         self::assertTrue($result['isError'] ?? null);
-        self::assertSame('"doc_approve" is not available to your role in state "review". Available now: doc_read_comments.', StatelessClient::text($result));
+        self::assertSame('"doc_approve" is not available to you in state "review": your role cannot use it here, or your turn is over. Available now: doc_read_comments.', StatelessClient::text($result));
         self::assertSame('review', $document->getStatus());
         self::assertSame(0, $this->harness->subjects->saves);
         $denied = $this->harness->eventsOf(CapabilityDenied::class);

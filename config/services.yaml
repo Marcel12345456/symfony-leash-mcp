@@ -9,6 +9,8 @@
 parameters:
     # Werewolf transcripts (decisions/032); tests write into the cache dir.
     leash.werewolf.transcripts: '%kernel.project_dir%/var/werewolf'
+    # Recorded Werewolf games, committed (decisions/033); tests replay the same files.
+    leash.werewolf.cassettes: '%kernel.project_dir%/data/werewolf'
 
 services:
     # default configuration for services in *this* file

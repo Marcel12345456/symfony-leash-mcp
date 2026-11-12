@@ -22,6 +22,7 @@ final class Game
     public const int SEATS = 6;
     public const int STATEMENTS_PER_SEAT = 2;
     public const int MAX_STATEMENT_LENGTH = 300;
+    public const int MAX_VOTE_REASON_LENGTH = 200;
     public const int MAX_DAYS = 4;
 
     private Phase $phase = Phase::Night;
@@ -196,7 +197,7 @@ final class Game
             $action instanceof ChooseVictim => $this->chooseVictim($actor, $this->seats[$action->target]),
             $action instanceof Inspect => $this->inspect($actor, $this->seats[$action->target]),
             $action instanceof Say => $this->say($actor, trim($action->message)),
-            $action instanceof Vote => $this->vote($actor, $this->seats[$action->target]),
+            $action instanceof Vote => $this->vote($actor, $this->seats[$action->target], trim($action->reason)),
             default => throw new \LogicException(\sprintf('Unsupported action %s.', $action::class)),
         };
 
@@ -341,10 +342,12 @@ final class Game
         ++$this->turn;
     }
 
-    private function vote(Seat $voter, Seat $target): void
+    /** The reason, if any, is public: the village sees why each seat voted. */
+    private function vote(Seat $voter, Seat $target, string $reason): void
     {
         $this->votes[$voter->number] = $target->number;
-        $this->log(EventType::VoteCast, Audience::Public, \sprintf('%s votes for %s.', $voter->label(), $target->label()), $voter->number, $target->number);
+        $text = '' === $reason ? \sprintf('%s votes for %s.', $voter->label(), $target->label()) : \sprintf('%s votes for %s: %s', $voter->label(), $target->label(), $reason);
+        $this->log(EventType::VoteCast, Audience::Public, $text, $voter->number, $target->number);
     }
 
     /** Wolves agree → that seat dies; they disagree → seeded pick among their choices; no choice → nobody dies. */

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Werewolf;
 
+use App\Werewolf\Rules\EventType;
 use App\Werewolf\Rules\Game;
 use App\Werewolf\Rules\Phase;
 use App\Werewolf\Rules\Role;
@@ -30,6 +31,11 @@ final class WerewolfMcpGameTest extends WerewolfMcpCase
         self::assertSame('over', $this->game('g1')->getStatus());
         self::assertNotNull($game->winner());
         self::assertSame([], $this->game('g1')->denials(), 'scripted seats only call what they can see');
+        $votes = array_filter($game->events(), static fn($e): bool => EventType::VoteCast === $e->type);
+        self::assertNotSame([], $votes);
+        foreach ($votes as $vote) {
+            self::assertMatchesRegularExpression('/votes for .+ \(seat (\d)\): Seat \1 never answered me\.$/', $vote->text, 'the vote reason is in the public log');
+        }
     }
 
     public function testSameSeedGivesTheSameGame(): void
@@ -89,7 +95,8 @@ final class WerewolfMcpGameTest extends WerewolfMcpCase
 
         return match ($tool) {
             'ww_choose_victim' => ['target' => array_values(array_diff($others, self::ints((array) (self::read($client, $gameId, 'wolf-den')['pack'] ?? []))))[0]],
-            'ww_inspect', 'ww_vote' => ['target' => $others[0]],
+            'ww_inspect' => ['target' => $others[0]],
+            'ww_vote' => ['target' => $others[0], 'reason' => \sprintf('Seat %d never answered me.', $others[0])],
             'ww_say' => ['message' => \sprintf('Seat %d here. I suspect seat %d.', $seat, $others[0])],
             default => self::fail('Unexpected tool ' . $tool),
         };

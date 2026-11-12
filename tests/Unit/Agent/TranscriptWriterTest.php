@@ -8,6 +8,7 @@ use App\Agent\TurnOutcome;
 use App\Agent\Werewolf\SeatTurn;
 use App\Agent\Werewolf\TranscriptWriter;
 use App\Werewolf\Rules\Game;
+use App\Werewolf\Rules\Phase;
 use App\Werewolf\Rules\Role;
 use PHPUnit\Framework\TestCase;
 use Symfony\AI\Platform\Message\Message;
@@ -46,7 +47,7 @@ final class TranscriptWriterTest extends TestCase
         );
         $writer = new TranscriptWriter($this->directory);
 
-        $writer->turn('g1', self::game(), new SeatTurn(1, $messages, 'I chose seat 2.', 1, TurnOutcome::Done));
+        $writer->turn('g1', 1, Phase::Night, new SeatTurn(1, $messages, 'I chose seat 2.', 1, TurnOutcome::Done));
         $text = $this->read($writer);
 
         self::assertStringContainsString('## Day 1, night: seat 1 (done, 1 tool call)', $text);
@@ -61,7 +62,7 @@ final class TranscriptWriterTest extends TestCase
     {
         $writer = new TranscriptWriter($this->directory);
 
-        $writer->turn('g1', self::game(), new SeatTurn(3, new MessageBag(), null, 0, TurnOutcome::TimedOut, 'Idle timeout reached'));
+        $writer->turn('g1', 1, Phase::Night, new SeatTurn(3, new MessageBag(), null, 0, TurnOutcome::TimedOut, 'Idle timeout reached'));
 
         self::assertStringContainsString("seat 3 (timed_out, 0 tool calls)\n\n**Turn ended:** Idle timeout reached", $this->read($writer));
     }
@@ -69,7 +70,7 @@ final class TranscriptWriterTest extends TestCase
     public function testLastLineNamesTheResult(): void
     {
         $writer = new TranscriptWriter($this->directory);
-        $writer->turn('g1', self::game(), new SeatTurn(1, new MessageBag(), 'ok', 0, TurnOutcome::Done));
+        $writer->turn('g1', 1, Phase::Night, new SeatTurn(1, new MessageBag(), 'ok', 0, TurnOutcome::Done));
 
         $writer->finish('g1', self::game());
         $lines = explode("\n", rtrim($this->read($writer), "\n"));

@@ -17,7 +17,7 @@ final class ToolResults
     public static function unavailable(string $tool, array $places, array $available): CallToolResult
     {
         return self::error(\sprintf(
-            '"%s" is not available to your role in state "%s". %s',
+            '"%s" is not available to you in state "%s": your role cannot use it here, or your turn is over. %s',
             $tool,
             implode(', ', $places),
             self::availableNow($available),

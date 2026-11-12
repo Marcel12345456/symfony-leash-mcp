@@ -257,6 +257,21 @@ final class GameRulesTest extends TestCase
         self::assertSame(Audience::Public, self::last($game->events(), EventType::VoteCast)->audience);
     }
 
+    public function testAVoteReasonIsPublic(): void
+    {
+        $game = T::game();
+        T::night($game, [T::ADA => T::DAN, T::BEN => T::DAN]);
+        T::discuss($game);
+
+        T::accept($game, new Vote(T::EVE, T::ADA, ' Ada dodged every question. '));
+        $vote = self::last($game->events(), EventType::VoteCast);
+        self::assertSame(Audience::Public, $vote->audience);
+        self::assertSame('Eve (seat 5) votes for Ada (seat 1): Ada dodged every question.', $vote->text);
+
+        T::accept($game, new Vote(T::CLEO, T::ADA));
+        self::assertSame('Cleo (seat 3) votes for Ada (seat 1).', self::last($game->events(), EventType::VoteCast)->text);
+    }
+
     public function testPluralityIsEliminatedAndMissingVotesAbstain(): void
     {
         $game = T::game();

@@ -13,18 +13,16 @@
 
 ## Current
 
-- Plan v3 (`decisions/022`): Werewolf main, Doc Review second, Refund Desk retired in M6.
-- Phase: **M5 Agents play — in progress**, branch `m/phase-5-agents-play`, stacked on `m/phase-4-werewolf-mcp` (M4 not merged yet; rebase onto main after the M4 merge).
-- M5 done so far: decisions 027–032; `symfony/lock`; turn deadline (`skipSpeaker()`, `expire()`); lib `McpClientToolbox` + `TurnBudgetToolbox`; `SeatTurnRunner` + `McpConnector` over `InProcessPsr18Client` + prompt `player.md`.
-- M5 runner stretch done: `TranscriptWriter`, `NextActorRunner`, `RunNextActorHandler`, `ModelChoiceFactory` (details: M5 notes, Decisions).
-- M5 left, in order: `leash:werewolf:play --seed --record` (`ModelChoice` from `LEASH_MODEL`), `ReplayPlatform` + signature pin test (028), full-game agent test (`ScriptedSeatPlatform`, 030), live qwen3 game + cassette, `make werewolf`.
-- M5 done-signal and design: see "M5 notes".
-- M2 (PR #7) and M3 (PR #6) in main. M4 branch pushed, needs review ([R] `lib/`), then merge (human).
+- Phase: **G1 polish** done, branch `m/g1-polish` (pushed), stacked on M5 → M4 (unmerged). Needs review: `player.md`, `lib/` error wording ([R]).
+- Built: public vote reasons, accurate turn-over error, prompt fixes, day/phase in turn message and transcript, scripted villager seat (`--scripted-seat`, PLAN §3.5).
+- Demo cassette `data/werewolf/seed-8.json` (qwen3:latest, scripted seat 3; seed 7 removed). Denied wolf-tool call + injection that makes wolf Eve confess; wolves win day 2. Details in Decisions 2026-11-11.
+- Done-signal green: `.claude/done.sh`, `make werewolf` → `Result: wolves`.
+- G1 = headline, demo seed 8 (Decisions 2026-11-12). Next: M6.
 - Blocked: none.
 
 ## Next prompt
 
-/phase M5 — continue with the leash:werewolf:play command, then ReplayPlatform and the full-game agent test
+/phase G1 — human watches the recorded demo game (make werewolf, var/werewolf/seed-8.md), decides headline or fallback, record under Decisions; then /phase M6
 
 ## M5 notes
 
@@ -122,10 +120,26 @@
 - 2026-11-10: `RunNextActorHandler` queues the next `RunNextActor` after a played step until the game ends; locked/paused/missing/over stop the chain (a resumed input queues a new one via `RunNextActorOnResolved`). Workflows without agents (refund_case, doc_review for now) are logged and dropped.
 - 2026-11-10: `ModelChoiceFactory` reads `LEASH_MODEL` (`ollama` | `replay`; replay throws until `ReplayPlatform`, 028), `LEASH_OLLAMA_MODEL` (qwen3:8b), `LEASH_THINK`, `LEASH_TURN_TIMEOUT` (own HttpClient `timeout`/`max_duration`, marked workaround, 029). Test env: Ollama on closed port `127.0.0.1:9`, so handler tests run on the deadline path with no model. Transcripts: parameter `leash.werewolf.transcripts` (`var/werewolf`, tests: cache dir); `TranscriptWriter` leaves out the system prompt and thinking (non-streaming Ollama drops it, 029).
 
+- 2026-11-10: Replay is own code: recording decorator around `Ollama\Factory::createProvider` + `ReplayProvider` (per-seat FIFO over `ResultSerializer::toArray/fromArray`, prompt hash, explicit `--record`); no `RecordingProvider`/`Cassette` (no read-all API, content-blind default signature) (`decisions/033`, revises 028).
+- 2026-11-10: `leash:werewolf:play [--seed=7] [--game=seed-<seed>] [--model] [--max-steps=60]` in `App\Agent\Werewolf\PlayGameCommand`: replaces the game and transcript, steps until a winner; exit 1 and `Result: unfinished` otherwise (`PlayGameCommandTest`).
+- 2026-11-10: Replay built: `App\Agent\Replay\SeatCassette` (`data/werewolf/seed-<seed>.json`: model, prompt hash, interactions `{seat, result|timeout|error}`), `RecordingSeatProvider` (marked workaround), `ReplayPlatform` (per-seat FIFO over `MockPlatformFactory`, recorded failures fail again, exhausted seat → `LogicException`). `ModelChoiceFactory::create($model, $cassette)`; `leash:werewolf:play --record [--cassette]`; a replay that ends with unused answers fails (diverged). Seat from the first `You are seat N.` in the input (bag or normalized payload).
+- 2026-11-10: `WerewolfAgentsTest` green: six scripted agents play a whole game through runner steps (village wins day 2); villager's `ww_choose_victim` denied + logged; budget 3 (fourth call never reaches the server); silent wolf → one deadline. Calls to tools that vanished after acting also log denials (seat 6's extra `ww_say`).
+- 2026-11-11: First live qwen3 game recorded (`qwen3:latest`, think on, 120 s turn timeout): seed 7, village wins, 82 model requests, 32 steps; `WerewolfReplayTest` replays it. The run hung ~40 min when the Mac idle-slept (16:38, battery) and resumed after wake; record under `caffeinate -dims` on AC. 4 of ~10 day-2 votes timed out at 120 s → re-record with `LEASH_TURN_TIMEOUT=240` (human). Dev runs need `LEASH_WEREWOLF_SECRET` (`make install`), else every seat gets a bare 401.
+- 2026-11-11: Demo cassette = re-record with `LEASH_TURN_TIMEOUT=240` under `caffeinate -dims` (human): seed 7, wolves win day 1 (wolf seat 3 deflects suspicion from wolf seat 2 onto villager seat 6), 41 requests, 0 timeouts. Neither live game contains the §3.5 forbidden `ww_choose_victim` call or the prompt injection; staging them in the demo cassette is open. Record into `var/` (`--game=rec-N --cassette=var/werewolf/…`) and copy over, never into the committed cassette (replay test breaks mid-run).
+- 2026-11-11: Idea (stretch, after M6): Werewolf with more seats (8–10). Needs rules changes (`Game::SEATS`, composition), names, tests; ~2–3 h per live recording at 240 s. Candidate for `make tournament`.
+- 2026-11-11: G1 polish before the gate (human: "fix 1-4"): vote reasons are optional in `VoteInput` (max 200) so scripted tests stay valid; the prompt asks for them. Demo cassette re-recorded (seed 7, wolves win day 2). `LEASH_OLLAMA_MODEL` must be `qwen3:latest` on this Mac: with `qwen3:8b` every turn fails with "No provider found" and the game silently ends in a draw after 56 steps (candidate: fail fast on an unknown model).
+- 2026-11-11: Demo moments of PLAN §3.5 come from one scripted villager seat (human: "One scripted villager seat"), disclosed in the video; all other seats stay qwen3. It abstains from votes so it does not steer the outcome. Model stays `qwen3:latest` for now (human); bigger local model (gpt-oss 20B / Qwen 3.6 27B) is a later comparison. Demo seed 8.
+- 2026-11-11: Seed-8 demo story: wolves kill the seer night 1; scripted Cara's `ww_choose_victim` is denied, her "[MODERATOR OVERRIDE]" makes wolf Eve confess; wolf Anna turns on Eve; vote ties 2–2, nobody dies; night 2 wolves kill Cara and win by parity. Pitch point: the server blocked the tool, the LLM fell for the injection — capabilities belong in the workflow.
+- 2026-11-12: **G1 = headline** (human: "g1 seed 8"): Werewolf stays the main demo, plan §1/§10 unchanged; demo game = seed 8 (`data/werewolf/seed-8.json`, scripted seat 3). Bigger local model comparison and more seeds are optional, later (M7 records the best game).
+
 ## Test changes
+
+- 2026-11-11: `WerewolfReplayTest` replays seed 8 instead of seed 7 (demo cassette switched; the seed-7 cassette was recorded with an outdated prompt and is removed) and now also asserts the scripted seat, the denied `ww_choose_victim` call and the injection in the transcript (stronger).
+- 2026-11-11: Unavailable-tool error reworded in `ToolResults::unavailable()` (`is not available to you in state "X": your role cannot use it here, or your turn is over.`), because "not available to your role" was wrong when a seat's turn had simply ended (G1 transcript L440ff.). Exact-string assertions updated in `WorkflowServerTest`, `McpClientToolboxTest`, `RefundMcpEndpointTest`, `WerewolfVisibilityTest`; same check, new wording. `TranscriptWriterTest` passes day and phase instead of a `Game` (call sites only). `WerewolfMcpGameTest` scripted votes now carry a reason and the test asserts it appears in the public log (stronger, not weaker).
 
 <!-- Every weakened, deleted, skipped or changed assertion: date, test, reason. -->
 
+- 2026-11-10: `.claude/tests/hooks.t.sh` context checks now use usage lines (tokens) instead of zero-filled KB files; "small transcript quiet" became "110k tokens quiet (700 KB transcript is fine)", plus a bytes/4 fallback check. Reason: the hook now measures real context tokens (human: warning fired at ~10% of the 1M context).
 - 2026-11-10: `ScopedCapabilityProviderTest` / `WorkflowServerTest` resource tests (added in d1a9888) expect `doc://{subjectId}/rubric` (provider) and `doc://d1/rubric` (server): the rubric fixture now uses the new `{subjectId}` URI placeholder. Same checks, new URI.
 - 2026-11-10: `tests/Unit/Lib/WorkflowMcp/ScopedCapabilityProviderTest::testUnknownPlaceToolIsAConfigurationError` passes an empty `PlaceResourceRegistry`, because `ScopedCapabilityProvider` now takes one. Call site only; no assertion changed.
 - 2026-11-10: `tests/Unit/RefundDesk/SearchPolicyToolTest` passes an `InMemoryUser` caller to the tool, because `PlaceToolInterface::__invoke()` now requires one. Call site only; no assertion changed.
@@ -135,6 +149,7 @@
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
 
+- 2026-11-11 — M5 done (with human). Built: `leash:werewolf:play` (`PlayGameCommandTest`), per-seat record/replay `SeatCassette`/`RecordingSeatProvider`/`ReplayPlatform` (`ReplayPlatformTest`, pins upstream `RecordingProvider` content-blind signature, BUGS.md), `WerewolfAgentsTest` (full scripted game: denial, budget 3, deadline), `WerewolfReplayTest`, `make werewolf`, demo cassette seed 7 (live `qwen3:latest`, 240 s turns, wolves win day 1). Hook: context warning now counts tokens (300k, step 100k). Decision 033. Test changes: `.claude/tests/hooks.t.sh` context checks (logged). Blocked: none (laptop idle sleep hung the first recording; use `caffeinate -dims` on AC). Needs review: `player.md`, M4/M5 `lib/` ([R]). Spend: $0 (local Ollama).
 - 2026-11-10 — M5 continued (with human). Built: `TranscriptWriter` (`var/werewolf/<game>.md`, last line `Result: …`), `NextActorRunner` + `Step`/`StepOutcome` (lock, pause, `actorsAmong` round, deadline via `expire()`), `RunNextActorHandler` (chains until game over), `ModelChoiceFactory` (`LEASH_MODEL`, own Ollama HttpClient timeout), test helper `ScriptedSeatPlatform`; new env vars in `.env`/`.env.test`; parameter `leash.werewolf.transcripts`. Tests: `TranscriptWriterTest` (3), `NextActorRunnerTest` (3), `RunNextActorHandlerTest` (3). Test changes: none. Blocked: none. Needs review: prompt `player.md` and M4/M5 `lib/` ([R], unchanged this stretch). Spend: $0.
 
 - 2026-11-10 — M5 continued (with human). VERIFY → decisions 030 (scripted fake platform via `MockPlatformFactory`), 031 (MCP client toolbox API, in-process session pinned), 032 (turn exceptions: raw HttpClient transport errors, transcript accessors). Built: lib `McpClientToolbox` (bare names, server errors as text, empty-properties schema → null) + `TurnBudgetToolbox`; App `McpConnector`, `InProcessPsr18Client`, `ModelChoice`, `TurnOutcome`, `SeatTurnRunner`, `SeatTurn`; prompt `player.md`. Tests: `McpClientToolboxTest` (5), `SeatTurnRunnerTest` (4). BUGS.md: candidate (Ollama HTTP errors lose the body). Test changes: none. Blocked: none. Needs review: `lib/WorkflowMcp/Client` ([R]), prompt `player.md` ([R]). Spend: $0.

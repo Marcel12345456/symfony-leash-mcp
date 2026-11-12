@@ -52,6 +52,22 @@ final class NextActorRunnerTest extends WerewolfMcpCase
         self::assertStringContainsString('seat 5 (timed_out, 0 tool calls)', $transcript);
     }
 
+    public function testTranscriptLabelsATurnWithThePhaseItWasPlayedIn(): void
+    {
+        $model = new ScriptedSeatPlatform([
+            1 => [new ToolCallResult([new ToolCall('c1', 'ww_choose_victim', ['target' => 2])]), 'I chose seat 2.'],
+            3 => [new ToolCallResult([new ToolCall('c1', 'ww_inspect', ['target' => 1])]), 'I inspected seat 1.'],
+            5 => [new ToolCallResult([new ToolCall('c1', 'ww_choose_victim', ['target' => 2])]), 'I chose seat 2 too.'],
+        ]);
+
+        $this->runner()->step('g1', new ModelChoice($model->platform(), 'qwen3:8b'));
+
+        self::assertSame(Phase::DayDiscussion, $this->game('g1')->game()->phase(), 'the last wolf call ended the night');
+        $transcript = (string) file_get_contents($this->service(TranscriptWriter::class)->path('g1'));
+        self::assertStringContainsString('## Day 1, night: seat 5 (done, 1 tool call)', $transcript);
+        self::assertStringNotContainsString('day_discussion: seat', $transcript);
+    }
+
     public function testHeldLockSkipsTheStep(): void
     {
         $model = new ScriptedSeatPlatform();

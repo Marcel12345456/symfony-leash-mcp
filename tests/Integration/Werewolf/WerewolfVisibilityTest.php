@@ -42,10 +42,31 @@ final class WerewolfVisibilityTest extends WerewolfMcpCase
         $villager->disconnect();
 
         self::assertTrue($result->isError);
-        self::assertSame('"ww_choose_victim" is not available to your role in state "night". No tools are available to you now.', self::text($result));
+        self::assertSame('"ww_choose_victim" is not available to you in state "night": your role cannot use it here, or your turn is over. No tools are available to you now.', self::text($result));
         $game = $this->game('g1');
         self::assertSame([['caller' => 'seat:2', 'capability' => 'ww_choose_victim', 'places' => ['night'], 'day' => 1]], $game->denials());
         self::assertCount(\count(Game::arranged(7, self::ROLES)->events()), $game->game()->events(), 'no event was added');
+    }
+
+    public function testASecondStatementInOneTurnSaysTheTurnIsOver(): void
+    {
+        $game = Game::arranged(7, self::ROLES);
+        $game->submit(new ChooseVictim(1, 2));
+        $game->submit(new ChooseVictim(5, 2));
+        $game->submit(new Inspect(3, 1));
+        $game->advance();
+        $game->advance();
+        self::assertSame(Phase::DayDiscussion, $game->phase());
+        $speaker = $game->currentSpeaker() ?? self::fail('no speaker');
+        $this->createGame('g1', $game);
+
+        $client = $this->connect(WerewolfCallers::seat($speaker), 'g1');
+        self::assertFalse($client->callTool('ww_say', ['message' => 'First.'])->isError);
+        $again = $client->callTool('ww_say', ['message' => 'Second.']);
+        $client->disconnect();
+
+        self::assertTrue($again->isError);
+        self::assertStringContainsString('or your turn is over', self::text($again));
     }
 
     public function testAVillagerReadingTheWolfDenIsDeniedAndLogged(): void

@@ -1,7 +1,7 @@
 # 028 — Werewolf replay: record with RecordingProvider, replay with an own per-seat platform
 
 - Date: 2026-11-10
-- Status: proposed (until the signature check test pins the content-blind default signature)
+- Status: superseded in part by 033 (replay is own code, not RecordingProvider)
 - PLAN reference: §3.4 Replay mode (follow-up to 007)
 
 ## Question

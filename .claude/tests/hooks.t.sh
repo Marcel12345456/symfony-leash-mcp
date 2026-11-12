@@ -20,15 +20,19 @@ expect_out    "prompt-check decision: en" 'Record it' "$(run_prompt "we'll go wi
 expect_out    "prompt-check decision: de" 'Record it' "$(run_prompt "ok, entschieden: Werewolf bleibt drin")"
 expect_no_out "prompt-check no decision"  'Record it' "$(run_prompt "what are the options for MRTR?")"
 # ---- prompt-check: context size, once per step
-tp="$TMP/transcript.jsonl"; head -c 450000 /dev/zero > "$tp"
+tp="$TMP/transcript.jsonl"
+usage() { printf '{"type":"user"}\n{"message":{"usage":{"input_tokens":2,"cache_read_input_tokens":%s,"cache_creation_input_tokens":500}}}\n' "$1" > "$tp"; }
 ctxp() { jq -n --arg tp "$tp" --arg cwd "$HP_PROJ" '{session_id:"ctx", prompt:"hello", transcript_path:$tp, cwd:$cwd}' \
           | CLAUDE_PROJECT_DIR="$HP_PROJ" bash $H/prompt-check.sh; }
-expect_out    "ctx: first warning at 440 KB" '"systemMessage".*/clear' "$(ctxp)"
+usage 110000
+expect_no_out "ctx: 110k tokens quiet (700 KB transcript is fine)" 'systemMessage' "$(head -c 700000 /dev/zero >> "$tp"; ctxp)"
+usage 310000
+expect_out    "ctx: first warning at 310k tokens" '"systemMessage".*/clear' "$(ctxp)"
 expect_no_out "ctx: no repeat in same step"  'systemMessage' "$(ctxp)"
-head -c 700000 /dev/zero > "$tp"
+usage 420000
 expect_out    "ctx: warns again next step"   'systemMessage' "$(ctxp)"
-head -c 100000 /dev/zero > "$TMP/small.jsonl"
-expect_no_out "ctx: small transcript quiet" 'systemMessage' "$(jq -n --arg tp "$TMP/small.jsonl" --arg cwd "$HP_PROJ" '{session_id:"s2",prompt:"hi",transcript_path:$tp,cwd:$cwd}' | CLAUDE_PROJECT_DIR="$HP_PROJ" bash $H/prompt-check.sh)"
+head -c 1300000 /dev/zero > "$TMP/big.jsonl"
+expect_out    "ctx: no usage lines, bytes / 4" 'systemMessage' "$(jq -n --arg tp "$TMP/big.jsonl" --arg cwd "$HP_PROJ" '{session_id:"s2",prompt:"hi",transcript_path:$tp,cwd:$cwd}' | CLAUDE_PROJECT_DIR="$HP_PROJ" bash $H/prompt-check.sh)"
 # ---- prompt-check: kill switch
 touch "$HP_PROJ/.claude/hooks.off"
 expect_no_out "prompt-check off switch" 'done-signal' "$(run_prompt "implement the SchemaFactory")"
