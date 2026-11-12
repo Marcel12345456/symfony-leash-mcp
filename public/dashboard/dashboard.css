@@ -1,0 +1,62 @@
+:root {
+    --bg: #f7f7f5; --panel: #ffffff; --text: #1c1c1a; --muted: #6b6b66; --line: #deded8;
+    --red: #c62828; --red-bg: #fdecea; --amber: #b26a00; --amber-bg: #fff4e0; --green: #2e7d32; --green-bg: #e8f5e9;
+    --chip: #eef0f4; --tool: #1d4ed8; --tool-bg: #e7eefe;
+    color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #141414; --panel: #1e1e1e; --text: #ececea; --muted: #a0a09a; --line: #333331;
+        --red: #ff8a80; --red-bg: #3a1f1f; --amber: #ffc46b; --amber-bg: #3a2e17; --green: #8fd694; --green-bg: #1b3320;
+        --chip: #2a2a2a; --tool: #9ab8ff; --tool-bg: #1c2742;
+    }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+a { color: var(--tool); }
+h2 { font-size: 1.05rem; margin: 0 0 .6rem; }
+h2 small { color: var(--muted); font-weight: normal; margin-left: .4rem; }
+.bar { display: flex; align-items: center; gap: 1.5rem; padding: .7rem 1.5rem; background: var(--panel); border-bottom: 1px solid var(--line); }
+.brand { font-size: 1.25rem; }
+.spacer { flex: 1; }
+.tabs button { font: inherit; background: none; border: 0; padding: .4rem .9rem; border-radius: 6px; color: var(--muted); cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--chip); color: var(--text); font-weight: 600; }
+.tab { padding: 1rem 1.5rem; }
+.controls { display: flex; gap: 1.5rem; align-items: center; margin-bottom: 1rem; }
+.controls select { font: inherit; }
+.status { font-weight: 600; }
+.status .winner { color: var(--green); }
+.werewolf { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 1.5rem; }
+.seats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; }
+.seat { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: .8rem .9rem; min-height: 9rem; }
+.seat.on-turn { border-color: var(--amber); box-shadow: 0 0 0 2px var(--amber-bg); }
+.seat.dead { opacity: .55; }
+.seat header { display: flex; justify-content: space-between; gap: .5rem; margin-bottom: .5rem; }
+.seat .role { font-size: .85rem; padding: 0 .5rem; border-radius: 99px; background: var(--chip); }
+.seat .role.wolf { background: var(--red-bg); color: var(--red); }
+.seat .role.seer { background: var(--tool-bg); color: var(--tool); }
+.chips { display: flex; flex-wrap: wrap; gap: .3rem; margin: .25rem 0; }
+.chip { font: .82rem/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; padding: 0 .45rem; border-radius: 5px; background: var(--chip); }
+.chip.tool { background: var(--tool-bg); color: var(--tool); }
+.chip.none { color: var(--muted); background: none; font-family: inherit; font-style: italic; }
+.seat details { font-size: .8rem; color: var(--muted); }
+.seat pre { white-space: pre-wrap; word-break: break-word; margin: .3rem 0 0; max-height: 10rem; overflow: auto; }
+.log { list-style: none; margin: 0 0 1.2rem; padding: 0; max-height: 58vh; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+.log li { padding: .45rem .8rem; border-bottom: 1px solid var(--line); }
+.log li:last-child { border-bottom: 0; }
+.log .when { color: var(--muted); font-size: .8rem; margin-right: .5rem; }
+.log li.private { background: var(--chip); }
+.log li.death { font-weight: 600; }
+.denials { max-height: 20vh; }
+.denials li { color: var(--red); background: var(--red-bg); }
+.documents { display: grid; gap: 1.2rem; }
+.doc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.2rem; display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 1.2rem; }
+.doc h3 { margin: 0 0 .3rem; }
+.doc .brief { color: var(--muted); margin: 0 0 .6rem; }
+.timeline { list-style: none; margin: 0; padding: 0; max-height: 22rem; overflow: auto; font-size: .92rem; }
+.timeline li { padding: .3rem .6rem; border-left: 4px solid var(--line); margin-bottom: .25rem; }
+.timeline li.denied { border-color: var(--red); background: var(--red-bg); }
+.timeline li.requested, .timeline li.declined { border-color: var(--amber); background: var(--amber-bg); }
+.timeline li.transition { border-color: var(--green); background: var(--green-bg); }
+.timeline .actor { font-weight: 600; margin-right: .4rem; }
+pre.mermaid { background: transparent; margin: 0; }

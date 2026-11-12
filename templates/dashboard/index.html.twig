@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+{% block title %}Leash dashboard{% endblock %}
+{% block stylesheets %}<link rel="stylesheet" href="/dashboard/dashboard.css">{% endblock %}
+{% block javascripts %}
+<script src="/vendor/mermaid.min.js" defer></script>
+<script src="/dashboard/dashboard.js" defer></script>
+{% endblock %}
+{% block body %}
+<header class="bar">
+    <strong class="brand">Leash</strong>
+    <nav class="tabs" role="tablist">
+        <button role="tab" data-tab="werewolf" aria-selected="true">Werewolf</button>
+        <button role="tab" data-tab="doc-review" aria-selected="false">Doc Review</button>
+    </nav>
+    <span class="spacer"></span>
+    <a href="{{ path('inbox') }}">Inbox</a>
+</header>
+
+<main id="werewolf" class="tab" data-url-template="{{ path('dashboard_werewolf', {id: '__ID__'}) }}">
+    <section class="controls">
+        <label>Game
+            <select id="game">
+                {% for id in games %}<option value="{{ id }}"{{ id == game ? ' selected' }}>{{ id }}</option>{% else %}<option value="{{ game }}">{{ game }}</option>{% endfor %}
+            </select>
+        </label>
+        <label><input type="checkbox" id="reveal"> Reveal roles</label>
+        <span id="status" class="status">waiting for the game…</span>
+    </section>
+    <div class="werewolf">
+        <section>
+            <h2>What each seat sees <small>tools and resources from the MCP server, right now</small></h2>
+            <div id="seats" class="seats"></div>
+        </section>
+        <section>
+            <h2>Public log</h2>
+            <ol id="log" class="log"></ol>
+            <h2>Denied</h2>
+            <ul id="denials" class="log denials"></ul>
+        </section>
+    </div>
+</main>
+
+<main id="doc-review" class="tab" hidden data-url="{{ path('dashboard_doc_review') }}">
+    <div id="documents" class="documents"></div>
+</main>
+{% endblock %}
