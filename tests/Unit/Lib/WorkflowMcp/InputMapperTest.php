@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Lib\WorkflowMcp;
 
+use App\Tests\Unit\Lib\WorkflowMcp\Fixture\ContactInput;
 use App\Tests\Unit\Lib\WorkflowMcp\Fixture\ReviewInput;
 use App\Tests\Unit\Lib\WorkflowMcp\Fixture\Verdict;
 use Leash\WorkflowMcp\Tool\InputMapper;
@@ -65,5 +66,22 @@ final class InputMapperTest extends TestCase
         } catch (InvalidInputException $e) {
             self::assertStringContainsString($expected, implode(' ', $e->violations));
         }
+    }
+
+    /** Choice, Email and Url are not in the published schema (decisions/015); the Validator checks them here. */
+    public function testChoiceEmailAndUrlAreCheckedServerSide(): void
+    {
+        try {
+            self::mapper()->map(ContactInput::class, ['priority' => 'urgent', 'email' => 'not-an-email', 'homepage' => 'ftp:/nope']);
+            self::fail('Expected InvalidInputException.');
+        } catch (InvalidInputException $e) {
+            $violations = implode(' ', $e->violations);
+            self::assertStringContainsString('priority: The value you selected is not a valid choice.', $violations);
+            self::assertStringContainsString('email: This value is not a valid email address.', $violations);
+            self::assertStringContainsString('homepage: This value is not a valid URL.', $violations);
+        }
+
+        $valid = self::mapper()->map(ContactInput::class, ['priority' => 'low', 'email' => 'ada@example.org', 'homepage' => 'https://example.org']);
+        self::assertSame('ada@example.org', $valid?->email);
     }
 }

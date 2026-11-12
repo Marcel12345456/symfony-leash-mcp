@@ -38,6 +38,13 @@
 - Expected: the signature reflects the messages (normalize the bag, or serialize messages), or the docs require a custom signature closure.
 - Workaround: own per-seat cassette `App\Agent\Replay\RecordingSeatProvider` + `ReplayPlatform` (decisions/033).
 
+## symfony/ai-platform 0.15.0 — `JsonSchema\Factory` turns `mixed` and union properties into wrong schemas
+
+- Repro: `(new Factory())->buildProperties(X::class)` for `public function __construct(public mixed $anything = null, public int|string $either = 1)`.
+- Actual: `anything` → `{"type": ["null"]}` (only null is valid); `either` → `[]` (no type at all), with two PHP warnings `Undefined array key "type"` from `TypeInfoDescriber.php:77`. A plain `object` type throws `InvalidArgumentException` ("Cannot build schema from plain object type"), which is fine.
+- Expected: `mixed` → no type constraint (or an exception); `int|string` → `{"type": ["integer", "string"]}` (or an exception), no warnings.
+- Workaround: `Leash\WorkflowMcp\Schema\SchemaFactory::assertDescribable()` refuses such input classes with a `LogicException` naming class and property (`SchemaFactoryTest::testUnsupportedPropertyTypesFailLoudly`).
+
 ## Candidates (from code reading, not yet reproduced)
 
 - **symfony/ai-ollama-platform 0.15.0 — HTTP errors lose the Ollama error body.** `OllamaResultConverter` ignores the status code; a 4xx/5xx `{"error": "…"}` body becomes `RuntimeException('Response does not contain message.')` (`OllamaResultConverter.php:70-72`). Repro idea: `MockHttpClient` with status 500 and `{"error":"boom"}`. Workaround: the seat turn runner treats it as a failed turn (`decisions/032`).

@@ -157,6 +157,9 @@
 
 - 2026-11-12: `.claude/bin/clean-clone.sh [branch] [budget]`: clone from origin → `docker compose build` → `make install` → `leash:demo:prepare --model=replay`; own compose project and port 18765, cleaned up after. First run: 32 s (Docker image layers cached on this Mac, composer cache empty).
 
+- 2026-11-12: §7 audit (Explore agent): 35 of 39 items covered; gaps L5 (Choice/Email/Url), L6 (unsupported constructs fail loudly), D2 (ActorSelector hand-off on doc_review), D3 (rubric only for the reviewer in in_review). PLAN §7 "Range, Length, Choice, Email, Url → schema" is read through decisions/015: Choice is structural (enum), the others stay server-side Validator checks with actionable errors; both are pinned.
+- 2026-11-12: `SchemaFactory` refuses input classes with `mixed`, union, intersection or untyped constructor properties (`LogicException` naming class and property): the platform factory emitted wrong schemas silently (BUGS.md).
+
 ## Test changes
 
 - 2026-11-12: Refund Desk retired (decisions/022; code at tag `refund-desk-v1`). Removed `tests/Integration/RefundDesk/SeedDemoCommandTest.php` (refund seed C1–C8 + H5 idempotent, reset to `received`, C3 injection). Replacement: `tests/Integration/DocReview/SeedDemoCommandTest.php` (new `leash:demo:seed` run twice, d1–d3 in `drafting`, d2 brief mentions Node 18 but not upgrade notes).

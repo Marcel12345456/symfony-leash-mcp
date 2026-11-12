@@ -23,9 +23,35 @@ final readonly class SchemaFactory
      */
     public function inputSchema(?string $inputClass): array
     {
+        if (null !== $inputClass) {
+            self::assertDescribable($inputClass);
+        }
         $schema = null === $inputClass ? null : $this->factory->buildProperties($inputClass);
 
         return null === $schema ? ['type' => 'object', 'properties' => new \stdClass()] : self::normalize($schema);
+    }
+
+    /**
+     * The platform factory maps `mixed` to `{"type": ["null"]}` and unions to a property without a type, silently
+     * or with PHP warnings (BUGS.md). Such a schema would mislead the model, so the input class is refused instead.
+     *
+     * @param class-string $inputClass
+     */
+    private static function assertDescribable(string $inputClass): void
+    {
+        foreach (new \ReflectionClass($inputClass)->getConstructor()?->getParameters() ?? [] as $parameter) {
+            $type = $parameter->getType();
+            $problem = match (true) {
+                null === $type => 'has no type',
+                $type instanceof \ReflectionNamedType && 'mixed' === $type->getName() => 'has type mixed',
+                $type instanceof \ReflectionUnionType && \count(array_filter($type->getTypes(), static fn(\ReflectionType $t): bool => !$t instanceof \ReflectionNamedType || 'null' !== $t->getName())) > 1,
+                $type instanceof \ReflectionIntersectionType => 'has type ' . $type,
+                default => null,
+            };
+            if (null !== $problem) {
+                throw new \LogicException(\sprintf('Input class %s: property "%s" %s, which no JSON schema type describes. Use one scalar type, a backed enum, or an array.', $inputClass, $parameter->getName(), $problem));
+            }
+        }
     }
 
     /** @return array<string, mixed> */
