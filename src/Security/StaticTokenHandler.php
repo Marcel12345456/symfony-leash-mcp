@@ -24,10 +24,6 @@ final readonly class StaticTokenHandler implements AccessTokenHandlerInterface, 
     private array $tokens;
 
     public function __construct(
-        #[Autowire('%env(LEASH_INVESTIGATOR_TOKEN)%')]
-        string $investigatorToken,
-        #[Autowire('%env(LEASH_RESOLVER_TOKEN)%')]
-        string $resolverToken,
         #[Autowire('%env(LEASH_WEREWOLF_SECRET)%')]
         #[\SensitiveParameter]
         string $werewolfSecret,
@@ -35,7 +31,7 @@ final readonly class StaticTokenHandler implements AccessTokenHandlerInterface, 
         #[\SensitiveParameter]
         string $kernelSecret,
     ) {
-        $tokens = ['agent:investigator' => $investigatorToken, 'agent:resolver' => $resolverToken];
+        $tokens = [];
         foreach (WerewolfCallers::all() as $caller) {
             $tokens[$caller] = WerewolfCallers::token($werewolfSecret, $caller);
         }

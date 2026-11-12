@@ -24,8 +24,8 @@ final class DoctrinePendingInputsTest extends KernelTestCase
         $schema->createSchema($em->getMetadataFactory()->getAllMetadata());
         $store = new DoctrinePendingInputs($em);
 
-        $asks = ['approval' => ['method' => 'elicitation/create', 'params' => ['message' => 'Refund?', 'requestedSchema' => ['type' => 'object']]]];
-        $call = new ToolCall('http://localhost/mcp/refund_case/C2', 'refund_case:C2', 'agent:resolver', 'refund_issue', ['amountCents' => 18000]);
+        $asks = ['approval' => ['method' => 'elicitation/create', 'params' => ['message' => 'Publish?', 'requestedSchema' => ['type' => 'object']]]];
+        $call = new ToolCall('http://localhost/mcp/doc_review/d1', 'doc_review:d1', 'agent:reviewer', 'doc_publish', ['headline' => 'Quill 2.0 released']);
         $pending = new PendingInput($call, new InputRequired($asks, 'signed-state'), new \DateTimeImmutable('2026-11-07 12:00:00'));
         $store->save($pending);
         $pending->answer(['approval' => ['action' => 'accept', 'content' => ['approve' => true]]], new \DateTimeImmutable('2026-11-07 12:05:00'));
