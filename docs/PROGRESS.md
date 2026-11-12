@@ -13,14 +13,14 @@
 
 ## Current
 
-- Phase: **M8 Hardening, README, video, submit — starting**, branch `m/phase-8-hardening-submit` from `main` (M6 and M7 merged by the human, 2026-11-12).
-- Done-signal (human-approved 2026-11-12): (1) `docs/test-matrix.md` maps every PLAN §7 item to test methods; `TestMatrixTest` fails if a listed test is missing or an item has none; gaps get written. (2) `ReadmeTest`: README has the §9 sections, every `make X` it names exists, relative links resolve; `lib/WorkflowMcp/README.md` and `lib/HumanInput/README.md` exist. (3) `.claude/bin/clean-clone.sh`: fresh clone → `make install` → `leash:demo:prepare` → winner; prints the time, fails above 5 min. (4) `.claude/done.sh` green. Human review [R]: README texts, BUGS.md issue text, `docs/video-script.md`; recording, upload, submission are the human's.
-- Telegram is not in the video (human); the live smoke test is optional.
+- Phase: **M8 Hardening, README, video, submit — automatable part done**, branch `m/phase-8-hardening-submit` (pushed, from `main`; [R], unmerged).
+- Done-signal green: (1) `docs/test-matrix.md` + `TestMatrixTest` (all 39 PLAN §7 items; gaps L5, L6, D2, D3 filled); (2) `ReadmeTest` (README per §9, make targets, links; both library READMEs); (3) `.claude/bin/clean-clone.sh` 24 s (budget 300 s); (4) `.claude/done.sh` green (271 tests).
+- Left for the human: review README, `lib/*/README.md`, `docs/upstream-issues.md` (then file the 7 issues), `docs/video-script.md` (decide the MRTR moment: A editor sign-off in replay / B live human seat / C live decline→revise); record, edit, upload the 90 s video; add the video link (and optionally a spectator GIF) to the README; merge; submit by Sat 11-21 20:00 CET. Optional: live Telegram smoke test, `make tournament`.
 - Blocked: none.
 
 ## Next prompt
 
-/phase M8 — agree the done-signal, then the §7 test-gap audit
+/phase M8 — the human reviewed the README and video script; continue with their feedback and the video link
 
 ## M5 notes
 
@@ -192,6 +192,8 @@
 ## Log
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
+
+- 2026-11-12 — M8 automatable part (with human). Done: CI memory fix on M7 (phpunit 512M), M6/M7 merged by the human, decisions/039 (related work), §7 test matrix + `TestMatrixTest`, `SchemaFactory` refuses mixed/union types (BUGS.md), Choice/Email/Url pinned, Doc Review hand-off + rubric visibility test, library READMEs, `leash:tokens`, `make inspector CALLER/MCP`, `--max-steps=0`, README per §9 + `ReadmeTest`, clean-clone script (24 s), upstream issue texts, video script draft. Blocked: none. Needs review ([R]): README and library READMEs, `docs/upstream-issues.md`, `docs/video-script.md` (MRTR choice), `SchemaFactory::assertDescribable` (lib). Spend: $0.
 
 - 2026-11-12 — M7 (with human). Done: dashboard (Werewolf spectator + Doc Review), decisions 037 (Mermaid) and 038 (paced replay, Doc Review cassette, worker idle under replay), `leash:demo:prepare`, `make demo`, `leash:demo:seed --reset`, README sections; 4 done-signal tests + replay/handler/seed tests. Blocked: none. Needs review ([R]): dashboard look at 1080p (light/dark), public dashboard, role hints in resource names, worker skipping model turns in replay mode, 3.5 MB vendored mermaid. Spend: $0 (local Ollama only).
 
