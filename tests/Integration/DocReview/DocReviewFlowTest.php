@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\DocReview;
 
 use App\DocReview\Entity\DocEvent;
+use App\DocReview\Entity\DocEventType;
 use App\DocReview\Entity\Document;
 use App\DocReview\Security\DocReviewCallers;
 use App\Tests\Integration\Support\KernelBrowserPsr18Client;
@@ -15,6 +16,7 @@ use Leash\HumanInput\Client\RawMcpClient;
 use Leash\HumanInput\Client\ToolCall;
 use Mcp\Client;
 use Mcp\Client\Transport\HttpTransport;
+use Mcp\Schema\Content\TextContent;
 use Mcp\Schema\Content\TextResourceContents;
 use Mcp\Schema\ResourceDefinition;
 use Mcp\Schema\Result\CallToolResult;
@@ -63,6 +65,44 @@ final class DocReviewFlowTest extends WebTestCase
         self::assertSame(['doc_request_changes', 'doc_approve'], self::toolNames($reviewer));
         self::assertContains('rubric', self::resourceNames($reviewer));
         $reviewer->disconnect();
+    }
+
+    /** Endpoint-level coverage formerly in the Refund Desk's endpoint test (retired, decisions/022). */
+    public function testInvisibleToolGivesActionableErrorLogsCapabilityDeniedAndChangesNothing(): void
+    {
+        $reviewer = $this->connect(DocReviewCallers::REVIEWER);
+        $result = $reviewer->callTool('doc_submit_draft', ['title' => 'Quill 2.0', 'body' => 'Not my draft.']);
+        $reviewer->disconnect();
+
+        self::assertTrue($result->isError);
+        $text = $result->content[0] ?? null;
+        self::assertInstanceOf(TextContent::class, $text);
+        self::assertSame('"doc_submit_draft" is not available to you in state "drafting": your role cannot use it here, or your turn is over. No tools are available to you now.', $text->text);
+        self::assertSame('drafting', $this->document()->getStatus());
+
+        $denied = array_values(array_filter(
+            $this->entityManager()->getRepository(DocEvent::class)->findBy(['documentId' => 'd1']),
+            static fn(DocEvent $e): bool => DocEventType::CapabilityDenied === $e->type,
+        ));
+        self::assertCount(1, $denied);
+        self::assertSame(DocReviewCallers::REVIEWER, $denied[0]->actor);
+        self::assertSame('doc_submit_draft', $denied[0]->payload['tool'] ?? null);
+    }
+
+    public function testInvalidInputReturnsValidatorMessagesAsActionableError(): void
+    {
+        $author = $this->connect(DocReviewCallers::AUTHOR);
+        $result = $author->callTool('doc_submit_draft', ['title' => '', 'body' => '']);
+        $author->disconnect();
+
+        self::assertTrue($result->isError);
+        $text = $result->content[0] ?? null;
+        self::assertInstanceOf(TextContent::class, $text);
+        $message = \is_string($text->text) ? $text->text : '';
+        self::assertStringContainsString('title: This value should not be blank.', $message);
+        self::assertStringContainsString('body: This value should not be blank.', $message);
+        self::assertStringContainsString('call "doc_submit_draft" again', $message);
+        self::assertSame('drafting', $this->document()->getStatus());
     }
 
     public function testPublishAsksFirstThenAnEditedHeadlineIsPublishedOnce(): void
