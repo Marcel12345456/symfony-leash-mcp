@@ -78,8 +78,9 @@ Leave d2 and d3 pending; they are fine as they are for the next shot.
 
 ## 8. Voice and captions
 
-Use the voice and caption column of [`video-script.md`](video-script.md). Recording the voice separately and laying
-it under the clips is easier than talking while recording.
+Use the voice and caption column of [`video-script.md`](video-script.md), or the AI narration in
+[`video-narration.md`](video-narration.md) (ElevenLabs, one segment per shot). Recording the voice separately and
+laying it under the clips is easier than talking while recording.
 
 ## 9. Edit, export, upload
 
