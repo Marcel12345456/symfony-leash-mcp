@@ -13,11 +13,9 @@
 
 ## Current
 
-- Phase: **M6 Human seat + Doc Review — done** (all four acceptance criteria green; [R], unmerged, needs review), branch `m/phase-6-human-seat-doc-review` (pushed), based on main (M4, M5, g1-polish merged).
-- Done in M6: decline with a reason (lib), Doc Review over MCP + agents (`leash:work`, `HumanInputToolbox`), Refund Desk retired (tag `refund-desk-v1`), seed d1–d3, `make work`; **human seat** (decisions/035): `ElicitMissingInputPolicy` + MRTR for place tools (lib), `InputChoicesInterface`, Werewolf `--human-seat` / `HUMAN_SEAT=n`, paused step skips the deadline.
-- Left: live Telegram smoke test (human, needs a bot token); Doc Review replay for `make demo` and the poller in `make demo` are M7.
-- Done-signal: `.claude/done.sh` green (237 tests) incl. `DocReviewFlowTest`, `DocReviewAgentsTest`, `RetiredDemoTest`, `ElicitMissingInputPolicyTest`, `HumanSeatTest`.
-- Telegram done (decisions/034 + re-check): `TelegramHumanInputNotifier` (decorates email; HTML parse mode, one button per option, inbox link otherwise), `leash:telegram:poll`, `TelegramCallbacks` (chat = DSN channel, unknown/foreign ignored, idempotent). Green: `TelegramHumanSeatTest` (button press resumes the human-seat vote, foreign/unknown/repeat presses, poller offset, link fallback), `TelegramBotTest` (env gate). Open: one live smoke test with a real bot (empty-keyboard edit, HTML message).
+- Phase: **M7 Spectator, replay demo, exhibition — in progress**, branch `m/phase-7-spectator-demo`, stacked on `m/phase-6-human-seat-doc-review` (M6 unmerged, [R]).
+- Done-signal (human-approved 2026-11-12): (1) `DashboardWerewolfTest`: `/` renders the Werewolf tab; JSON after a replayed seed-8 game has public log, winner, denied `ww_choose_victim`, roles only with reveal. (2) `SeatPanelMatchesServerTest`: every seat × every phase of the replayed game, panel tools/resources == MCP `tools/list`/`resources/list` with that seat's token. (3) `DashboardDocReviewTest`: Mermaid with current place, timeline colours (denied/requested/transition). (4) `DemoPrepareTest`: `leash:demo:prepare` with replay and Ollama on a closed port ends with a seed-8 winner and Doc Review documents moved forward. (5) `.claude/done.sh` green. Look at 1080p = human review [R].
+- Left from M6: live Telegram smoke test (human, needs a bot token).
 - Blocked: none.
 
 ## Next prompt
@@ -136,6 +134,8 @@
 - 2026-11-12: Doc Review workflow and "decline with a note" = editor accepts the form with `approve: false` + note; generic `DecliningApprovalPolicyInterface` + `ApprovalDeclined` event; app stores the note, `doc_send_back` carries it to the author (human, `decisions/036`).
 - 2026-11-12: Telegram implemented per decisions/034 with deviations recorded there: HTML parse mode (bridge's MarkdownV2 auto-escape misses `_*()[]~`), allowed chat = DSN `channel` (no separate `TELEGRAM_CHAT_ID`), non-choice inputs get the link in the text (Telegram rejects `localhost` URL buttons).
 - 2026-11-12: Human seat implemented per decisions/035 (implementation notes there): human-backed = workflow role via the role resolver (per game for Werewolf), place tools only, `InputChoicesInterface` for pick lists, `werewolf_game.human_seat` + `--human-seat`/`HUMAN_SEAT=n`; a paused step skips the deadline.
+
+- 2026-11-12: M7 (human): `make demo` replays Werewolf seed 8 paced (worker steps with a delay, dashboard polls every second); Doc Review gets a recorded cassette (replay key generalised from seat to agent id, one local Ollama recording); M7 branch stacked on M6.
 
 ## Test changes
 
