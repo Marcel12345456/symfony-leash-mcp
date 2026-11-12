@@ -19,11 +19,12 @@ use Symfony\Component\Workflow\Transition;
 /**
  * Synthetic workflow: draft → review → published, archive from draft and from published (same name, two instances).
  * `approve` is guarded: a locked document cannot be approved; with `$approvalOnApprove` it also needs a human (MRTR).
+ * With `$rating`, review also offers the acting place tool `doc_rate` to ROLE_RATER (decisions/035).
  */
 final class DocumentWorkflow
 {
     /** @param array<string, mixed> $workflowMetadata */
-    public static function create(array $workflowMetadata = ['mcp_prefix' => 'doc'], bool $approvalOnApprove = false): StateMachine
+    public static function create(array $workflowMetadata = ['mcp_prefix' => 'doc'], bool $approvalOnApprove = false, bool $rating = false): StateMachine
     {
         $transitions = [
             'submit' => new Transition('submit', 'draft', 'review'),
@@ -52,7 +53,7 @@ final class DocumentWorkflow
                     'mcp_tools' => [
                         'doc_read_comments' => ['ROLE_AUTHOR', 'ROLE_EDITOR'],
                         'doc_add_comment' => ['ROLE_EDITOR'],
-                    ],
+                    ] + ($rating ? ['doc_rate' => ['ROLE_RATER']] : []),
                     'mcp_resources' => [
                         'doc_guidelines' => ['ROLE_AUTHOR', 'ROLE_EDITOR'],
                         'doc_rubric' => ['ROLE_EDITOR'],
@@ -73,10 +74,10 @@ final class DocumentWorkflow
         return new StateMachine($definition, new MethodMarkingStore(true, 'status'), $dispatcher, 'document');
     }
 
-    public static function provider(): ScopedCapabilityProvider
+    public static function provider(?RateTool $rate = null): ScopedCapabilityProvider
     {
         return new ScopedCapabilityProvider(
-            new PlaceToolRegistry([new ReadCommentsTool(), new AddCommentTool()]),
+            new PlaceToolRegistry([new ReadCommentsTool(), new AddCommentTool(), $rate ?? new RateTool()]),
             new PlaceResourceRegistry([new GuidelinesResource(), new RubricResource()]),
             new ServiceLocator([OwnerRoleResolver::class => static fn(): OwnerRoleResolver => new OwnerRoleResolver()]),
         );
