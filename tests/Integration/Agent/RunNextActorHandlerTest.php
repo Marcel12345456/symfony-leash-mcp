@@ -41,7 +41,7 @@ final class RunNextActorHandlerTest extends WerewolfMcpCase
 
     public function testWorkflowWithoutAgentsIsLeftAlone(): void
     {
-        $this->handler()(new RunNextActor('refund_case', 'C1'));
+        $this->handler()(new RunNextActor('no_agents_workflow', 'x1'));
 
         self::assertSame([], $this->queued());
         self::assertSame(Phase::Night, $this->game('g1')->game()->phase());

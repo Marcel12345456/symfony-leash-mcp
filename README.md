@@ -13,13 +13,14 @@ nothing else is installed on the host.
 ## Commands
 
 ```
-make install      # composer install, warm the cache, migrate, seed demo cases; generate APP_SECRET + agent tokens into .env.local
+make install      # composer install, warm the cache, migrate, seed the Doc Review demo documents; generate APP_SECRET + Werewolf secret into .env.local
 make werewolf     # play one Werewolf game: replays data/werewolf/seed-8.json (SEED=…, LEASH_MODEL=ollama for live)
+make work         # run the Doc Review agents once over all open documents (bin/console leash:work; LEASH_MODEL=ollama)
 make test         # phpunit
 make qa           # php-cs-fixer (changed files) + phpstan + phpunit, quiet
 make qa-verbose   # the same with full output, whole tree
 make cs-fix       # apply php-cs-fixer
-make inspector TOKEN=...  # MCP Inspector against /mcp/refund_case/C1 (INSPECTOR_CASE=…); needs host Node ^22.23.4 or ^24.22.1
+make inspector TOKEN=...  # MCP Inspector against /mcp/doc_review/d1 (INSPECTOR_DOC=…); needs host Node ^22.23.4 or ^24.22.1
 ```
 
 Inside the container, or with a local PHP 8.4, pass `NATIVE=1` to skip Docker.

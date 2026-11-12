@@ -20,8 +20,9 @@ final class LibraryBoundariesTest extends TestCase
     public static function forbiddenReferences(): iterable
     {
         yield 'lib → App\\' => [self::LIB, '/\bApp\\\\/'];
-        yield 'lib → RefundDesk' => [self::LIB, '/RefundDesk/i'];
+        yield 'lib → refunds' => [self::LIB, '/refund/i'];
         yield 'lib → Werewolf' => [self::LIB, '/Werewolf/i'];
+        yield 'lib → DocReview' => [self::LIB, '/DocReview|doc_review/i'];
         yield 'HumanInput → WorkflowMcp' => [self::LIB . '/HumanInput', '/Leash\\\\WorkflowMcp\\\\/'];
     }
 

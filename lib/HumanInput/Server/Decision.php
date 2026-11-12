@@ -13,6 +13,8 @@ final readonly class Decision
         public ?object $input = null,
         public ?string $nonce = null,
         public ?InputRequiredResult $inputRequired = null,
+        /** Why a human declined, when the policy can tell (DecliningApprovalPolicyInterface). */
+        public ?string $reason = null,
     ) {}
 
     public static function proceed(object $input, ?string $nonce): self
@@ -25,9 +27,10 @@ final readonly class Decision
         return new self(Verdict::InputRequired, inputRequired: $result);
     }
 
-    public static function declined(): self
+    /** With a reason, the nonce lets the caller handle the decline once per request state. */
+    public static function declined(?string $reason = null, ?string $nonce = null): self
     {
-        return new self(Verdict::Declined);
+        return new self(Verdict::Declined, nonce: $nonce, reason: $reason);
     }
 
     public static function unanswered(): self

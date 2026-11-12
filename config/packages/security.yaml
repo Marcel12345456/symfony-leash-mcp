@@ -15,8 +15,8 @@ security:
         agents:
             memory:
                 users:
-                    'agent:investigator': { roles: [ROLE_INVESTIGATOR] }
-                    'agent:resolver': { roles: [ROLE_RESOLVER] }
+                    'agent:author': { roles: [ROLE_AUTHOR] }
+                    'agent:reviewer': { roles: [ROLE_REVIEWER] }
                     # Werewolf: game roles come from WerewolfSeatRoleResolver, not from here.
                     'seat:1': { roles: [ROLE_SEAT] }
                     'seat:2': { roles: [ROLE_SEAT] }

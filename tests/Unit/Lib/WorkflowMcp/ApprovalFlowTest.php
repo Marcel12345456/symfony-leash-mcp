@@ -8,8 +8,10 @@ use App\Tests\Unit\Lib\WorkflowMcp\Fixture\ApproveInput;
 use App\Tests\Unit\Lib\WorkflowMcp\Fixture\Document;
 use App\Tests\Unit\Lib\WorkflowMcp\Fixture\DocumentWorkflow;
 use App\Tests\Unit\Lib\WorkflowMcp\Fixture\Harness;
+use App\Tests\Unit\Lib\WorkflowMcp\Fixture\SignoffApproval;
 use App\Tests\Unit\Lib\WorkflowMcp\Fixture\StatelessClient;
 use Leash\HumanInput\RequestState\RejectionReason;
+use Leash\WorkflowMcp\Event\ApprovalDeclined;
 use Leash\WorkflowMcp\Event\ToolCalled;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\InMemoryUser;
@@ -77,6 +79,33 @@ final class ApprovalFlowTest extends TestCase
         self::assertSame(['doc_approve', 'doc_reject', 'doc_read_comments', 'doc_add_comment'], StatelessClient::at($result, 'structuredContent', 'availableTools'));
         self::assertSame('review', $this->document->getStatus());
         self::assertSame(0, $this->harness->subjects->saves);
+    }
+
+    public function testDeclineWithAReasonIsReportedOnceAndAppliesNothing(): void
+    {
+        $this->harness = new Harness(new SignoffApproval());
+        $state = $this->ask();
+        $no = ['action' => 'accept', 'content' => ['approve' => false, 'note' => 'Add the upgrade notes.']];
+
+        $result = $this->retry('bob', $state, $no);
+        $again = $this->retry('bob', $state, $no);
+
+        self::assertSame('Not approved: a human declined "doc_approve": Add the upgrade notes. The transition was not applied.', StatelessClient::at($result, 'structuredContent', 'message'));
+        self::assertSame(StatelessClient::at($result, 'structuredContent'), StatelessClient::at($again, 'structuredContent'), 'a duplicate retry replays the stored result');
+        self::assertSame('review', $this->document->getStatus());
+        $declined = $this->harness->eventsOf(ApprovalDeclined::class);
+        self::assertCount(1, $declined);
+        self::assertSame(['doc_approve', 'Add the upgrade notes.'], [$declined[0]->tool, $declined[0]->reason]);
+    }
+
+    public function testAcceptedYesOfADecliningPolicyApplies(): void
+    {
+        $this->harness = new Harness(new SignoffApproval());
+
+        $result = $this->retry('bob', $this->ask(), ['action' => 'accept', 'content' => ['approve' => true]]);
+
+        self::assertSame('Applied "doc_approve".', StatelessClient::at($result, 'structuredContent', 'message'));
+        self::assertSame([], $this->harness->eventsOf(ApprovalDeclined::class));
     }
 
     public function testCancelChangesNothing(): void

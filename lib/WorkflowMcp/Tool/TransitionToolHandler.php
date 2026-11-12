@@ -10,6 +10,7 @@ use Leash\HumanInput\Server\HumanInputGate;
 use Leash\HumanInput\Server\Verdict;
 use Leash\WorkflowMcp\Capability\ScopedCapabilityProvider;
 use Leash\WorkflowMcp\Capability\VisibleTool;
+use Leash\WorkflowMcp\Event\ApprovalDeclined;
 use Leash\WorkflowMcp\Event\CapabilityDenied;
 use Leash\WorkflowMcp\Event\ToolCalled;
 use Leash\WorkflowMcp\Metadata\WorkflowMetadata;
@@ -94,6 +95,10 @@ final readonly class TransitionToolHandler
 
                     return $decision->inputRequired;
                 case Verdict::Declined:
+                    if (null !== $decision->reason) {
+                        return $this->called($workflow, $subject, $caller, $toolName, $arguments, ToolResults::fromStored($this->declinedWithReason($workflow, $subject, $caller, $toolName, $decision->reason, $decision->nonce)));
+                    }
+
                     return $this->called($workflow, $subject, $caller, $toolName, $arguments, ToolResults::transitionResult(\sprintf('Not approved: a human declined "%s"; nothing changed.', $toolName), $places, $names));
                 case Verdict::Unanswered:
                     return $this->called($workflow, $subject, $caller, $toolName, $arguments, ToolResults::transitionResult(\sprintf('No answer: "%s" needs human approval that was not given; nothing changed.', $toolName), $places, $names));
@@ -114,6 +119,24 @@ final readonly class TransitionToolHandler
         });
 
         return $this->called($workflow, $subject, $caller, $toolName, $arguments, ToolResults::fromStored($result));
+    }
+
+    /**
+     * Once per request state: listeners may record the reason on the subject (saved), the transition is not applied.
+     *
+     * @return array<string, mixed>
+     */
+    private function declinedWithReason(WorkflowInterface $workflow, object $subject, UserInterface $caller, string $toolName, string $reason, ?string $nonce): array
+    {
+        return $this->humanInput->apply($nonce, function () use ($workflow, $subject, $caller, $toolName, $reason): array {
+            $this->dispatcher->dispatch(new ApprovalDeclined($workflow->getName(), $subject, $caller, $toolName, $reason));
+            $this->subjects->save($subject);
+
+            $after = array_map(static fn(VisibleTool $t): string => $t->name, $this->capabilities->visibleTools($workflow, $subject, $caller));
+            $places = array_map(strval(...), array_keys($workflow->getMarking($subject)->getPlaces()));
+
+            return ['state' => implode(', ', $places), 'availableTools' => $after, 'message' => \sprintf('Not approved: a human declined "%s": %s The transition was not applied.', $toolName, $reason)];
+        });
     }
 
     private function policy(WorkflowInterface $workflow, VisibleTool $tool): ?ApprovalPolicyInterface

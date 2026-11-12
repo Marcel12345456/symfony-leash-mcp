@@ -1,75 +1,75 @@
 # MCP metadata contract: PLAN §3.2, decisions/012. Tool names are {mcp_prefix}_{transition}.
-# M1 scope: `issue` takes no input and has no approval policy yet (both arrive in M2).
 framework:
     workflows:
-        refund_case:
-            type: state_machine
-            metadata:
-                mcp_prefix: refund
-                mcp_subject: App\RefundDesk\Entity\RefundCase
-            marking_store: { type: method, property: status }
-            supports: [App\RefundDesk\Entity\RefundCase]
-            initial_marking: received
-            places:
-                received: ~
-                investigating:
-                    metadata:
-                        mcp_tools:
-                            refund_get_order: [ROLE_INVESTIGATOR]
-                            refund_get_customer_history: [ROLE_INVESTIGATOR]
-                            refund_search_policy: [ROLE_INVESTIGATOR, ROLE_RESOLVER]
-                proposed:
-                    metadata:
-                        mcp_tools:
-                            refund_get_proposal: [ROLE_RESOLVER]
-                            refund_search_policy: [ROLE_RESOLVER]
-                refunded: ~
-                rejected: ~
-                closed: ~
-            transitions:
-                start_investigation:
-                    from: received
-                    to: investigating
-                    metadata:
-                        mcp_roles: [ROLE_INVESTIGATOR]
-                        mcp_description: 'Begin investigating this refund case.'
-                propose_resolution:
-                    from: investigating
-                    to: proposed
-                    metadata:
-                        mcp_roles: [ROLE_INVESTIGATOR]
-                        mcp_description: 'Record your proposed resolution (refund or reject) with amount and rationale.'
-                        mcp_input: App\RefundDesk\Mcp\Input\ProposeResolutionInput
-                issue:
-                    from: proposed
-                    to: refunded
-                    guard: "is_granted('REFUND_ISSUE', subject) and subject.isRefundDecision()"
-                    metadata:
-                        mcp_roles: [ROLE_RESOLVER]
-                        mcp_description: 'Issue the proposed refund.'
-                reject:
-                    from: proposed
-                    to: rejected
-                    guard: "subject.isRejectDecision()"
-                    metadata:
-                        mcp_roles: [ROLE_RESOLVER]
-                        mcp_description: 'Reject the refund request with a reason for the customer.'
-                        mcp_input: App\RefundDesk\Mcp\Input\RejectInput
-                revise:
-                    from: proposed
-                    to: investigating
-                    metadata:
-                        mcp_roles: [ROLE_RESOLVER]
-                        mcp_description: 'Send the case back to investigation, e.g. after a human declined the refund.'
-                close:
-                    from: [refunded, rejected]
-                    to: closed
-                    metadata:
-                        mcp_roles: [ROLE_RESOLVER]
-                        mcp_description: 'Close a refunded or rejected case.'
-
         # Werewolf (PLAN §3.5): transitions are the moderator's; seats act through place tools while it is their turn.
         # Roles come from WerewolfSeatRoleResolver: ROLE_ALIVE/ROLE_DEAD, ROLE_WOLF/SEER/VILLAGER, *_ON_TURN.
+        doc_review:
+            type: state_machine
+            metadata:
+                mcp_prefix: doc
+                mcp_subject: App\DocReview\Entity\Document
+            marking_store: { type: method, property: status }
+            supports: [App\DocReview\Entity\Document]
+            initial_marking: drafting
+            places:
+                drafting:
+                    metadata:
+                        mcp_resources:
+                            brief: [ROLE_AUTHOR, ROLE_REVIEWER]
+                            draft: [ROLE_AUTHOR, ROLE_REVIEWER]
+                            feedback: [ROLE_AUTHOR]
+                in_review:
+                    metadata:
+                        mcp_resources:
+                            brief: [ROLE_REVIEWER]
+                            draft: [ROLE_AUTHOR, ROLE_REVIEWER]
+                            rubric: [ROLE_REVIEWER]
+                approved:
+                    metadata:
+                        mcp_resources:
+                            brief: [ROLE_REVIEWER]
+                            draft: [ROLE_AUTHOR, ROLE_REVIEWER]
+                published:
+                    metadata:
+                        mcp_resources:
+                            draft: [ROLE_AUTHOR, ROLE_REVIEWER]
+            transitions:
+                submit_draft:
+                    from: drafting
+                    to: in_review
+                    metadata:
+                        mcp_roles: [ROLE_AUTHOR]
+                        mcp_description: 'Submit your draft (title and body) for review. Read the brief and any feedback first.'
+                        mcp_input: App\DocReview\Mcp\Input\SubmitDraftInput
+                request_changes:
+                    from: in_review
+                    to: drafting
+                    metadata:
+                        mcp_roles: [ROLE_REVIEWER]
+                        mcp_description: 'Send the draft back to the author with concrete feedback, when it fails the rubric.'
+                        mcp_input: App\DocReview\Mcp\Input\FeedbackInput
+                approve:
+                    from: in_review
+                    to: approved
+                    metadata:
+                        mcp_roles: [ROLE_REVIEWER]
+                        mcp_description: 'Approve the draft when it meets every rubric point.'
+                publish:
+                    from: approved
+                    to: published
+                    metadata:
+                        mcp_roles: [ROLE_REVIEWER]
+                        mcp_description: 'Publish an approved document under a headline. A human editor signs off first.'
+                        mcp_input: App\DocReview\Mcp\Input\PublishInput
+                        mcp_approval: editor_signoff
+                send_back:
+                    from: approved
+                    to: drafting
+                    guard: "subject.hasEditorNote()"
+                    metadata:
+                        mcp_roles: [ROLE_REVIEWER]
+                        mcp_description: "The editor declined publication: send the document back to the author with the editor's note."
+
         werewolf_game:
             type: state_machine
             metadata:

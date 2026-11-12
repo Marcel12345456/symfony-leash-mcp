@@ -6,7 +6,7 @@ namespace App\Tests\Integration\Lib;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-/** Endpoint guards that need no workflow; the full MCP round-trip is RefundMcpEndpointTest (M1 step 4). */
+/** Endpoint guards that need no workflow; the full MCP round-trip is DocReview\DocReviewFlowTest. */
 final class WorkflowMcpControllerTest extends WebTestCase
 {
     public function testWithoutCallerAsksForABearerToken(): void

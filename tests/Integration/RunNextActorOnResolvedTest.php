@@ -18,11 +18,11 @@ final class RunNextActorOnResolvedTest extends KernelTestCase
         $events = self::getContainer()->get(EventDispatcherInterface::class);
         self::assertInstanceOf(EventDispatcherInterface::class, $events);
 
-        $events->dispatch(new PendingInputResolved('abc123', 'refund_case:C2', 'refund_issue', false));
+        $events->dispatch(new PendingInputResolved('abc123', 'doc_review:d1', 'doc_publish', false));
 
         $transport = self::getContainer()->get('messenger.transport.async');
         self::assertInstanceOf(InMemoryTransport::class, $transport);
-        self::assertEquals([new RunNextActor('refund_case', 'C2')], array_map(static fn($e): object => $e->getMessage(), $transport->getSent()));
+        self::assertEquals([new RunNextActor('doc_review', 'd1')], array_map(static fn($e): object => $e->getMessage(), $transport->getSent()));
     }
 
     public function testMalformedSubjectRefIsRefused(): void
@@ -32,6 +32,6 @@ final class RunNextActorOnResolvedTest extends KernelTestCase
 
         $this->expectException(\UnexpectedValueException::class);
 
-        $events->dispatch(new PendingInputResolved('abc123', 'no-workflow-part', 'refund_issue', false));
+        $events->dispatch(new PendingInputResolved('abc123', 'no-workflow-part', 'doc_publish', false));
     }
 }

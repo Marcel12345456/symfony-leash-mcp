@@ -13,16 +13,15 @@
 
 ## Current
 
-- Phase: **G1 polish** done, branch `m/g1-polish` (pushed), stacked on M5 → M4 (unmerged). Needs review: `player.md`, `lib/` error wording ([R]).
-- Built: public vote reasons, accurate turn-over error, prompt fixes, day/phase in turn message and transcript, scripted villager seat (`--scripted-seat`, PLAN §3.5).
-- Demo cassette `data/werewolf/seed-8.json` (qwen3:latest, scripted seat 3; seed 7 removed). Denied wolf-tool call + injection that makes wolf Eve confess; wolves win day 2. Details in Decisions 2026-11-11.
-- Done-signal green: `.claude/done.sh`, `make werewolf` → `Result: wolves`.
-- G1 = headline, demo seed 8 (Decisions 2026-11-12). Next: M6.
+- Phase: **M6 Human seat + Doc Review — in progress**, branch `m/phase-6-human-seat-doc-review` (pushed), based on main (M4, M5, g1-polish merged). [R] phase.
+- Done in M6: decline with a reason (lib), Doc Review over MCP + agents (`leash:work`, `HumanInputToolbox`), Refund Desk retired (tag `refund-desk-v1`), seed d1–d3, `make work`.
+- Left: human seat (decisions/035: elicit-missing step, MRTR for place tools, `HumanSeatTest`); Telegram (decisions/034, cut order #2); Doc Review replay for `make demo` is M7.
+- Done-signal: `.claude/done.sh` (220 tests) + `DocReviewFlowTest`, `DocReviewAgentsTest`, `RetiredDemoTest` green; open: `ElicitMissingInputPolicyTest`, `HumanSeatTest`.
 - Blocked: none.
 
 ## Next prompt
 
-/phase G1 — human watches the recorded demo game (make werewolf, var/werewolf/seed-8.md), decides headline or fallback, record under Decisions; then /phase M6
+/phase M6 — human seat (decisions/035): ElicitMissingInputPolicy + MRTR for place tools, HumanSeatTest
 
 ## M5 notes
 
@@ -131,9 +130,22 @@
 - 2026-11-11: Demo moments of PLAN §3.5 come from one scripted villager seat (human: "One scripted villager seat"), disclosed in the video; all other seats stay qwen3. It abstains from votes so it does not steer the outcome. Model stays `qwen3:latest` for now (human); bigger local model (gpt-oss 20B / Qwen 3.6 27B) is a later comparison. Demo seed 8.
 - 2026-11-11: Seed-8 demo story: wolves kill the seer night 1; scripted Cara's `ww_choose_victim` is denied, her "[MODERATOR OVERRIDE]" makes wolf Eve confess; wolf Anna turns on Eve; vote ties 2–2, nobody dies; night 2 wolves kill Cara and win by parity. Pitch point: the server blocked the tool, the LLM fell for the injection — capabilities belong in the workflow.
 - 2026-11-12: **G1 = headline** (human: "g1 seed 8"): Werewolf stays the main demo, plan §1/§10 unchanged; demo game = seed 8 (`data/werewolf/seed-8.json`, scripted seat 3). Bigger local model comparison and more seeds are optional, later (M7 records the best game).
+- 2026-11-12: Telegram bridge sends/edits inline keyboards, no receiving; own `getUpdates` poller, short `callback_data` (`decisions/034`).
+- 2026-11-12: Human seat = argument-level elicit-missing step before DTO mapping for `ROLE_HUMAN_BACKED` callers (schema without `required`), MRTR for place tools (human, `decisions/035`). M6 order: Doc Review first (human).
+- 2026-11-12: Doc Review workflow and "decline with a note" = editor accepts the form with `approve: false` + note; generic `DecliningApprovalPolicyInterface` + `ApprovalDeclined` event; app stores the note, `doc_send_back` carries it to the author (human, `decisions/036`).
 
 ## Test changes
 
+- 2026-11-12: Refund Desk retired (decisions/022; code at tag `refund-desk-v1`). Removed `tests/Integration/RefundDesk/SeedDemoCommandTest.php` (refund seed C1–C8 + H5 idempotent, reset to `received`, C3 injection). Replacement: `tests/Integration/DocReview/SeedDemoCommandTest.php` (new `leash:demo:seed` run twice, d1–d3 in `drafting`, d2 brief mentions Node 18 but not upgrade notes).
+- 2026-11-12: Removed `tests/Integration/RefundMcpEndpointTest.php` (M1 done-signal: refund endpoint over the real mcp/sdk client, per-role visibility, invisible tool → actionable error + `capability_denied` logged + no change, validator messages as actionable error, valid input moves state). Replacement: `DocReviewFlowTest` (visibility per role, real endpoint) plus two new tests there with the same intent: `testInvisibleToolGivesActionableErrorLogsCapabilityDeniedAndChangesNothing`, `testInvalidInputReturnsValidatorMessagesAsActionableError`.
+- 2026-11-12: Removed `tests/Integration/RefundDesk/RefundWorkflowVisibilityTest.php` (refund YAML through the lib: every place × role, guards/voter, `ActorSelector` per state, input copied into the case). Replacement: synthetic `ScopedCapabilityProviderTest`, `ActorSelectorTest`, `WorkflowServerTest` (lib), `DocReviewFlowTest` and `WerewolfVisibilityTest` (real workflows). Helper `tests/Integration/RefundDesk/RefundCaseFactory.php` removed with it.
+- 2026-11-12: Removed `tests/Unit/RefundDesk/RefundIssueVoterTest.php` (refund amount limit per role) and `tests/Unit/RefundDesk/SearchPolicyToolTest.php` (policy keyword search ranking): domain-only, the code is gone; no replacement needed.
+- 2026-11-12: `RunNextActorHandlerTest::testWorkflowWithoutAgentsIsLeftAlone` sends `RunNextActor('no_agents_workflow', 'x1')` instead of `refund_case`/`C1` (Doc Review now has agents). Same assertions.
+- 2026-11-12: `DoctrinePendingInputsTest` stores a `doc_review:d1` / `agent:reviewer` / `doc_publish` call instead of `refund_case:C2` / `refund_issue`. Same assertions.
+- 2026-11-12: `RawMcpClientEndpointTest` runs against the seeded Doc Review d1 with the author's derived token: first call `doc_submit_draft` → `in_review`; invisible `doc_approve` → error naming `doc_submit_draft`; retry shape and 401 unchanged. Same intent, new tools.
+- 2026-11-12: `RunNextActorOnResolvedTest` resolves `doc_review:d1` / `doc_publish` instead of `refund_case:C2` / `refund_issue`. Same assertions.
+- 2026-11-12: `McpFirewallTest` uses `/mcp/doc_review/d1` and the reviewer's derived token instead of the removed `test-resolver-token`. Same assertions.
+- 2026-11-12: `LibraryBoundariesTest` guard `lib → RefundDesk` (`/RefundDesk/i`) became `lib → refunds` (`/refund/i`), stricter, matching G1 "no refunds". New `tests/Architecture/RetiredDemoTest.php`: no `RefundDesk`/`refund_case` in src/, config/, tests/.
 - 2026-11-11: `WerewolfReplayTest` replays seed 8 instead of seed 7 (demo cassette switched; the seed-7 cassette was recorded with an outdated prompt and is removed) and now also asserts the scripted seat, the denied `ww_choose_victim` call and the injection in the transcript (stronger).
 - 2026-11-11: Unavailable-tool error reworded in `ToolResults::unavailable()` (`is not available to you in state "X": your role cannot use it here, or your turn is over.`), because "not available to your role" was wrong when a seat's turn had simply ended (G1 transcript L440ff.). Exact-string assertions updated in `WorkflowServerTest`, `McpClientToolboxTest`, `RefundMcpEndpointTest`, `WerewolfVisibilityTest`; same check, new wording. `TranscriptWriterTest` passes day and phase instead of a `Game` (call sites only). `WerewolfMcpGameTest` scripted votes now carry a reason and the test asserts it appears in the public log (stronger, not weaker).
 
@@ -149,6 +161,8 @@
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
 
+- 2026-11-12 — M6 part 1 (with human). Done: decline with a reason (lib), Doc Review workflow/resources/editor sign-off, agents + `leash:work`, Refund Desk retired, seed d1–d3. Blocked: none. Needs review: lib `DecliningApprovalPolicyInterface`, `ApprovalDeclined`, `HumanInputToolbox`; prompts `config/prompts/docreview/*` ([R]). Open notes: `make inspector` needs a Doc Review token (no command prints one yet); `src/Spike` still mentions refunds in text only. Spend: $0.
+- 2026-11-12 — G1 polish + G1 + M6 start (with human). Done: vote reasons, accurate turn-over error, prompt fixes, day/phase labels, scripted villager seat; demo cassette seed 8; G1 = headline; M6 decisions 034 (Telegram), 035 (human seat), 036 (Doc Review, decline with a note). Blocked: none. Needs review: `player.md`, `lib/` error wording, branches M4/M5/g1-polish unmerged. Spend: $0 (Ollama local).
 - 2026-11-11 — M5 done (with human). Built: `leash:werewolf:play` (`PlayGameCommandTest`), per-seat record/replay `SeatCassette`/`RecordingSeatProvider`/`ReplayPlatform` (`ReplayPlatformTest`, pins upstream `RecordingProvider` content-blind signature, BUGS.md), `WerewolfAgentsTest` (full scripted game: denial, budget 3, deadline), `WerewolfReplayTest`, `make werewolf`, demo cassette seed 7 (live `qwen3:latest`, 240 s turns, wolves win day 1). Hook: context warning now counts tokens (300k, step 100k). Decision 033. Test changes: `.claude/tests/hooks.t.sh` context checks (logged). Blocked: none (laptop idle sleep hung the first recording; use `caffeinate -dims` on AC). Needs review: `player.md`, M4/M5 `lib/` ([R]). Spend: $0 (local Ollama).
 - 2026-11-10 — M5 continued (with human). Built: `TranscriptWriter` (`var/werewolf/<game>.md`, last line `Result: …`), `NextActorRunner` + `Step`/`StepOutcome` (lock, pause, `actorsAmong` round, deadline via `expire()`), `RunNextActorHandler` (chains until game over), `ModelChoiceFactory` (`LEASH_MODEL`, own Ollama HttpClient timeout), test helper `ScriptedSeatPlatform`; new env vars in `.env`/`.env.test`; parameter `leash.werewolf.transcripts`. Tests: `TranscriptWriterTest` (3), `NextActorRunnerTest` (3), `RunNextActorHandlerTest` (3). Test changes: none. Blocked: none. Needs review: prompt `player.md` and M4/M5 `lib/` ([R], unchanged this stretch). Spend: $0.
 

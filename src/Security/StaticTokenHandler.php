@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Security;
 
+use App\DocReview\Security\DocReviewCallers;
 use App\Werewolf\Security\WerewolfCallers;
 use Leash\HumanInput\Client\CallerTokens;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -13,7 +14,8 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
 /**
  * Bearer token → agent user (PLAN §3.2 Authentication). Tokens live in `.env.local`; an empty token never matches.
- * Werewolf seat and moderator tokens are derived from one secret (WerewolfCallers).
+ * Werewolf seat and moderator tokens are derived from one secret (WerewolfCallers), Doc Review agent tokens from
+ * the kernel secret (DocReviewCallers).
  * Also the reverse lookup a resume needs: the original caller's token (decisions/017).
  */
 final readonly class StaticTokenHandler implements AccessTokenHandlerInterface, CallerTokens
@@ -22,17 +24,19 @@ final readonly class StaticTokenHandler implements AccessTokenHandlerInterface, 
     private array $tokens;
 
     public function __construct(
-        #[Autowire('%env(LEASH_INVESTIGATOR_TOKEN)%')]
-        string $investigatorToken,
-        #[Autowire('%env(LEASH_RESOLVER_TOKEN)%')]
-        string $resolverToken,
         #[Autowire('%env(LEASH_WEREWOLF_SECRET)%')]
         #[\SensitiveParameter]
         string $werewolfSecret,
+        #[Autowire('%kernel.secret%')]
+        #[\SensitiveParameter]
+        string $kernelSecret,
     ) {
-        $tokens = ['agent:investigator' => $investigatorToken, 'agent:resolver' => $resolverToken];
+        $tokens = [];
         foreach (WerewolfCallers::all() as $caller) {
             $tokens[$caller] = WerewolfCallers::token($werewolfSecret, $caller);
+        }
+        foreach (DocReviewCallers::all() as $caller) {
+            $tokens[$caller] = DocReviewCallers::token($kernelSecret, $caller);
         }
         $this->tokens = $tokens;
     }

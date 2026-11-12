@@ -65,7 +65,8 @@ final class McpClientToolbox implements ToolboxInterface
         return new ToolResult($toolCall, self::render($result));
     }
 
-    private static function render(CallToolResult $result): string
+    /** The text a model gets for a tool result: the structured content as JSON, or the text; errors prefixed. */
+    public static function render(CallToolResult $result): string
     {
         $text = implode("\n", array_map(
             static fn(TextContent $c): string => \is_string($c->text) ? $c->text : json_encode($c->text, \JSON_THROW_ON_ERROR),
