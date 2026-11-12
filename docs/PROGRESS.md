@@ -13,16 +13,16 @@
 
 ## Current
 
-- Phase: **M6 Human seat + Doc Review — in progress**, branch `m/phase-6-human-seat-doc-review` (pushed), based on main (M4, M5, g1-polish merged). [R] phase.
+- Phase: **M6 Human seat + Doc Review — done** (all four acceptance criteria green; [R], unmerged, needs review), branch `m/phase-6-human-seat-doc-review` (pushed), based on main (M4, M5, g1-polish merged).
 - Done in M6: decline with a reason (lib), Doc Review over MCP + agents (`leash:work`, `HumanInputToolbox`), Refund Desk retired (tag `refund-desk-v1`), seed d1–d3, `make work`; **human seat** (decisions/035): `ElicitMissingInputPolicy` + MRTR for place tools (lib), `InputChoicesInterface`, Werewolf `--human-seat` / `HUMAN_SEAT=n`, paused step skips the deadline.
 - Left: live Telegram smoke test (human, needs a bot token); Doc Review replay for `make demo` and the poller in `make demo` are M7.
-- Done-signal: `.claude/done.sh` green (230 tests) incl. `DocReviewFlowTest`, `DocReviewAgentsTest`, `RetiredDemoTest`, `ElicitMissingInputPolicyTest`, `HumanSeatTest`.
+- Done-signal: `.claude/done.sh` green (237 tests) incl. `DocReviewFlowTest`, `DocReviewAgentsTest`, `RetiredDemoTest`, `ElicitMissingInputPolicyTest`, `HumanSeatTest`.
 - Telegram done (decisions/034 + re-check): `TelegramHumanInputNotifier` (decorates email; HTML parse mode, one button per option, inbox link otherwise), `leash:telegram:poll`, `TelegramCallbacks` (chat = DSN channel, unknown/foreign ignored, idempotent). Green: `TelegramHumanSeatTest` (button press resumes the human-seat vote, foreign/unknown/repeat presses, poller offset, link fallback), `TelegramBotTest` (env gate). Open: one live smoke test with a real bot (empty-keyboard edit, HTML message).
 - Blocked: none.
 
 ## Next prompt
 
-/phase M6 — Telegram (decisions/034): Telegram notifier + button resumes a human-seat vote
+/phase M7
 
 ## M5 notes
 
@@ -163,6 +163,8 @@
 ## Log
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
+
+- 2026-11-12 — M6 Telegram (with human). Done: symfony/notifier + telegram-notifier 8.1 installed (decisions/034 re-checked), `src/Telegram` (notifier decorator, `TelegramQuestion`, `TelegramCallbacks`, `TelegramPoller`, `leash:telegram:poll`), README section, `TelegramHumanSeatTest`, `TelegramBotTest`. M6 acceptance complete. Blocked: none. Needs review ([R]): `src/Telegram`, test-only `test.telegram_http` mock in `services.yaml`, `TELEGRAM_DSN=null://null` default in `.env`; live smoke test with a real bot still open (human). Spend: $0.
 
 - 2026-11-12 — M6 human seat (with human). Done: `ElicitMissingInputPolicy` + MRTR for place tools (lib, synthetic `doc_rate`, `ElicitMissingInputPolicyTest`), `InputChoicesInterface`, Werewolf human seat (`werewolf_game.human_seat` migration, `HumanSeatTurnRunner`, `ww_vote` pick list, paused step, `--human-seat`, `HumanSeatTest`). Blocked: none. Needs review ([R]): lib `PlaceToolHandler` MRTR path, `HumanInputGate::ask/answer`, `ElicitMissingInputPolicy`, `InputChoicesInterface`; `PlayGameCommand --human-seat` untested by its own test (covered via runner). Spend: $0.
 - 2026-11-12 — M6 part 1 (with human). Done: decline with a reason (lib), Doc Review workflow/resources/editor sign-off, agents + `leash:work`, Refund Desk retired, seed d1–d3. Blocked: none. Needs review: lib `DecliningApprovalPolicyInterface`, `ApprovalDeclined`, `HumanInputToolbox`; prompts `config/prompts/docreview/*` ([R]). Open notes: `make inspector` needs a Doc Review token (no command prints one yet); `src/Spike` still mentions refunds in text only. Spend: $0.
