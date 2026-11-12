@@ -13,15 +13,14 @@
 
 ## Current
 
-- Phase: **M7 Spectator, replay demo — done** (done-signal green; [R], unmerged, needs review), branch `m/phase-7-spectator-demo` (pushed), stacked on `m/phase-6-human-seat-doc-review` (M6 unmerged, [R]).
-- Done in M7: dashboard `/` (Werewolf spectator: public log, denials, per-seat panel from `ScopedCapabilityProvider`, reveal toggle; Doc Review: Mermaid with current place (decisions/037), timeline red/amber/green), JSON `/dashboard/werewolf/{id}`, `/dashboard/doc-review`, assets `public/static/`, mermaid 11.17.2 in `public/vendor/`; replay for Doc Review + `LEASH_REPLAY_PACE` (decisions/038), cassette `data/docreview/demo.json` (qwen3:latest, 45 answers); `leash:demo:seed --reset`, `leash:demo:prepare`, `make demo` (php -S + worker + poller if telegram DSN, paced replay; smoke-run OK).
-- Done-signal: `.claude/done.sh` green (247 tests) incl. `DashboardWerewolfTest`, `SeatPanelMatchesServerTest`, `DashboardDocReviewTest`, `DemoPrepareTest`.
-- Dashboard look reviewed by the human via `make demo` (2026-11-12: "looks good"). Left / needs a human: live Telegram smoke test (from M6). Optional, not done: `make tournament` (stretch), step scrubber.
+- Phase: **M8 Hardening, README, video, submit — starting**, branch `m/phase-8-hardening-submit` from `main` (M6 and M7 merged by the human, 2026-11-12).
+- Done-signal: not yet agreed (proposal pending with the human).
+- Open from earlier phases: live Telegram smoke test (only needed if Telegram is in the video).
 - Blocked: none.
 
 ## Next prompt
 
-/phase M8
+/phase M8 — agree the done-signal, then the §7 test-gap audit
 
 ## M5 notes
 
@@ -149,6 +148,8 @@
 - 2026-11-12: Dashboard look accepted by the human after `make demo` ("looks good").
 
 - 2026-11-12: CI on the M7 PR ran out of memory (128M) in `DemoPrepareTest`: the replayed demo adds ~67 MB in one debug test kernel, ~34 MB of it debug traces (stopwatch, TraceableEventDispatcher, Doctrine backtraces for 429 queries). `phpunit.dist.xml` sets `memory_limit=512M` for tests only; `leash:demo:prepare` in dev peaks at 84.6 MB under the default 128M, so the app is unchanged.
+
+- 2026-11-12: M6 and M7 merged into `main` (human). M8 branches from `main`.
 
 ## Test changes
 
