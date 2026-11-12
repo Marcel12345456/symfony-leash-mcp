@@ -137,6 +137,8 @@
 
 - 2026-11-12: M7 (human): `make demo` replays Werewolf seed 8 paced (worker steps with a delay, dashboard polls every second); Doc Review gets a recorded cassette (replay key generalised from seat to agent id, one local Ollama recording); M7 branch stacked on M6.
 
+- 2026-11-12: Dashboard diagram: `MermaidDumper(statemachine, LR)` + marking + own appended `style placeN fill:…` line; vendor mermaid 11.17.2 IIFE as `public/vendor/mermaid.min.js` (`decisions/037`).
+
 ## Test changes
 
 - 2026-11-12: Refund Desk retired (decisions/022; code at tag `refund-desk-v1`). Removed `tests/Integration/RefundDesk/SeedDemoCommandTest.php` (refund seed C1–C8 + H5 idempotent, reset to `received`, C3 injection). Replacement: `tests/Integration/DocReview/SeedDemoCommandTest.php` (new `leash:demo:seed` run twice, d1–d3 in `drafting`, d2 brief mentions Node 18 but not upgrade notes).
