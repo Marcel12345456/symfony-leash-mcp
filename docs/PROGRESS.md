@@ -15,7 +15,7 @@
 
 - Phase: **M8 Hardening, README, video, submit — automatable part done**, branch `m/phase-8-hardening-submit` (pushed, from `main`; [R], unmerged).
 - Done-signal green: (1) `docs/test-matrix.md` + `TestMatrixTest` (all 39 PLAN §7 items; gaps L5, L6, D2, D3 filled); (2) `ReadmeTest` (README per §9, make targets, links; both library READMEs); (3) `.claude/bin/clean-clone.sh` 24 s (budget 300 s); (4) `.claude/done.sh` green (271 tests).
-- Left for the human: review README, `lib/*/README.md`, `docs/upstream-issues.md` (then file the 7 issues), `docs/video-script.md` (decide the MRTR moment: A editor sign-off in replay / B live human seat / C live decline→revise); record, edit, upload the 90 s video; add the video link (and optionally a spectator GIF) to the README; merge; submit by Sat 11-21 20:00 CET. Optional: live Telegram smoke test, `make tournament`.
+- Reviewed: README and library READMEs; MRTR moment on video = A (editor sign-off). Left for the human: PR with the README diagram fix into `main`; review `docs/upstream-issues.md` (then file the 7 issues) and `docs/video-script.md`; record, edit, upload the 90 s video; add the video link (and optionally a spectator GIF) to the README; merge; submit by Sat 11-21 20:00 CET. Optional: live Telegram smoke test, `make tournament`.
 - Blocked: none.
 
 ## Next prompt
@@ -163,6 +163,8 @@
 - 2026-11-12: `leash:tokens [caller]` prints demo bearer tokens; `make inspector CALLER=… MCP=…` (TOKEN still works); `leash:werewolf:play --max-steps=0` sets a game up at night 1 and stops (README "Try it from an MCP client").
 - 2026-11-12: `docs/upstream-issues.md`: the 7 reproduced BUGS.md entries as issue text (human files them); candidates stay out until reproduced.
 - 2026-11-12: `docs/video-script.md` draft adapts PLAN §10: inbox instead of phone; MRTR on video = editor sign-off (works in replay), human-seat vote and decline→revise need a live model; the injection beat says "the server held, the model confessed its own role". Needs human review.
+
+- 2026-11-12: Video MRTR moment = A, the Doc Review editor sign-off in the replay (human). README and both library READMEs reviewed by the human ("looks good", "both are good"); the README diagram fix (`4d9e5a1`) still needs a PR into `main`.
 
 ## Test changes
 

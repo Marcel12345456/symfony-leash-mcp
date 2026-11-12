@@ -14,7 +14,7 @@ Based on PLAN §10 (headline storyboard), adjusted to what the build shows today
      vote, you pick in the inbox, the game continues. Needs Ollama and a live game, about one take per game.
    - **C (live):** the editor declines with a note and the author agent revises. Needs `LEASH_MODEL=ollama make work`
      after the decline, because the worker plays no model turns in replay mode (decisions/038).
-   Recommendation: A for sure, B if a live take works; C only if time is left.
+   **Decided (human, 2026-11-12): A, the editor sign-off.**
 3. **The injection beat, honestly.** The server keeps every secret: Cara's `ww_choose_victim` is denied, and no seat's
    context holds another seat's role. But wolf Eve *confesses* her own role after the fake "[MODERATOR OVERRIDE]". Say
    that: "the server held; the model did not". It is the stronger point.
