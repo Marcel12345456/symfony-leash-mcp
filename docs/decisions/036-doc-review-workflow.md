@@ -1,14 +1,14 @@
 # 036 — Doc Review workflow, editor sign-off, decline with a note
 
 - Date: 2026-11-12
-- Status: proposed (needs the human's OK on "decline with a note")
+- Status: accepted (human, 2026-11-12)
 - PLAN reference: §3.6 Doc Review, M6 acceptance (`DocReviewFlowTest`)
 
 ## Question
 
 How does Doc Review map onto WorkflowMcp, and how does "decline with note → `doc_send_back` visible → author gets the note" work, when an MCP elicitation `decline` carries no content and the HumanInput gate drops a declined call without a trace?
 
-## Proposal
+## Decision
 
 Workflow `doc_review` (state machine, prefix `doc`, subject `App\DocReview\Entity\Document`, roles `ROLE_AUTHOR`, `ROLE_REVIEWER` via agent users `agent:author`, `agent:reviewer`):
 

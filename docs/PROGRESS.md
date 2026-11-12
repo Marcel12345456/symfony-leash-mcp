@@ -13,14 +13,14 @@
 
 ## Current
 
-- Phase: **M6 Human seat + Doc Review**, branch `m/phase-6-human-seat-doc-review`, stacked on `m/g1-polish` (main lacks M4/M5; rebase after merges). [R] phase.
-- G1 = headline, demo seed 8. Design: decisions/034 (Telegram), 035 (human seat, argument-level elicit-missing, MRTR for place tools). Order: Doc Review first, then Refund Desk removal, then human seat, Telegram last (cut order #2).
+- Phase: **M6 Human seat + Doc Review — in progress** (design done, no code yet), branch `m/phase-6-human-seat-doc-review`, stacked on `m/g1-polish` (main lacks M4/M5; rebase after merges). [R] phase. Left: all M6 code.
+- G1 = headline, demo seed 8. Design: decisions/034 (Telegram), 035 (human seat), 036 (Doc Review, decline with a note). Order: Doc Review first, then Refund Desk removal, then human seat, Telegram last (cut order #2).
 - Done-signal: `.claude/done.sh` plus `DocReviewFlowTest` (publish → input_required no side effects; approve with edited headline → published; decline + note → doc_send_back → author gets note; duplicate retry idempotent; author never sees doc_rubric/reviewer tools); `ElicitMissingInputPolicyTest` (synthetic: exactly the missing fields); `HumanSeatTest` (vote input_required → inbox answer → retry → game continues); architecture test forbids DocReview in lib/; no RefundDesk references; `TelegramPollerTest` (mock HttpClient) if Telegram is built.
 - Blocked: none.
 
 ## Next prompt
 
-/phase G1 — human watches the recorded demo game (make werewolf, var/werewolf/seed-8.md), decides headline or fallback, record under Decisions; then /phase M6
+/phase M6 — Doc Review first (decisions/036): entities, workflow, editor_signoff + DecliningApprovalPolicyInterface, DocReviewFlowTest
 
 ## M5 notes
 
@@ -131,6 +131,7 @@
 - 2026-11-12: **G1 = headline** (human: "g1 seed 8"): Werewolf stays the main demo, plan §1/§10 unchanged; demo game = seed 8 (`data/werewolf/seed-8.json`, scripted seat 3). Bigger local model comparison and more seeds are optional, later (M7 records the best game).
 - 2026-11-12: Telegram bridge sends/edits inline keyboards, no receiving; own `getUpdates` poller, short `callback_data` (`decisions/034`).
 - 2026-11-12: Human seat = argument-level elicit-missing step before DTO mapping for `ROLE_HUMAN_BACKED` callers (schema without `required`), MRTR for place tools (human, `decisions/035`). M6 order: Doc Review first (human).
+- 2026-11-12: Doc Review workflow and "decline with a note" = editor accepts the form with `approve: false` + note; generic `DecliningApprovalPolicyInterface` + `ApprovalDeclined` event; app stores the note, `doc_send_back` carries it to the author (human, `decisions/036`).
 
 ## Test changes
 
@@ -149,6 +150,7 @@
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
 
+- 2026-11-12 — G1 polish + G1 + M6 start (with human). Done: vote reasons, accurate turn-over error, prompt fixes, day/phase labels, scripted villager seat; demo cassette seed 8; G1 = headline; M6 decisions 034 (Telegram), 035 (human seat), 036 (Doc Review, decline with a note). Blocked: none. Needs review: `player.md`, `lib/` error wording, branches M4/M5/g1-polish unmerged. Spend: $0 (Ollama local).
 - 2026-11-11 — M5 done (with human). Built: `leash:werewolf:play` (`PlayGameCommandTest`), per-seat record/replay `SeatCassette`/`RecordingSeatProvider`/`ReplayPlatform` (`ReplayPlatformTest`, pins upstream `RecordingProvider` content-blind signature, BUGS.md), `WerewolfAgentsTest` (full scripted game: denial, budget 3, deadline), `WerewolfReplayTest`, `make werewolf`, demo cassette seed 7 (live `qwen3:latest`, 240 s turns, wolves win day 1). Hook: context warning now counts tokens (300k, step 100k). Decision 033. Test changes: `.claude/tests/hooks.t.sh` context checks (logged). Blocked: none (laptop idle sleep hung the first recording; use `caffeinate -dims` on AC). Needs review: `player.md`, M4/M5 `lib/` ([R]). Spend: $0 (local Ollama).
 - 2026-11-10 — M5 continued (with human). Built: `TranscriptWriter` (`var/werewolf/<game>.md`, last line `Result: …`), `NextActorRunner` + `Step`/`StepOutcome` (lock, pause, `actorsAmong` round, deadline via `expire()`), `RunNextActorHandler` (chains until game over), `ModelChoiceFactory` (`LEASH_MODEL`, own Ollama HttpClient timeout), test helper `ScriptedSeatPlatform`; new env vars in `.env`/`.env.test`; parameter `leash.werewolf.transcripts`. Tests: `TranscriptWriterTest` (3), `NextActorRunnerTest` (3), `RunNextActorHandlerTest` (3). Test changes: none. Blocked: none. Needs review: prompt `player.md` and M4/M5 `lib/` ([R], unchanged this stretch). Spend: $0.
 
