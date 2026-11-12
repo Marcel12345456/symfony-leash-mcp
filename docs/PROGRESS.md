@@ -13,16 +13,15 @@
 
 ## Current
 
-- Phase: **M6 Human seat + Doc Review — done** (all four acceptance criteria green; [R], unmerged, needs review), branch `m/phase-6-human-seat-doc-review` (pushed), based on main (M4, M5, g1-polish merged).
-- Done in M6: decline with a reason (lib), Doc Review over MCP + agents (`leash:work`, `HumanInputToolbox`), Refund Desk retired (tag `refund-desk-v1`), seed d1–d3, `make work`; **human seat** (decisions/035): `ElicitMissingInputPolicy` + MRTR for place tools (lib), `InputChoicesInterface`, Werewolf `--human-seat` / `HUMAN_SEAT=n`, paused step skips the deadline.
-- Left: live Telegram smoke test (human, needs a bot token); Doc Review replay for `make demo` and the poller in `make demo` are M7.
-- Done-signal: `.claude/done.sh` green (237 tests) incl. `DocReviewFlowTest`, `DocReviewAgentsTest`, `RetiredDemoTest`, `ElicitMissingInputPolicyTest`, `HumanSeatTest`.
-- Telegram done (decisions/034 + re-check): `TelegramHumanInputNotifier` (decorates email; HTML parse mode, one button per option, inbox link otherwise), `leash:telegram:poll`, `TelegramCallbacks` (chat = DSN channel, unknown/foreign ignored, idempotent). Green: `TelegramHumanSeatTest` (button press resumes the human-seat vote, foreign/unknown/repeat presses, poller offset, link fallback), `TelegramBotTest` (env gate). Open: one live smoke test with a real bot (empty-keyboard edit, HTML message).
+- Phase: **M7 Spectator, replay demo — done** (done-signal green; [R], unmerged, needs review), branch `m/phase-7-spectator-demo` (pushed), stacked on `m/phase-6-human-seat-doc-review` (M6 unmerged, [R]).
+- Done in M7: dashboard `/` (Werewolf spectator: public log, denials, per-seat panel from `ScopedCapabilityProvider`, reveal toggle; Doc Review: Mermaid with current place (decisions/037), timeline red/amber/green), JSON `/dashboard/werewolf/{id}`, `/dashboard/doc-review`, assets `public/static/`, mermaid 11.17.2 in `public/vendor/`; replay for Doc Review + `LEASH_REPLAY_PACE` (decisions/038), cassette `data/docreview/demo.json` (qwen3:latest, 45 answers); `leash:demo:seed --reset`, `leash:demo:prepare`, `make demo` (php -S + worker + poller if telegram DSN, paced replay; smoke-run OK).
+- Done-signal: `.claude/done.sh` green (247 tests) incl. `DashboardWerewolfTest`, `SeatPanelMatchesServerTest`, `DashboardDocReviewTest`, `DemoPrepareTest`.
+- Dashboard look reviewed by the human via `make demo` (2026-11-12: "looks good"). Left / needs a human: live Telegram smoke test (from M6). Optional, not done: `make tournament` (stretch), step scrubber.
 - Blocked: none.
 
 ## Next prompt
 
-/phase M7
+/phase M8
 
 ## M5 notes
 
@@ -137,6 +136,20 @@
 - 2026-11-12: Telegram implemented per decisions/034 with deviations recorded there: HTML parse mode (bridge's MarkdownV2 auto-escape misses `_*()[]~`), allowed chat = DSN `channel` (no separate `TELEGRAM_CHAT_ID`), non-choice inputs get the link in the text (Telegram rejects `localhost` URL buttons).
 - 2026-11-12: Human seat implemented per decisions/035 (implementation notes there): human-backed = workflow role via the role resolver (per game for Werewolf), place tools only, `InputChoicesInterface` for pick lists, `werewolf_game.human_seat` + `--human-seat`/`HUMAN_SEAT=n`; a paused step skips the deadline.
 
+- 2026-11-12: M7 (human): `make demo` replays Werewolf seed 8 paced (worker steps with a delay, dashboard polls every second); Doc Review gets a recorded cassette (replay key generalised from seat to agent id, one local Ollama recording); M7 branch stacked on M6.
+
+- 2026-11-12: Dashboard diagram: `MermaidDumper(statemachine, LR)` + marking + own appended `style placeN fill:…` line; vendor mermaid 11.17.2 IIFE as `public/vendor/mermaid.min.js` (`decisions/037`).
+
+- 2026-11-12: Replay generalised: cassette key `int|string` (Doc Review `author:d1`), prompt hash per agent set, `LEASH_REPLAY_PACE` waits before each answer, `leash:work --record/--cassette` (default `data/docreview/demo.json`); worker plays no model turns under `LEASH_MODEL=replay` (`decisions/038`).
+
+- 2026-11-12: Dashboard is public (local demo screen); without reveal it hides roles, private events and resource contents, but resource names (`wolf-den`, `seer-notes`) and night tools still show who is a wolf/seer — on purpose, that is the information hiding the demo shows ([R]). Dawn never rests between runner steps, so the panel-vs-server test covers night, day_discussion, day_vote, over.
+- 2026-11-12: Dashboard JSON routes have no `.json` suffix and assets live in `public/static/`: `php -S` 404s on file-like paths and stops at a real `public/dashboard/` directory.
+- 2026-11-12: Doc Review demo cassette recorded live (qwen3:latest, 240 s turn timeout): d1 and d3 approved after one change request, d2 after three; every editor sign-off waits for a human. Re-record after any change to `config/prompts/docreview/*.md`: `leash:demo:seed --reset && leash:work --model=ollama --record`.
+
+- 2026-11-12: Dashboard look accepted by the human after `make demo` ("looks good").
+
+- 2026-11-12: CI on the M7 PR ran out of memory (128M) in `DemoPrepareTest`: the replayed demo adds ~67 MB in one debug test kernel, ~34 MB of it debug traces (stopwatch, TraceableEventDispatcher, Doctrine backtraces for 429 queries). `phpunit.dist.xml` sets `memory_limit=512M` for tests only; `leash:demo:prepare` in dev peaks at 84.6 MB under the default 128M, so the app is unchanged.
+
 ## Test changes
 
 - 2026-11-12: Refund Desk retired (decisions/022; code at tag `refund-desk-v1`). Removed `tests/Integration/RefundDesk/SeedDemoCommandTest.php` (refund seed C1–C8 + H5 idempotent, reset to `received`, C3 injection). Replacement: `tests/Integration/DocReview/SeedDemoCommandTest.php` (new `leash:demo:seed` run twice, d1–d3 in `drafting`, d2 brief mentions Node 18 but not upgrade notes).
@@ -154,6 +167,8 @@
 
 <!-- Every weakened, deleted, skipped or changed assertion: date, test, reason. -->
 
+- 2026-11-12: `ReplayPlatformTest::testCassetteFromAnotherPromptIsRefused` expects "recorded with other prompts" instead of "recorded with another player prompt": cassettes now pin a prompt set (Werewolf or Doc Review, decisions/038). Same check, new wording.
+
 - 2026-11-10: `.claude/tests/hooks.t.sh` context checks now use usage lines (tokens) instead of zero-filled KB files; "small transcript quiet" became "110k tokens quiet (700 KB transcript is fine)", plus a bytes/4 fallback check. Reason: the hook now measures real context tokens (human: warning fired at ~10% of the 1M context).
 - 2026-11-10: `ScopedCapabilityProviderTest` / `WorkflowServerTest` resource tests (added in d1a9888) expect `doc://{subjectId}/rubric` (provider) and `doc://d1/rubric` (server): the rubric fixture now uses the new `{subjectId}` URI placeholder. Same checks, new URI.
 - 2026-11-10: `tests/Unit/Lib/WorkflowMcp/ScopedCapabilityProviderTest::testUnknownPlaceToolIsAConfigurationError` passes an empty `PlaceResourceRegistry`, because `ScopedCapabilityProvider` now takes one. Call site only; no assertion changed.
@@ -163,6 +178,8 @@
 ## Log
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
+
+- 2026-11-12 — M7 (with human). Done: dashboard (Werewolf spectator + Doc Review), decisions 037 (Mermaid) and 038 (paced replay, Doc Review cassette, worker idle under replay), `leash:demo:prepare`, `make demo`, `leash:demo:seed --reset`, README sections; 4 done-signal tests + replay/handler/seed tests. Blocked: none. Needs review ([R]): dashboard look at 1080p (light/dark), public dashboard, role hints in resource names, worker skipping model turns in replay mode, 3.5 MB vendored mermaid. Spend: $0 (local Ollama only).
 
 - 2026-11-12 — M6 Telegram (with human). Done: symfony/notifier + telegram-notifier 8.1 installed (decisions/034 re-checked), `src/Telegram` (notifier decorator, `TelegramQuestion`, `TelegramCallbacks`, `TelegramPoller`, `leash:telegram:poll`), README section, `TelegramHumanSeatTest`, `TelegramBotTest`. M6 acceptance complete. Blocked: none. Needs review ([R]): `src/Telegram`, test-only `test.telegram_http` mock in `services.yaml`, `TELEGRAM_DSN=null://null` default in `.env`; live smoke test with a real bot still open (human). Spend: $0.
 

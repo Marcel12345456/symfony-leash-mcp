@@ -36,7 +36,7 @@ final readonly class RecordingSeatProvider implements ProviderInterface
 
     public function invoke(Model|string $model, object|array|string $input, array $options = []): DeferredResult
     {
-        $seat = SeatCassette::seatOf($input);
+        $seat = SeatCassette::actorOf($input);
         try {
             $deferred = $this->provider->invoke($model, $input, $options);
             $result = $deferred->getResult();

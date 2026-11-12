@@ -14,20 +14,23 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 /**
  * Replays a SeatCassette (decisions/033): each seat gets its recorded answers first in, first out; no model, no
  * network. Recorded failures fail again the same way. An exhausted seat fails loudly: the game diverged.
+ * `$paceSeconds` waits before each answer, so a spectator can follow a replayed game (`make demo`, decisions/038).
  */
 final class ReplayPlatform
 {
-    /** @var array<int, list<array{seat: int, result?: array<string, mixed>, timeout?: string, error?: string}>> */
+    /** @var array<int|string, list<array{seat: int|string, result?: array<string, mixed>, timeout?: string, error?: string}>> */
     private array $queues;
 
-    public function __construct(SeatCassette $cassette)
-    {
+    public function __construct(
+        SeatCassette $cassette,
+        private readonly float $paceSeconds = 0.0,
+    ) {
         $this->queues = $cassette->bySeat();
     }
 
     public function platform(): PlatformInterface
     {
-        return MockPlatformFactory::createPlatform(fn(mixed $model, object|array|string $input): ResultInterface => $this->next(SeatCassette::seatOf($input)));
+        return MockPlatformFactory::createPlatform(fn(mixed $model, object|array|string $input): ResultInterface => $this->next(SeatCassette::actorOf($input)));
     }
 
     /** @return int requests left, per seat (0 everywhere once the game replayed to the end) */
@@ -36,10 +39,13 @@ final class ReplayPlatform
         return array_sum(array_map(\count(...), $this->queues));
     }
 
-    private function next(int $seat): ResultInterface
+    private function next(int|string $seat): ResultInterface
     {
+        if ($this->paceSeconds > 0) {
+            usleep((int) ($this->paceSeconds * 1_000_000));
+        }
         $this->queues[$seat] ??= [];
-        $interaction = array_shift($this->queues[$seat]) ?? throw new \LogicException(\sprintf('Replay: seat %d asked for more model answers than the cassette holds; the game diverged from the recording.', $seat));
+        $interaction = array_shift($this->queues[$seat]) ?? throw new \LogicException(\sprintf('Replay: seat %s asked for more model answers than the cassette holds; the game diverged from the recording.', $seat));
 
         return match (true) {
             isset($interaction['timeout']) => throw new TransportException($interaction['timeout']),

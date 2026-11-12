@@ -86,7 +86,7 @@ final class ReplayPlatformTest extends TestCase
     {
         SeatCassette::start($this->path, 'qwen3:8b', 'hash-1');
 
-        $this->expectExceptionMessage('recorded with another player prompt');
+        $this->expectExceptionMessage('recorded with other prompts');
         SeatCassette::load($this->path, 'hash-2');
     }
 
@@ -125,6 +125,38 @@ final class ReplayPlatformTest extends TestCase
         });
 
         return new Platform([new RecordingSeatProvider($live, SeatCassette::start($this->path, 'qwen3:8b', 'hash-1'))]);
+    }
+
+    public function testDocReviewAgentsReplayPerAgentAndDocument(): void
+    {
+        $live = $this->recording([new TextResult('author d1'), new TextResult('reviewer d1'), new TextResult('author d2')]);
+        $live->invoke('qwen3:8b', self::docTurn('author', 'd1'))->getResult();
+        $live->invoke('qwen3:8b', self::docTurn('reviewer', 'd1'))->getResult();
+        $live->invoke('qwen3:8b', self::docTurn('author', 'd2'))->getResult();
+
+        $platform = new ReplayPlatform(SeatCassette::load($this->path, 'hash-1'))->platform();
+
+        self::assertSame('author d2', $platform->invoke('qwen3:8b', self::docTurn('author', 'd2'))->getResult()->getContent());
+        self::assertSame('reviewer d1', $platform->invoke('qwen3:8b', self::docTurn('reviewer', 'd1'))->getResult()->getContent());
+        self::assertSame('author d1', $platform->invoke('qwen3:8b', self::docTurn('author', 'd1'))->getResult()->getContent());
+    }
+
+    public function testPaceWaitsBeforeEachAnswer(): void
+    {
+        $live = $this->recording([new TextResult('one'), new TextResult('two')]);
+        $live->invoke('qwen3:8b', self::turn(1))->getResult();
+        $live->invoke('qwen3:8b', self::turn(1))->getResult();
+        $platform = new ReplayPlatform(SeatCassette::load($this->path, 'hash-1'), 0.05)->platform();
+        $start = microtime(true);
+        $platform->invoke('qwen3:8b', self::turn(1))->getResult();
+        $platform->invoke('qwen3:8b', self::turn(1))->getResult();
+
+        self::assertGreaterThanOrEqual(0.1, microtime(true) - $start);
+    }
+
+    private static function docTurn(string $role, string $document): MessageBag
+    {
+        return new MessageBag(Message::forSystem('rules'), Message::ofUser(\sprintf('You are the %s. Document %s. Here is everything you can see right now.', $role, $document)));
     }
 
     private static function turn(int $seat): MessageBag
