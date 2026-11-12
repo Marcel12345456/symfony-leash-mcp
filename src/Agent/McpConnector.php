@@ -19,12 +19,18 @@ final readonly class McpConnector
         private string $baseUrl,
     ) {}
 
+    /** The endpoint URL for a path, e.g. for raw calls that may need human input. */
+    public function url(string $path): string
+    {
+        return rtrim($this->baseUrl, '/') . $path;
+    }
+
     /** @param string $path e.g. `/mcp/werewolf_game/g1` */
     public function connect(string $path, #[\SensitiveParameter] string $token, string $clientName = 'leash-agent'): Client
     {
         $factory = new Psr17Factory();
         $client = Client::builder()->setClientInfo($clientName, '0.1')->build();
-        $client->connect(new HttpTransport(rtrim($this->baseUrl, '/') . $path, ['Authorization' => 'Bearer ' . $token], $this->http, $factory, $factory));
+        $client->connect(new HttpTransport($this->url($path), ['Authorization' => 'Bearer ' . $token], $this->http, $factory, $factory));
 
         return $client;
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Agent\MessageHandler;
 
+use App\Agent\DocReview\DocWorkRunner;
 use App\Agent\Message\RunNextActor;
 use App\Agent\ModelChoiceFactory;
 use App\Agent\Werewolf\NextActorRunner;
@@ -15,13 +16,15 @@ use Symfony\Component\Messenger\MessageBusInterface;
 /**
  * Runs one step for the subject and, while the game goes on, queues the next one. Locked, paused, finished and
  * missing subjects stop the chain; a resumed human input queues a new RunNextActor (RunNextActorOnResolved).
- * Only Werewolf has agents so far; other workflows are logged and dropped.
+ * Werewolf runs one step per message; Doc Review works the document until it waits or is done. Other workflows
+ * are logged and dropped.
  */
 #[AsMessageHandler]
 final readonly class RunNextActorHandler
 {
     public function __construct(
         private NextActorRunner $werewolf,
+        private DocWorkRunner $docReview,
         private ModelChoiceFactory $models,
         private MessageBusInterface $bus,
         private LoggerInterface $logger,
@@ -29,6 +32,12 @@ final readonly class RunNextActorHandler
 
     public function __invoke(RunNextActor $message): void
     {
+        if (DocWorkRunner::WORKFLOW === $message->workflow) {
+            $turns = $this->docReview->work($message->subjectId, $this->models->create());
+            $this->logger->info('RunNextActor {subject}: {turns}.', ['subject' => $message->subjectId, 'turns' => [] === $turns ? 'nobody acts' : implode('; ', $turns)]);
+
+            return;
+        }
         if (NextActorRunner::WORKFLOW !== $message->workflow) {
             $this->logger->notice('RunNextActor: no agents for workflow {workflow}; subject {subject} left alone.', ['workflow' => $message->workflow, 'subject' => $message->subjectId]);
 

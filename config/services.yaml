@@ -73,6 +73,11 @@ services:
     Leash\HumanInput\Client\InputRequestHandlerInterface: '@Leash\HumanInput\Pending\DeferringInputRequestHandler'
     Leash\HumanInput\Client\CallerTokens: '@App\Security\StaticTokenHandler'
 
+    # Calls that may need a human (agents and the resume after an answer) take the same in-process path.
+    Leash\HumanInput\Client\RawMcpClient:
+        arguments:
+            $http: '@App\Agent\InProcessPsr18Client'
+
 when@test:
     parameters:
         leash.werewolf.transcripts: '%kernel.cache_dir%/werewolf'
