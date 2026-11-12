@@ -14,7 +14,7 @@ nothing else is installed on the host.
 
 ```
 make install      # composer install, warm the cache, migrate, seed the Doc Review demo documents; generate APP_SECRET + Werewolf secret into .env.local
-make werewolf     # play one Werewolf game: replays data/werewolf/seed-8.json (SEED=…, LEASH_MODEL=ollama for live)
+make werewolf     # play one Werewolf game: replays data/werewolf/seed-8.json (SEED=…, LEASH_MODEL=ollama for live, HUMAN_SEAT=n: you play seat n via the inbox)
 make work         # run the Doc Review agents once over all open documents (bin/console leash:work; LEASH_MODEL=ollama)
 make test         # phpunit
 make qa           # php-cs-fixer (changed files) + phpstan + phpunit, quiet

@@ -21,7 +21,8 @@ use Symfony\Component\Workflow\WorkflowInterface;
  * One step of a Werewolf game (PLAN §3.4): under the subject lock, unless a human input pauses the game, the workflow
  * picks the seats that may act now (G3, `ActorSelector::actorsAmong`) and each plays one turn. A seat that ends its
  * turn without acting has missed the deadline: `GameModerator::expire()` skips or abstains it. Then the moderator
- * advances.
+ * advances. The game's human seat plays without a model (HumanSeatTurnRunner); while its question is open, the step
+ * stops and the game is paused until the answer resumes it.
  */
 final readonly class NextActorRunner
 {
@@ -35,6 +36,7 @@ final readonly class NextActorRunner
         private ActorSelector $actors,
         private GameModerator $moderator,
         private SeatTurnRunner $turns,
+        private HumanSeatTurnRunner $humanTurns,
         private TranscriptWriter $transcript,
         private PendingInputs $pendingInputs,
     ) {}
@@ -70,10 +72,16 @@ final readonly class NextActorRunner
                 if ($day !== $game->game()->day() || $phase !== $game->game()->phase() || !\in_array($seat, $this->actorSeats($game), true)) {
                     continue;
                 }
-                $turn = $this->turns->play($gameId, $seat, $model, $day, $phase);
+                $turn = $seat === $game->humanSeat()
+                    ? $this->humanTurns->play($gameId, $seat)
+                    : $this->turns->play($gameId, $seat, $model, $day, $phase);
                 $game = $this->load($gameId) ?? throw new \LogicException(\sprintf('Werewolf game "%s" vanished during a turn.', $gameId));
                 $this->transcript->turn($gameId, $day, $phase, $turn);
                 $turns[] = $turn;
+                // The human seat was asked; the game waits for the answer instead of applying the deadline.
+                if ($this->paused($gameId)) {
+                    return new Step(StepOutcome::Paused, $turns);
+                }
             }
 
             $missed = $day === $game->game()->day() && $phase === $game->game()->phase() && [] !== array_intersect($round, $this->actorSeats($game));
@@ -115,6 +123,7 @@ final readonly class NextActorRunner
         return $this->entityManager->find(WerewolfGame::class, $gameId);
     }
 
+    /** @phpstan-impure reads the pending inputs, which a turn may have just created */
     private function paused(string $gameId): bool
     {
         $ref = self::WORKFLOW . ':' . $gameId;

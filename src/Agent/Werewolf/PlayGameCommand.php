@@ -51,6 +51,8 @@ final readonly class PlayGameCommand
         ?string $cassette = null,
         #[Option(description: 'Live only: this villager seat plays the scripted demo moves (PLAN §3.5); replay takes it from the cassette', name: 'scripted-seat')]
         ?int $scriptedSeat = null,
+        #[Option(description: 'This seat is played by a human through the inbox (decisions/035); the game pauses at its turns and the worker resumes it', name: 'human-seat')]
+        ?int $humanSeat = null,
     ): int {
         $gameId = $game ?? 'seed-' . $seed;
         $cassette ??= \sprintf('%s/seed-%d.json', $this->cassettes, $seed);
@@ -71,8 +73,13 @@ final readonly class PlayGameCommand
 
             return Command::INVALID;
         }
+        if (null !== $humanSeat && (null === ($start->seats()[$humanSeat] ?? null) || $humanSeat === $scriptedSeat)) {
+            $io->error(\sprintf('--human-seat=%d is not a seat of this game, or it is the scripted seat.', $humanSeat));
+
+            return Command::INVALID;
+        }
         $choice = $this->models->create($model, $live && !$record ? null : $cassette, $scriptedSeat);
-        $this->reset($gameId, $start);
+        $this->reset($gameId, $start, $humanSeat);
         $io->writeln(\sprintf('Game <info>%s</info> (seed %d, model %s%s), transcript %s', $gameId, $seed, $choice->model, null === $choice->scripted ? '' : ', scripted seat ' . $choice->scripted->seat, $this->transcript->path($gameId)));
 
         for ($n = 1; $n <= $maxSteps; ++$n) {
@@ -90,6 +97,11 @@ final readonly class PlayGameCommand
 
                 return Command::SUCCESS;
             }
+            if (StepOutcome::Paused === $step->outcome) {
+                $io->note(\sprintf('Seat %d waits for a human: answer in the inbox; the messenger worker (make demo) resumes the game.', $humanSeat ?? 0));
+
+                return Command::SUCCESS;
+            }
             if (StepOutcome::Played !== $step->outcome) {
                 break;
             }
@@ -104,7 +116,7 @@ final readonly class PlayGameCommand
         return Command::FAILURE;
     }
 
-    private function reset(string $gameId, Game $game): void
+    private function reset(string $gameId, Game $game, ?int $humanSeat): void
     {
         $existing = $this->entityManager->find(WerewolfGame::class, $gameId);
         if (null !== $existing) {
@@ -112,7 +124,9 @@ final readonly class PlayGameCommand
             $this->entityManager->flush();
         }
         @unlink($this->transcript->path($gameId));
-        $this->entityManager->persist(new WerewolfGame($gameId, $game));
+        $entity = new WerewolfGame($gameId, $game);
+        $entity->setHumanSeat($humanSeat);
+        $this->entityManager->persist($entity);
         $this->entityManager->flush();
         $this->entityManager->clear();
     }
