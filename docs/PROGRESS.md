@@ -148,6 +148,8 @@
 
 - 2026-11-12: Dashboard look accepted by the human after `make demo` ("looks good").
 
+- 2026-11-12: CI on the M7 PR ran out of memory (128M) in `DemoPrepareTest`: the replayed demo adds ~67 MB in one debug test kernel, ~34 MB of it debug traces (stopwatch, TraceableEventDispatcher, Doctrine backtraces for 429 queries). `phpunit.dist.xml` sets `memory_limit=512M` for tests only; `leash:demo:prepare` in dev peaks at 84.6 MB under the default 128M, so the app is unchanged.
+
 ## Test changes
 
 - 2026-11-12: Refund Desk retired (decisions/022; code at tag `refund-desk-v1`). Removed `tests/Integration/RefundDesk/SeedDemoCommandTest.php` (refund seed C1–C8 + H5 idempotent, reset to `received`, C3 injection). Replacement: `tests/Integration/DocReview/SeedDemoCommandTest.php` (new `leash:demo:seed` run twice, d1–d3 in `drafting`, d2 brief mentions Node 18 but not upgrade notes).
