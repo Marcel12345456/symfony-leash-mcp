@@ -155,6 +155,8 @@
 
 - 2026-11-12: Video shows the human step in the web inbox, not Telegram (human); Telegram stays optional and documented, live smoke test optional.
 
+- 2026-11-12: `.claude/bin/clean-clone.sh [branch] [budget]`: clone from origin → `docker compose build` → `make install` → `leash:demo:prepare --model=replay`; own compose project and port 18765, cleaned up after. First run: 32 s (Docker image layers cached on this Mac, composer cache empty).
+
 ## Test changes
 
 - 2026-11-12: Refund Desk retired (decisions/022; code at tag `refund-desk-v1`). Removed `tests/Integration/RefundDesk/SeedDemoCommandTest.php` (refund seed C1–C8 + H5 idempotent, reset to `received`, C3 injection). Replacement: `tests/Integration/DocReview/SeedDemoCommandTest.php` (new `leash:demo:seed` run twice, d1–d3 in `drafting`, d2 brief mentions Node 18 but not upgrade notes).
