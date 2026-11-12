@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\DocReview\Command;
 
+use App\DocReview\Entity\DocEvent;
 use App\DocReview\Entity\Document;
+use Leash\HumanInput\Pending\PendingInput;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -15,9 +18,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * d1 is clean; d2's brief omits the upgrade notes the rubric requires, so a first draft likely fails review;
  * d3 is ordinary, the demo's editor declines it with a note.
  * Idempotent: a document whose id already exists is left alone (whatever its state), missing ones are created in
- * `drafting`. To start over, recreate the database.
+ * `drafting`. `--reset` starts over: it first removes d1–d3, their events and their pending human inputs.
  */
-#[AsCommand('leash:demo:seed', 'Create the Doc Review demo documents d1–d3 (existing ones are left alone)')]
+#[AsCommand('leash:demo:seed', 'Create the Doc Review demo documents d1–d3 (existing ones are left alone unless --reset)')]
 final readonly class SeedDemoCommand
 {
     /** Document id => brief. */
@@ -39,8 +42,18 @@ final readonly class SeedDemoCommand
         private EntityManagerInterface $entityManager,
     ) {}
 
-    public function __invoke(SymfonyStyle $io): int
-    {
+    public function __invoke(
+        SymfonyStyle $io,
+        #[Option(description: 'Remove d1–d3, their events and pending inputs first')]
+        bool $reset = false,
+    ): int {
+        if ($reset) {
+            $ids = array_keys(self::BRIEFS);
+            $this->entityManager->createQuery('DELETE FROM ' . DocEvent::class . ' e WHERE e.documentId IN (:ids)')->setParameter('ids', $ids)->execute();
+            $this->entityManager->createQuery('DELETE FROM ' . PendingInput::class . ' p WHERE p.subjectRef IN (:refs)')
+                ->setParameter('refs', array_map(static fn(string $id): string => 'doc_review:' . $id, $ids))->execute();
+            $this->entityManager->createQuery('DELETE FROM ' . Document::class . ' d WHERE d.id IN (:ids)')->setParameter('ids', $ids)->execute();
+        }
         $created = 0;
         foreach (self::BRIEFS as $id => $brief) {
             if (null === $this->entityManager->find(Document::class, $id)) {

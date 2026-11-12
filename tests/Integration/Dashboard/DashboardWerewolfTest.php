@@ -41,7 +41,7 @@ final class DashboardWerewolfTest extends WerewolfMcpCase
 
     public function testUnknownGameIs404(): void
     {
-        $this->browser->request('GET', '/dashboard/werewolf/nope.json');
+        $this->browser->request('GET', '/dashboard/werewolf/nope');
         self::assertResponseStatusCodeSame(404);
     }
 
@@ -61,7 +61,7 @@ final class DashboardWerewolfTest extends WerewolfMcpCase
     /** @return array{winner: ?string, events: list<array{type: string, audience: string}>, seats: list<array{seat: int, role: ?string, roles: list<string>, resources: list<array{content: mixed}>}>, denials: list<array<string, mixed>>} */
     private function view(bool $reveal): array
     {
-        $this->browser->request('GET', '/dashboard/werewolf/' . ReplayedDemoGame::ID . '.json' . ($reveal ? '?reveal=1' : ''));
+        $this->browser->request('GET', '/dashboard/werewolf/' . ReplayedDemoGame::ID . ($reveal ? '?reveal=1' : ''));
         self::assertResponseIsSuccessful();
         /** @var array{winner: ?string, events: list<array{type: string, audience: string}>, seats: list<array{seat: int, role: ?string, roles: list<string>, resources: list<array{content: mixed}>}>, denials: list<array<string, mixed>>} $view JSON of WerewolfSpectator::view() */
         $view = json_decode((string) $this->browser->getResponse()->getContent(), true, flags: \JSON_THROW_ON_ERROR);

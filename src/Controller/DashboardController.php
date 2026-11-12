@@ -37,7 +37,7 @@ final class DashboardController extends AbstractController
         return $this->render('dashboard/index.html.twig', ['games' => $games, 'game' => $game]);
     }
 
-    #[Route('/dashboard/werewolf/{id}.json', name: 'dashboard_werewolf', methods: ['GET'])]
+    #[Route('/dashboard/werewolf/{id}', name: 'dashboard_werewolf', methods: ['GET'])]
     public function werewolf(string $id, Request $request): JsonResponse
     {
         $view = $this->spectator->view($id, $request->query->getBoolean('reveal'));
@@ -45,7 +45,7 @@ final class DashboardController extends AbstractController
         return null === $view ? new JsonResponse(['error' => \sprintf('No Werewolf game "%s".', $id)], Response::HTTP_NOT_FOUND) : new JsonResponse($view);
     }
 
-    #[Route('/dashboard/doc-review.json', name: 'dashboard_doc_review', methods: ['GET'])]
+    #[Route('/dashboard/doc-review', name: 'dashboard_doc_review', methods: ['GET'])]
     public function docReview(): JsonResponse
     {
         return new JsonResponse(['documents' => $this->docReview->view()]);

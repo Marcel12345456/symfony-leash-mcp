@@ -102,7 +102,7 @@ final class DashboardDocReviewTest extends WebTestCase
     /** @return list<array{id: string, status: string, diagram: string, timeline: list<array{kind: string, actor: string, text: string}>}> */
     private function documents(): array
     {
-        $this->browser->request('GET', '/dashboard/doc-review.json');
+        $this->browser->request('GET', '/dashboard/doc-review');
         self::assertResponseIsSuccessful();
         /** @var array{documents: list<array{id: string, status: string, diagram: string, timeline: list<array{kind: string, actor: string, text: string}>}>} $json JSON of DocReviewBoard::view() */
         $json = json_decode((string) $this->browser->getResponse()->getContent(), true, flags: \JSON_THROW_ON_ERROR);

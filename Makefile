@@ -12,7 +12,7 @@ endif
 BASE := $(shell git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main 2>/dev/null)
 CHANGED_PHP := $(sort $(filter %.php,$(shell git diff --name-only --diff-filter=ACMR $(BASE) 2>/dev/null; git ls-files --others --exclude-standard 2>/dev/null)))
 
-.PHONY: install qa qa-verbose test cs-fix inspector werewolf work
+.PHONY: install qa qa-verbose test cs-fix inspector werewolf work demo
 
 install: ## Generates APP_SECRET, the Werewolf token secret and the inbox approver password into .env.local on first run; never overwrites them
 	@grep -qs '^APP_SECRET=.' .env.local || echo "APP_SECRET=$$(openssl rand -hex 16)" >> .env.local
@@ -45,9 +45,24 @@ SEED ?= 8
 werewolf: ## make werewolf [SEED=8] [LEASH_MODEL=ollama] [HUMAN_SEAT=n]; transcript in var/werewolf/seed-<seed>.md
 	$(RUN) bin/console leash:werewolf:play --seed=$(SEED) $(if $(LEASH_MODEL),--model=$(LEASH_MODEL)) $(if $(HUMAN_SEAT),--human-seat=$(HUMAN_SEAT))
 
-# The Doc Review agents work every open document once (Ollama; replay is not available for Doc Review yet).
+# The Doc Review agents work every open document once; replay plays data/docreview/demo.json (start from
+# `bin/console leash:demo:seed --reset`), LEASH_MODEL=ollama works live.
 work: ## make work [LEASH_MODEL=ollama]
 	$(RUN) bin/console leash:work $(if $(LEASH_MODEL),--model=$(LEASH_MODEL))
+
+# Dashboard + worker (+ Telegram poller when .env.local has a telegram:// DSN), then the paced replay of the whole
+# story (leash:demo:prepare: Werewolf seed 8, then Doc Review up to the editor's sign-off). Ctrl-C stops everything.
+PACE ?= 2
+DEMO_RUN := $(if $(RUN),docker compose --progress quiet run --rm --service-ports --no-deps php,)
+TELEGRAM := $(shell grep -qs '^TELEGRAM_DSN=telegram://' .env.local && echo 1)
+demo: ## make demo [PACE=2] [LEASH_MODEL=ollama]; dashboard on http://127.0.0.1:$${LEASH_PORT:-8000}/
+	@echo "Dashboard: http://127.0.0.1:$${LEASH_PORT:-8000}/   Inbox: /inbox (user approver, APPROVER_PASSWORD in .env.local)"
+	$(DEMO_RUN) sh -c 'trap "trap - EXIT INT TERM; kill 0" EXIT INT TERM; \
+	  php -S 0.0.0.0:8000 -t public >/dev/null 2>&1 & \
+	  bin/console messenger:consume async -q & \
+	  $(if $(TELEGRAM),bin/console leash:telegram:poll -q &) \
+	  sleep 2; LEASH_REPLAY_PACE=$(PACE) bin/console leash:demo:prepare $(if $(LEASH_MODEL),--model=$(LEASH_MODEL)); \
+	  echo "Replay done. Answer the editor sign-off in the inbox; Ctrl-C stops the demo."; wait'
 
 cs-fix:
 	$(RUN) vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php

@@ -19,7 +19,7 @@ final class SeatPanelMatchesServerTest extends WerewolfMcpCase
         $phases = [];
         $checked = 0;
         ReplayedDemoGame::play($this->browser->getContainer(), function (int $step) use (&$phases, &$checked): void {
-            // The service behind /dashboard/werewolf/{id}.json (DashboardWerewolfTest covers the route).
+            // The service behind /dashboard/werewolf/{id} (DashboardWerewolfTest covers the route).
             $view = ReplayedDemoGame::service($this->browser->getContainer(), WerewolfSpectator::class)->view(ReplayedDemoGame::ID, false);
             self::assertNotNull($view);
             $phases[$view['phase']] = true;
