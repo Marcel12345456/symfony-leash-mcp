@@ -166,6 +166,8 @@
 
 - 2026-11-12: Video MRTR moment = A, the Doc Review editor sign-off in the replay (human). README and both library READMEs reviewed by the human ("looks good", "both are good"); the README diagram fix (`4d9e5a1`) still needs a PR into `main`.
 
+- 2026-11-12: `docs/video-recording-guide.md`: step-by-step recording guide for the human (Inspector wolf/villager as two clips because both Inspectors need port 8000; shots 10–55 s from one `make demo` run; sign-off via `/inbox`). `ReadmeTest` checks its make targets and links.
+
 ## Test changes
 
 - 2026-11-12: Refund Desk retired (decisions/022; code at tag `refund-desk-v1`). Removed `tests/Integration/RefundDesk/SeedDemoCommandTest.php` (refund seed C1–C8 + H5 idempotent, reset to `received`, C3 injection). Replacement: `tests/Integration/DocReview/SeedDemoCommandTest.php` (new `leash:demo:seed` run twice, d1–d3 in `drafting`, d2 brief mentions Node 18 but not upgrade notes).

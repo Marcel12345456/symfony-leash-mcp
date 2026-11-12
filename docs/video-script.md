@@ -32,6 +32,8 @@ Based on PLAN §10 (headline storyboard), adjusted to what the build shows today
 
 ## Recording checklist
 
+Step by step: [`video-recording-guide.md`](video-recording-guide.md).
+
 - `make install`, then `make demo` in a clean browser profile, 1920×1080, light or dark (both work).
 - Inspector split screen first (before `make demo` replaces the game): `docker compose run --rm php bin/console leash:werewolf:play --seed=8 --max-steps=0`.
 - The replay restarts on every `make demo`; `PACE=2` gives about 2 s per model answer. For the Doc Review shot, wait
