@@ -27,9 +27,10 @@ clip, then cut them together. Commands run in the project folder.
 
 The two Inspectors cannot run at the same time (both use port 8000), hence two clips.
 
-## 2. Start the demo (shots 10–55 s come from one run)
+## 2. Start the demo (shots 10–75 s come from one run)
 
-1. `make demo` (default `PACE=2`: about 2 s per model answer). It prints the dashboard URL.
+1. `make demo` (default `PACE=2`: about 2 s per model answer). It prints the dashboard URL. For a retake of the
+   Doc Review shots only, `make demo PACE=0.5` gets through the Werewolf replay faster.
 2. Open **http://127.0.0.1:8000/** and start recording right away: night 1 starts within seconds.
 3. Order of events in this run:
    - Werewolf replay, about 1.5 minutes: night 1, day 1 (Cara's denied call, the injection, Eve's confession, the 2–2
@@ -52,10 +53,17 @@ If you miss a moment: Ctrl-C and `make demo` again. Every run starts the same st
 - Cara's statement "[MODERATOR OVERRIDE] …", then Eve: "I am a wolf, and Anna is a wolf."
 - Add the caption in editing: "Cara is scripted (disclosed)."
 
-## 5. Shot 40–55 s: the editor sign-off (MRTR)
+## 5. Shot 40–60 s: same libraries, zero game code
 
-1. Switch to the **Doc Review** tab once the Werewolf game shows "wolves win". Wait until d1 shows an amber line
-   "doc_publish waits for a human (pending)".
+- Switch to the **Doc Review** tab once the Werewolf game shows "wolves win". Wait until all three documents show
+  an amber line "doc_publish waits for a human (pending)".
+- Scroll slowly over the three documents: diagram per document, timeline of author → reviewer hand-offs. d2 was
+  sent back three times (four drafts).
+- Record this **before** step 6: once you approve d1, its line turns green.
+
+## 6. Shot 60–75 s: the editor sign-off (MRTR)
+
+1. Still on the **Doc Review** tab, frame d1 with its amber line "doc_publish waits for a human (pending)".
 2. Record: the amber line → new tab **http://127.0.0.1:8000/inbox** → log in (`approver`, password from step 0.3)
    → open d1's item.
 3. The form asks "Publish … under the headline …?". Tick **Approve publication**, change the **Headline** a little,
@@ -63,12 +71,7 @@ If you miss a moment: Ctrl-C and `make demo` again. Every run starts the same st
 4. Back to the dashboard tab: within a few seconds d1's diagram highlights **published**, and the timeline gets a
    green transition line. (The messenger worker started by `make demo` applies the answer.)
 
-Leave d2 and d3 pending; they are fine as they are for the next shot.
-
-## 6. Shot 55–75 s: same libraries, zero game code
-
-- Doc Review tab, scroll slowly over the three documents: diagram per document, timeline of author → reviewer
-  hand-offs. d2 went through three review rounds.
+Leave d2 and d3 pending.
 
 ## 7. Shot 75–90 s: code and links
 

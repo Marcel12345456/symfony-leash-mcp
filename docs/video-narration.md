@@ -63,23 +63,7 @@ flat and cold, like a verdict.
 
 ---
 
-### 4 · 40–55 s · A human steps in (28 words)
-
-```
-Some calls need a human.
-
-The agent asks to publish... and the request simply waits.
-
-[pause] An editor approves, from the inbox.
-
-[pause] The original call resumes. [firmly] Applied exactly once.
-```
-
-Direction: release after the peak, warmer; a small lift on "resumes".
-
----
-
-### 5 · 55–75 s · Same libraries (33 words)
+### 4 · 40–60 s · Same libraries (33 words)
 
 ```
 Now, a different world entirely.
@@ -91,7 +75,23 @@ One draft went back three times.
 [pause] Same two libraries. [pause] Zero game code.
 ```
 
-Direction: matter-of-fact, confident; let "Zero game code" stand alone.
+Direction: release after the peak; matter-of-fact, confident; let "Zero game code" stand alone.
+
+---
+
+### 5 · 60–75 s · A human steps in (28 words)
+
+```
+Some calls need a human.
+
+The agent asks to publish... and the request simply waits.
+
+[pause] An editor approves, from the inbox.
+
+[pause] The original call resumes. [firmly] Applied exactly once.
+```
+
+Direction: warmer, the human beat; a small lift on "resumes".
 
 ---
 
@@ -116,4 +116,4 @@ Direction: slow, final. A long breath before "not in the prompt."
 - Segment 3 says "a wolf confesses": wolf Eve gives away her own role after Cara's fake override. The server leaked
   nothing; that is the point (see the injection decision in `video-script.md`).
 - Cara is scripted. The caption "Cara is scripted (disclosed)" belongs on screen in shot 3, not in the voice.
-- Music: a low suspense bed under segments 1–3, lift it slightly in 4, fade out under 6.
+- Music: a low suspense bed under segments 1–3, lift it slightly in 4 and 5, fade out under 6.
