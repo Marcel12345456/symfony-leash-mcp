@@ -17,7 +17,7 @@
 - Done-signal green: `.claude/done.sh` (274 tests), `ReadmeTest`, `TestMatrixTest`, `.claude/bin/clean-clone.sh` 99 s (budget 300 s); repo and video open logged out.
 - Upstream issues filed: symfony/ai #3034–#3037, php-sdk #767–#768 (re-checked against 1.0.0-BETA1/main and 0.10.0/main; ai-bundle HTTP-client report not filed, not reproducible upstream). Linked in README, BUGS.md, docs/upstream-issues.md.
 - Upstream status checked 2026-11-22 (public GitHub API): all 6 open, 0 comments, no linked PRs; symfony/ai #3034–#3036 triaged with label `Platform`, #3037 and php-sdk #767/#768 unlabelled. Nothing to act on.
-- Left for the human: submit the form if not done (deadline Sun 11-22 18:00 CET). Untracked `docs/plans/dashboard-visual-upgrade.md` is set aside by the human: leave it alone, don't raise it. Optional: bind the demo port to 127.0.0.1 (`compose.yaml:11`), live Telegram smoke test, `make tournament`.
+- Submitted (human confirmed 2026-11-22). Left for the human: Untracked `docs/plans/dashboard-visual-upgrade.md` is set aside by the human: leave it alone, don't raise it. Optional: bind the demo port to 127.0.0.1 (`compose.yaml:11`), live Telegram smoke test, `make tournament`.
 - Blocked: none.
 
 ## Next prompt
