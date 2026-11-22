@@ -41,6 +41,7 @@ final class ReadmeTest extends TestCase
         yield 'README' => ['README.md'];
         yield 'WorkflowMcp' => ['lib/WorkflowMcp/README.md'];
         yield 'HumanInput' => ['lib/HumanInput/README.md'];
+        yield 'video recording guide' => ['docs/video-recording-guide.md'];
     }
 
     #[DataProvider('documents')]

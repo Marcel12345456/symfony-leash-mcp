@@ -12,6 +12,8 @@ agent's turn.**
 Built for the Symfony AI & PHP MCP SDK hackathon. Demo: six LLM agents play **Werewolf** over MCP. Second demo:
 **Doc Review**, on the same libraries with no game code.
 
+**Video (90 s):** [youtu.be/PWASS9KTacQ](https://youtu.be/PWASS9KTacQ) (narration: AI voice, ElevenLabs)
+
 ## Quick start (no model needed)
 
 Requirements: Docker and `make`. PHP 8.4, Composer and SQLite run in the toolchain container (`compose.yaml`).
@@ -35,6 +37,10 @@ LEASH_MODEL=ollama make work         # the Doc Review agents over the open docum
 ```
 
 Set `LEASH_OLLAMA_MODEL` in `.env.local` to the tag Ollama lists (e.g. `qwen3:latest`).
+
+Models run locally on Ollama (`qwen3`); the recorded demo needs no API key at all. The Hugging Face platform bridge
+is installed and configured, but no Inference Providers tokens were available to us during the hackathon, so
+`LEASH_MODEL` offers `replay` and `ollama` only.
 
 ## What you are seeing
 
