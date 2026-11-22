@@ -15,7 +15,7 @@
 
 - Phase: **M8 Hardening, README, video, submit — automatable part done**, branch `m/phase-8-hardening-submit` (pushed, from `main`; [R], unmerged).
 - Done-signal green: (1) `docs/test-matrix.md` + `TestMatrixTest` (all 39 PLAN §7 items; gaps L5, L6, D2, D3 filled); (2) `ReadmeTest` (README per §9, make targets, links; both library READMEs); (3) `.claude/bin/clean-clone.sh` 24 s (budget 300 s); (4) `.claude/done.sh` green (271 tests).
-- Reviewed: README and library READMEs; MRTR moment on video = A (editor sign-off). Left for the human: PR with the README diagram fix into `main`; review `docs/upstream-issues.md` (then file the 7 issues) and `docs/video-script.md`; record, edit, upload the 90 s video; add the video link (and optionally a spectator GIF) to the README; merge; submit by Sat 11-21 20:00 CET. Optional: live Telegram smoke test, `make tournament`.
+- Video done (2026-11-22): https://youtu.be/PWASS9KTacQ, 90.8 s, cut from the human's clips + ElevenLabs narration (script outside the repo); linked in the README with the AI-voice disclosure, plus a note that models run on Ollama (no HF Inference Providers tokens). Left for the human: merge into `main`, make the repo public, submit by Sun 11-22 18:00 CET. Optional: file `docs/upstream-issues.md`, live Telegram smoke test, `make tournament`.
 - Blocked: none.
 
 ## Next prompt
