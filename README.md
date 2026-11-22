@@ -152,6 +152,11 @@ publish:
 ## Bugs found upstream
 
 The pre-release libraries had bugs. Each is in [`BUGS.md`](BUGS.md) with a minimal repro and the local workaround.
+Re-checked against symfony/ai 1.0.0-BETA1 / main and mcp/sdk 0.10.0 / main, and filed: symfony/ai
+[#3034](https://github.com/symfony/ai/issues/3034), [#3035](https://github.com/symfony/ai/issues/3035),
+[#3036](https://github.com/symfony/ai/issues/3036), [#3037](https://github.com/symfony/ai/issues/3037); mcp/sdk
+[#767](https://github.com/modelcontextprotocol/php-sdk/issues/767),
+[#768](https://github.com/modelcontextprotocol/php-sdk/issues/768).
 
 ## Commands
 

@@ -1,16 +1,21 @@
-# Upstream issues, ready to file
+# Upstream issues (filed 2026-11-22)
 
-Issue texts for the reproduced bugs in [`BUGS.md`](../BUGS.md), for a human to file (PLAN M8). Before filing: check
-the tracker for an existing issue and try the latest release; check the repository URL. The "Candidates" in
+Issue texts for the reproduced bugs in [`BUGS.md`](../BUGS.md), for a human to file (PLAN M8). The "Candidates" in
 `BUGS.md` are not reproduced and are not here.
+
+Re-checked on 2026-11-22 against the latest code: symfony/ai v1.0.0-BETA1 and main (f56c759), mcp/sdk v0.10.0 and
+main (7155eae). Issues 1–4 were re-run in Docker against BETA1 and dev-main; 5–7 were checked by reading the code.
+Parts already fixed upstream were dropped, and issue 4 is not filed (see there).
 
 Trackers: `symfony/ai-*` → https://github.com/symfony/ai/issues, `mcp/sdk` → https://github.com/modelcontextprotocol/php-sdk/issues.
 
 ---
 
-## 1. [Platform] JsonSchema Factory: nullable enum excludes null, nullable properties are required, draft-4 `exclusiveMinimum`
+## 1. [Platform] JsonSchema Factory: nullable properties without default are required; NotBlank emits OpenAPI "nullable"
 
-**Package:** symfony/ai-platform 0.15.0
+**Filed:** https://github.com/symfony/ai/issues/3034
+
+**Package:** symfony/ai-platform 1.0.0-BETA1 / main (f56c759)
 
 ```php
 enum Verdict: string { case Keep = 'keep'; case Drop = 'drop'; }
@@ -19,7 +24,7 @@ final class ReviewInput
 {
     public function __construct(
         #[Assert\Positive] public int $score,
-        public ?string $note,
+        #[Assert\NotBlank] public ?string $note,
         public ?Verdict $previous = null,
     ) {}
 }
@@ -27,43 +32,46 @@ final class ReviewInput
 $schema = (new Symfony\AI\Platform\Contract\JsonSchema\Factory())->buildProperties(ReviewInput::class);
 ```
 
-**Actual**
-- `previous` → `{"type": ["string", "null"], "enum": ["keep", "drop"]}`: `null` fails the enum, so the declared type can never be sent.
-- `note` is listed in `required` although it is nullable (debatable, but then clients must send `null`).
-- `score` gets `"exclusiveMinimum": true` (draft-4 boolean form); JSON Schema 2020-12 expects a number.
-- `NotBlank` adds OpenAPI's `nullable` keyword.
+**Actual (main):** `{"score":{"type":"integer","exclusiveMinimum":0},"note":{"type":["string","null"],"nullable":false,"minLength":1},"previous":{"type":["string","null"],"enum":["keep","drop",null]},…,"required":["score","note"]}`
+- `note` is required although it is nullable.
+- `NotBlank` adds OpenAPI's `nullable` keyword, which is not JSON Schema, and here it is `false` while `type` allows `null`.
 
-**Expected:** `enum` includes `null` for nullable enums; numeric `exclusiveMinimum`; no OpenAPI-only keywords.
+(The enum/null and `exclusiveMinimum` problems are fixed on main by #2836 and #2888, but are still present in
+1.0.0-BETA1.)
+
+**Expected:** no OpenAPI-only keywords. Either nullable properties are optional, or this is documented.
 
 **Context:** MCP servers publish these schemas as tool `inputSchema`; strict clients reject or mis-fill them. We
 normalise the output ourselves.
 
 ---
 
-## 2. [Platform] JsonSchema Factory: `mixed` and union properties produce wrong schemas and PHP warnings
+## 2. [Platform] JsonSchema Factory: mixed property produces {"type":["null"]} and PHP warnings
 
-**Package:** symfony/ai-platform 0.15.0
+**Filed:** https://github.com/symfony/ai/issues/3035
+
+**Package:** symfony/ai-platform 1.0.0-BETA1 / main (f56c759)
 
 ```php
 final class X
 {
-    public function __construct(public mixed $anything = null, public int|string $either = 1) {}
+    public function __construct(public mixed $anything = null) {}
 }
 (new Symfony\AI\Platform\Contract\JsonSchema\Factory())->buildProperties(X::class);
 ```
 
-**Actual:** `anything` → `{"type": ["null"]}` (only `null` is valid); `either` → `[]` (no type); two warnings
-`Undefined array key "type"` in `Contract/JsonSchema/Describer/TypeInfoDescriber.php` line 77.
-(A plain `object` throws `InvalidArgumentException`, which is fine.)
+**Actual:** `anything` → `{"type": ["null"]}`, plus two warnings `Undefined array key "type"` in
+`src/Contract/JsonSchema/Describer/TypeInfoDescriber.php` line 77. `mixed` counts as nullable but has no type schema.
 
-**Expected:** `mixed` → no type constraint, or an exception; `int|string` → `{"type": ["integer", "string"]}`, or an
-exception. No warnings.
+**Expected:** `mixed` → no type constraint (or an exception), and no warnings.
 
 ---
 
 ## 3. [Platform] `RecordingProvider` default signature ignores the message content
 
-**Package:** symfony/ai-platform 0.15.0
+**Filed:** https://github.com/symfony/ai/issues/3036
+
+**Package:** symfony/ai-platform 1.0.0-BETA1 / main (f56c759)
 
 ```php
 $platform = new Platform([new RecordingProvider($provider, new Cassette($path), record: true)]);
@@ -76,33 +84,31 @@ $platform->invoke('m', new MessageBag(Message::ofUser('b')))->getResult();
 `MessageBag` (private properties, no `JsonSerializable`) encodes as `{}`. Replay then serves answers FIFO in global
 call order, so a changed prompt silently gets the old answer. `Cassette` also has no way to read all interactions.
 
-**Expected:** the signature reflects the messages (normalise the bag), or the documentation requires a custom
-signature closure.
+**Expected:** the signature reflects the messages, e.g. normalise the bag with the `MessageBagNormalizer` added in
+#2799, or the documentation requires a custom signature closure.
 
 ---
 
-## 4. [AI Bundle] `ai.platform.ollama` ignores the configured HTTP client
+## 4. Not filed: `ai.platform.ollama` and the configured HTTP client
 
-**Package:** symfony/ai-bundle 0.15.0 with symfony/ai-ollama-platform 0.15.0
-
-**Repro:** configure `ai.platform.ollama.http_client` with a scoped client that has `timeout: 3` (or set
-`framework.http_client.default_options.timeout: 3`); call a slow model (e.g. `qwen3` with a long prompt).
-
-**Actual:** fails with `Idle timeout reached` after 60.2 s both times. With `php -d default_socket_timeout=3` it fails
-after 3.2 s, so the platform's client takes its timeout from `default_socket_timeout`.
-
-**Expected:** the configured `http_client`, and its timeout, is used.
+Not reproducible upstream (re-checked 2026-11-22): in a minimal kernel on 0.15.0 and main, a configured client
+timeout of 3 s was honoured (`AiBundle` passes `new Reference($platform['http_client'])`). The 60 s timeout seen in
+Leash is most likely our own configuration, e.g. a scoped client only applies to URLs matching its `base_uri`.
+Earlier related issues #899 and #917 are closed.
 
 ---
 
 ## 5. [Ollama Platform] Token usage has no total
 
-**Package:** symfony/ai-ollama-platform 0.15.0
+**Filed:** https://github.com/symfony/ai/issues/3037
+
+**Package:** symfony/ai-ollama-platform 1.0.0-BETA1 / main (f56c759)
 
 **Repro:** an agent call on `ai.platform.ollama` (`qwen2.5:7b`), then
 `$result->getMetadata()->get('token_usage')->getTotalTokens()`.
 
-**Actual:** prompt 425, completion 59, total `null`.
+**Actual:** prompt 425, completion 59, total `null`. `Bridge/Ollama/TokenUsageExtractor.php` builds `TokenUsage`
+without `totalTokens`.
 
 **Expected:** total = prompt + completion (Ollama returns `prompt_eval_count` and `eval_count`).
 
@@ -110,23 +116,31 @@ after 3.2 s, so the platform's client takes its timeout from `default_socket_tim
 
 ## 6. [Client] `callTool()` cannot defer `input_required` or send a later retry (MRTR)
 
-**Package:** mcp/sdk 0.9.0
+**Filed:** https://github.com/modelcontextprotocol/php-sdk/issues/767
+
+**Package:** mcp/sdk 0.9.0; still present in v0.10.0 and main (7155eae)
 
 **Repro:** `$client->callTool('x', [...])` against a tool that returns `InputRequiredResult`, from a client that wants
 to park the request until a human answers hours later.
 
-**Actual:** `Client\Protocol::request()` always resolves rounds through the elicitation handlers (at most 10,
-`Client/Protocol.php` around lines 555–620). `requestState` is never exposed, and `callTool()` takes no
-`inputResponses` / `requestState`. Throwing from the callback gives a message-only `RuntimeException`.
+**Actual:** `Client\Protocol::request()` always resolves rounds through the elicitation handlers
+(`src/Client/Protocol.php:560-627`, `MAX_ROUND_TRIPS` at line 69). `requestState` is never exposed, and `callTool()`
+takes no `inputResponses` / `requestState`. Throwing from the callback gives a message-only `RuntimeException`
+(`InputRequestResolver.php:145,163`).
 
 **Expected:** an option to return the raw `InputRequiredResult`, and a way to send the retry with `inputResponses`
-and `requestState`. Deferral is what multi-round-trip requests are designed for.
+and `requestState`. Deferral is what multi-round-trip requests are designed for. I understand automatic resolution
+is deliberate (#456); this asks for an opt-out next to it. The Tasks extension (#428) covers task-augmented
+requests, not plain MRTR.
 
 ---
 
 ## 7. [Client] `Builder::addRequestHandler()` rejects the SDK's own handlers under PHPStan
 
-**Package:** mcp/sdk 0.9.0
+**Filed:** https://github.com/modelcontextprotocol/php-sdk/issues/768
+
+**Package:** mcp/sdk 0.9.0; still present in v0.10.0 and main (`src/Client/Builder.php:177-179`,
+`src/Client/Handler/Request/RequestHandlerInterface.php:21`)
 
 ```php
 Client::builder()->addRequestHandler(new ElicitationRequestHandler($callback));

@@ -9,6 +9,7 @@
 - Actual: `expects RequestHandlerInterface<mixed>, ElicitationRequestHandler given` (template is invariant).
 - Expected: accepted; the template parameter should be covariant (`@template-covariant`) or the parameter typed `RequestHandlerInterface<*>`.
 - Workaround: inline `@phpstan-ignore argument.type` with comment in `src/Spike/SpikeMcpCommand.php`.
+- Upstream: https://github.com/modelcontextprotocol/php-sdk/issues/768 (still present in v0.10.0 and main).
 
 ## symfony/ai-ollama-platform 0.15.0 — no total token count
 
@@ -16,6 +17,7 @@
 - Actual: `TokenUsageAggregation` with prompt 425, completion 59, `getTotalTokens()` = null.
 - Expected: total = prompt + completion (Ollama returns `prompt_eval_count` and `eval_count`).
 - Workaround: compute prompt + completion ourselves (`src/Spike/SpikeLlmToolCommand.php`; later SpendGuard).
+- Upstream: https://github.com/symfony/ai/issues/3037 (still present in 1.0.0-BETA1 and main).
 
 ## symfony/ai-bundle 0.15.0 — `ai.platform.ollama` ignores the framework HTTP client config
 
@@ -23,6 +25,7 @@
 - Actual: fails with `Idle timeout reached` after 60.2 s both times; with `php -d default_socket_timeout=3` it fails after 3.2 s. The platform uses an HTTP client that takes its timeout from `default_socket_timeout`, not the configured client.
 - Expected: the configured `http_client` (and its timeout) is used.
 - Workaround: `default_socket_timeout=300` in `docker/php/leash.ini`.
+- Upstream: not filed. Not reproducible in a minimal kernel on 0.15.0 or main (2026-11-22): the configured timeout was honoured. Most likely our own configuration (a scoped client only applies to URLs matching its `base_uri`).
 
 ## symfony/ai-platform 0.15.0 — `JsonSchema\Factory` emits invalid/unusable schema for nullable and constrained properties
 
@@ -30,6 +33,7 @@
 - Actual: `previous` → `{type: ["string","null"], enum: ["keep","drop"]}` (null fails the enum); `note` is in `required` although nullable; `score` gets draft-4 boolean `exclusiveMinimum: true`; NotBlank emits OpenAPI `nullable`.
 - Expected: `enum` includes `null` for nullable enums; JSON Schema 2020-12 numeric `exclusiveMinimum`; no OpenAPI keywords. (Required-for-nullable is debatable; MCP clients then must send `null`.)
 - Workaround: `Leash\WorkflowMcp\Schema\SchemaFactory::normalize()` (decisions/013, 015).
+- Upstream: https://github.com/symfony/ai/issues/3034 (required nullable properties, OpenAPI `nullable`). The enum/null and `exclusiveMinimum` parts are fixed on main by symfony/ai#2836 and #2888 (after 1.0.0-BETA1).
 
 ## symfony/ai-platform 0.15.0 — `RecordingProvider` default signature is content-blind
 
@@ -37,6 +41,7 @@
 - Actual: equal. `defaultSignature` hashes `json_encode([model, $input, $options])`; `MessageBag` has only private properties and no `JsonSerializable`, so it encodes as `{}`. Replay matches FIFO in global call order and serves wrong answers silently after a prompt change. `Cassette` also has no way to read all interactions.
 - Expected: the signature reflects the messages (normalize the bag, or serialize messages), or the docs require a custom signature closure.
 - Workaround: own per-seat cassette `App\Agent\Replay\RecordingSeatProvider` + `ReplayPlatform` (decisions/033).
+- Upstream: https://github.com/symfony/ai/issues/3036 (still present in 1.0.0-BETA1 and main).
 
 ## symfony/ai-platform 0.15.0 — `JsonSchema\Factory` turns `mixed` and union properties into wrong schemas
 
@@ -44,6 +49,7 @@
 - Actual: `anything` → `{"type": ["null"]}` (only null is valid); `either` → `[]` (no type at all), with two PHP warnings `Undefined array key "type"` from `TypeInfoDescriber.php:77`. A plain `object` type throws `InvalidArgumentException` ("Cannot build schema from plain object type"), which is fine.
 - Expected: `mixed` → no type constraint (or an exception); `int|string` → `{"type": ["integer", "string"]}` (or an exception), no warnings.
 - Workaround: `Leash\WorkflowMcp\Schema\SchemaFactory::assertDescribable()` refuses such input classes with a `LogicException` naming class and property (`SchemaFactoryTest::testUnsupportedPropertyTypesFailLoudly`).
+- Upstream: https://github.com/symfony/ai/issues/3035 (`mixed` only; union types are fixed in 1.0.0-BETA1).
 
 ## Candidates (from code reading, not yet reproduced)
 
@@ -61,3 +67,4 @@
 - Actual: `Client\Protocol::request()` always auto-resolves rounds through elicitation handlers (max 10, `Client/Protocol.php:555-620`); `requestState` is never exposed, and `callTool()` has no parameter for `inputResponses`/`requestState`. Throwing from the callback yields a message-only `RuntimeException`.
 - Expected: an option to return the raw `InputRequiredResult`, and a way to send a retry with `inputResponses` + `requestState` (MRTR is designed for exactly this deferral).
 - Workaround: raw JSON-RPC client `Leash\HumanInput\Client\RawMcpClient` (decisions/017, 021).
+- Upstream: https://github.com/modelcontextprotocol/php-sdk/issues/767 (still present in v0.10.0 and main).
