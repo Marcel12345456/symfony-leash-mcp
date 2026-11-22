@@ -189,6 +189,11 @@ set. Tested against a mocked Telegram API; not yet against a live bot.
   answer is still applied; a declined Doc Review document needs a live model for the author's next draft.
 - MCP clients must support form elicitation to receive `input_required`.
 
+**How this was built:** Claude Code wrote the code; I set the direction, made the decisions and approved every step.
+It worked under rules it couldn't change (a hook-enforced Definition of Done, human gates for every merge, decision
+records instead of guesses), the same idea Leash is about. See [`.claude/`](.claude/) and
+[`docs/decisions/`](docs/decisions/).
+
 ## License
 
 MIT
