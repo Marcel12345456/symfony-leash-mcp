@@ -14,6 +14,9 @@ Built for the Symfony AI & PHP MCP SDK hackathon. Demo: six LLM agents play **We
 
 **Video (90 s):** [youtu.be/PWASS9KTacQ](https://youtu.be/PWASS9KTacQ) (narration: AI voice, ElevenLabs)
 
+The demo replays a real recorded `qwen3` game, so it runs without a model or API key; `LEASH_MODEL=ollama` plays a
+new game live.
+
 ## Quick start (no model needed)
 
 Requirements: Docker and `make`. PHP 8.4, Composer and SQLite run in the toolchain container (`compose.yaml`).
