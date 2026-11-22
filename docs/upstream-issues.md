@@ -7,6 +7,9 @@ Re-checked on 2026-11-22 against the latest code: symfony/ai v1.0.0-BETA1 and ma
 main (7155eae). Issues 1–4 were re-run in Docker against BETA1 and dev-main; 5–7 were checked by reading the code.
 Parts already fixed upstream were dropped, and issue 4 is not filed (see there).
 
+**Status 2026-11-22 (evening):** all six open, no maintainer comments, no linked PRs. symfony/ai #3034–#3036 labelled
+`Platform`; #3037, php-sdk #767 and #768 not yet triaged.
+
 Trackers: `symfony/ai-*` → https://github.com/symfony/ai/issues, `mcp/sdk` → https://github.com/modelcontextprotocol/php-sdk/issues.
 
 ---
