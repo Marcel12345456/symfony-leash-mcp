@@ -13,14 +13,15 @@
 
 ## Current
 
-- Phase: **M8 Hardening, README, video, submit — automatable part done**, branch `m/phase-8-hardening-submit` (pushed, from `main`; [R], unmerged).
-- Done-signal green: (1) `docs/test-matrix.md` + `TestMatrixTest` (all 39 PLAN §7 items; gaps L5, L6, D2, D3 filled); (2) `ReadmeTest` (README per §9, make targets, links; both library READMEs); (3) `.claude/bin/clean-clone.sh` 24 s (budget 300 s); (4) `.claude/done.sh` green (271 tests).
-- Video done (2026-11-22): https://youtu.be/PWASS9KTacQ, 90.8 s, cut from the human's clips + ElevenLabs narration (script outside the repo); linked in the README with the AI-voice disclosure, plus a note that models run on Ollama (no HF Inference Providers tokens). Left for the human: merge into `main`, make the repo public, submit by Sun 11-22 18:00 CET. Optional: file `docs/upstream-issues.md`, live Telegram smoke test, `make tournament`.
+- Phase: **M8 done — submitted-ready** (2026-11-22). `main` has everything; repo public (https://github.com/Marcel12345456/symfony-leash-mcp), video https://youtu.be/PWASS9KTacQ (90.8 s). Branch `m/phase-8-hardening-submit` = `main` + this handoff.
+- Done-signal green: `.claude/done.sh` (274 tests), `ReadmeTest`, `TestMatrixTest`, `.claude/bin/clean-clone.sh` 99 s (budget 300 s); repo and video open logged out.
+- Upstream issues filed: symfony/ai #3034–#3037, php-sdk #767–#768 (re-checked against 1.0.0-BETA1/main and 0.10.0/main; ai-bundle HTTP-client report not filed, not reproducible upstream). Linked in README, BUGS.md, docs/upstream-issues.md.
+- Left for the human: submit the form if not done (deadline Sun 11-22 18:00 CET). Untracked `docs/plans/dashboard-visual-upgrade.md`: keep or delete. Optional: bind the demo port to 127.0.0.1 (`compose.yaml:11`), live Telegram smoke test, `make tournament`.
 - Blocked: none.
 
 ## Next prompt
 
-/phase M8 — the human reviewed the README and video script; continue with their feedback and the video link
+/phase M8 — after submission: check the 6 upstream issues for maintainer replies and decide on docs/plans/dashboard-visual-upgrade.md
 
 ## M5 notes
 
@@ -170,6 +171,16 @@
 
 - 2026-11-12: `docs/video-narration.md`: ElevenLabs narration, six segments timed to the shots (≤ 2.2 words/s, checked by word count), delivery directions, AI-voice disclosure note.
 
+- 2026-11-22: Video cut from the human's prerecorded clips with ffmpeg in Docker (render script kept outside the repo, `~/Desktop/video-audio/`): sequential wolf/villager Inspector shots instead of side by side (unreadable at half width), zoom on the public log for the injection, continuous Doc Review take crossfading into the inbox, ~1.8 s pause after "The model did not." Human approved ("perfect").
+
+- 2026-11-22: README says why models run on Ollama: the HF bridge is installed but no Inference Providers tokens were available, so `LEASH_MODEL` is `replay|ollama` (the brief allows any provider). First screen also says the demo replays a real recorded `qwen3` game and how to run it live.
+
+- 2026-11-22: README "How this was built" (human's wording choice): the human set the direction, made the design decisions and approved every step; Claude Code wrote the code, under rules it couldn't change. Placed as a paragraph before "License" because `ReadmeTest` pins the `##` headings.
+
+- 2026-11-22: Upstream issues re-checked against the latest releases before filing (symfony/ai 1.0.0-BETA1/main f56c759, mcp/sdk 0.10.0/main 7155eae): JsonSchema issues narrowed to what is still broken (enum/null and `exclusiveMinimum` fixed by symfony/ai#2836, #2888; unions fixed); ai-bundle HTTP-client timeout not filed (configured timeout honoured in a minimal kernel; likely our scoped-client `base_uri`). Filed by the human: symfony/ai #3034–#3037, php-sdk #767–#768.
+
+- 2026-11-22: Pre-publication check: gitleaks over all 143 commits (no leaks), commit emails are GitHub noreply only, no binaries/local paths/internal hosts in history. Repo made public by the human.
+
 ## Test changes
 
 - 2026-11-12: Refund Desk retired (decisions/022; code at tag `refund-desk-v1`). Removed `tests/Integration/RefundDesk/SeedDemoCommandTest.php` (refund seed C1–C8 + H5 idempotent, reset to `received`, C3 injection). Replacement: `tests/Integration/DocReview/SeedDemoCommandTest.php` (new `leash:demo:seed` run twice, d1–d3 in `drafting`, d2 brief mentions Node 18 but not upgrade notes).
@@ -198,6 +209,8 @@
 ## Log
 
 <!-- One entry per phase or unattended stretch: done, blocked, needs review, spend used. -->
+
+- 2026-11-22 — M8 done (with human). Done: video cut + narration (https://youtu.be/PWASS9KTacQ), README video link, Ollama/HF note, replay sentence, "How this was built"; pre-publication secret scan; upstream issues re-checked and filed (symfony/ai #3034–#3037, php-sdk #767–#768) and linked; branch merged into `main` and repo made public by the human. Blocked: none. Needs review: none open (human reviewed the video, README texts and issue texts before filing). Spend: $0.
 
 - 2026-11-12 — M8 automatable part (with human). Done: CI memory fix on M7 (phpunit 512M), M6/M7 merged by the human, decisions/039 (related work), §7 test matrix + `TestMatrixTest`, `SchemaFactory` refuses mixed/union types (BUGS.md), Choice/Email/Url pinned, Doc Review hand-off + rubric visibility test, library READMEs, `leash:tokens`, `make inspector CALLER/MCP`, `--max-steps=0`, README per §9 + `ReadmeTest`, clean-clone script (24 s), upstream issue texts, video script draft. Blocked: none. Needs review ([R]): README and library READMEs, `docs/upstream-issues.md`, `docs/video-script.md` (MRTR choice), `SchemaFactory::assertDescribable` (lib). Spend: $0.
 
